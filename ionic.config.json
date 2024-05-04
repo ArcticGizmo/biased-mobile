@@ -1,0 +1,7 @@
+{
+  "name": "kpop-cards",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "vue-vite"
+}

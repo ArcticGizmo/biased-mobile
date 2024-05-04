@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">K-Pop Cards</string>
+    <string name="title_activity_main">K-Pop Cards</string>
+    <string name="package_name">io.arcticgizmo.kpop.cards</string>
+    <string name="custom_url_scheme">io.arcticgizmo.kpop.cards</string>
+</resources>

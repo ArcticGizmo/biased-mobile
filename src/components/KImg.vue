@@ -1,5 +1,5 @@
 <template>
-  <div class="k-img" :style="{ aspectRatio, width, height }">
+  <div class="k-img" :class="{ background }" :style="{ aspectRatio, width, height }">
     <div v-if="state === 'fallback'" class="centered-container">
       <slot name="fallback">
         <IonIcon class="fallback-icon" :icon="imageOutline" />
@@ -33,6 +33,7 @@ const props = defineProps<{
   width?: number | string;
   height?: number | string;
   cover?: boolean;
+  background?: boolean;
 }>();
 
 const loading = ref(true);
@@ -66,8 +67,8 @@ const onWillLoad = () => {
 </script>
 
 <style scoped>
-.k-img {
-  border: 1px solid orange;
+.k-img.background {
+  background-color: rgba(0, 0, 0, 0.1);
 }
 
 .k-img > * {
@@ -79,6 +80,7 @@ const onWillLoad = () => {
   display: flex;
   justify-content: center;
   align-items: center;
+  flex-direction: column;
 }
 
 .fallback-icon {

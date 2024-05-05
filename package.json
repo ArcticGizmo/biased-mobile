@@ -5,16 +5,18 @@
     "type": "module",
     "scripts": {
         "dev": "vite",
-        "dev:android": "ionic capacitor run android -l --external",
-        "build": "vue-tsc && vite build",
+        "dev:android": "ionic capacitor run android -l --external --target=Pixel5_34",
+        "build": "vue-tsc && vite build && ionic build && ionic cap sync",
         "preview": "vite preview",
         "test:e2e": "cypress run",
         "test:unit": "vitest",
-        "lint": "eslint ."
+        "lint": "eslint .",
+        "emulator": "emulator -avd Pixel5_34"
     },
     "dependencies": {
         "@capacitor/android": "^6.0.0",
         "@capacitor/app": "^6.0.0",
+        "@capacitor/camera": "^6.0.0",
         "@capacitor/core": "^6.0.0",
         "@capacitor/device": "^6.0.0",
         "@capacitor/filesystem": "^6.0.0",
@@ -22,6 +24,7 @@
         "@capacitor/keyboard": "^6.0.0",
         "@capacitor/preferences": "^6.0.0",
         "@capacitor/status-bar": "^6.0.0",
+        "@ionic/pwa-elements": "^3.2.2",
         "@ionic/vue": "^7.0.0",
         "@ionic/vue-router": "^7.0.0",
         "@vueuse/core": "^10.9.0",

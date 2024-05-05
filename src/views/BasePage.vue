@@ -9,7 +9,7 @@
       </IonToolbar>
     </IonHeader>
     <IonLoading :is-open="loading" class="transparent-loading" />
-    <IonContent :fullscreen="true">
+    <IonContent>
       <slot></slot>
     </IonContent>
     <IonFooter>

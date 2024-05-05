@@ -1,2 +1,6 @@
 /* For information on how to create your own theme, please see:
 http://ionicframework.com/docs/theming/ */
+
+.segment-button-checked::part(indicator-background) {
+  border-bottom: 4px solid #0054e9;
+}

@@ -11,7 +11,8 @@ const routes: Array<RouteRecordRaw> = [
     children: [
       {
         path: '',
-        redirect: '/home'
+        // redirect: '/home'
+        redirect: '/creator'
       },
       {
         path: '/home',

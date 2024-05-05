@@ -17,5 +17,8 @@ export default defineConfig({
     // for test ultis
     // setupFiles: ['tests/unit/unit.setup.ts'],
     include: ['tests/**/*.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx}']
+  },
+  server: {
+    port: 8100
   }
 });

@@ -2,6 +2,7 @@ import { createRouter, createWebHistory } from '@ionic/vue-router';
 import { RouteRecordRaw } from 'vue-router';
 import HomePage from '../views/HomePage.vue';
 import TabsPage from '@/views/TabsPage.vue';
+import CreatorPage from '@/views/CreatorPage.vue';
 
 const routes: Array<RouteRecordRaw> = [
   {
@@ -17,6 +18,10 @@ const routes: Array<RouteRecordRaw> = [
         component: HomePage
       }
     ]
+  },
+  {
+    path: '/creator',
+    component: CreatorPage
   },
   {
     path: '/:pathMatch(.*)*',

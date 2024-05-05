@@ -2,9 +2,10 @@ import { ref, onMounted, watch } from 'vue';
 import { Camera, CameraResultType, CameraSource, GalleryPhoto, Photo } from '@capacitor/camera';
 import { Filesystem, Directory } from '@capacitor/filesystem';
 import { Preferences } from '@capacitor/preferences';
-import { isPlatform } from '@ionic/vue';
+import { alertController, isPlatform } from '@ionic/vue';
 import { Capacitor } from '@capacitor/core';
 import { useToast } from '@/composables/toast';
+import { sad } from 'ionicons/icons';
 
 // TODO: deal with permissions
 // TODO: allow image scaling to reduce file size
@@ -19,7 +20,7 @@ const encodeBase64Uri = (base64Data: string, format: string) => {
   return `data:image/${format};base64,${base64Data}`;
 };
 
-const convertBlobToBase64 = (blob: Blob) => {
+const convertBlobToBase64Uri = (blob: Blob) => {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
     reader.onerror = reject;
@@ -37,7 +38,7 @@ export const useImageImport = () => {
     const msg = error.message || '';
     if (msg !== 'User cancelled photos app') {
       console.error('unable to take photo', error);
-      showToast({ header: 'Oh no :(', message, color: 'danger' });
+      showToast({ message, color: 'danger', icon: sad });
     }
     return { ok: false, error };
   };
@@ -58,7 +59,7 @@ export const useImageImport = () => {
     // Fetch the photo, read as a blob, then convert to base64 format
     const response = await fetch(photo.webPath!);
     const blob = await response.blob();
-    return (await convertBlobToBase64(blob)) as string;
+    return (await convertBlobToBase64Uri(blob)) as string;
   };
 
   const takePhoto = async (): Promise<KPhotoResponse> => {
@@ -96,7 +97,39 @@ export const useImageImport = () => {
     }
   };
 
-  const photoFromUrl = async () => {};
+  const photoFromUrl = async (): Promise<KPhotoResponse> => {
+    const alert = await alertController.create({
+      subHeader: 'Enter your URL',
+      buttons: [
+        { text: 'Ok', role: 'ok' },
+        { text: 'cancel', role: 'cancel' }
+      ],
+      inputs: [{ name: 'url', label: 'URL', type: 'url', placeholder: 'https://the-hottest-idol...' }]
+    });
+    alert.present();
+
+    const alertResp = await alert.onDidDismiss<{ values: { url: string } }>();
+
+    if (alertResp.role !== 'ok') {
+      return { ok: false, error: 'cancelled' };
+    }
+
+    const url = alertResp.data?.values.url || '';
+
+    if (!url) {
+      return { ok: false, error: 'cancelled' };
+    }
+
+    try {
+      const resp = await fetch(url);
+      const blob = await resp.blob();
+      const base64Uri = (await convertBlobToBase64Uri(blob)) as string;
+      return { ok: true, photo: { base64Uri } };
+    } catch (error: any) {
+      console.error('unable to parse from url', error);
+      return handleError(error, "That link didn't work. Check your connection or try another one!");
+    }
+  };
 
   return { takePhoto, photoFromGallery, photoFromUrl };
 };

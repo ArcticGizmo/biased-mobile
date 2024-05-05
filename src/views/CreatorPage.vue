@@ -23,7 +23,7 @@ import BasePage from './BasePage.vue';
 import KImg from '@/components/KImg.vue';
 import { useImageImport } from '@/composables/imageImport';
 
-const { takePhoto, photoFromGallery } = useImageImport();
+const { takePhoto, photoFromGallery, photoFromUrl } = useImageImport();
 
 const onTakePicture = async () => {
   const resp = await takePhoto();
@@ -42,6 +42,7 @@ const onGetFromGallery = async () => {
 };
 
 const onGetFromUrl = async () => {
-  console.log('url');
+  const resp = await photoFromUrl();
+  console.log(resp);
 };
 </script>

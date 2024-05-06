@@ -1,19 +1,16 @@
 import { KPopCard } from '@/types';
 import { onMounted, readonly, ref, watch } from 'vue';
-import { Preferences } from '@capacitor/preferences';
 import { Filesystem, Directory } from '@capacitor/filesystem';
 import { isPlatform } from '@ionic/vue';
+import { useStorage } from './storage';
 
-const STORAGE_KEY = 'kpop-cards';
+const { saveValue, loadValue } = useStorage<KPopCard[]>('kpop-cards');
 
 const cards = ref<KPopCard[]>([]);
 const isLoading = ref(true);
 
 const cacheCards = () => {
-  Preferences.set({
-    key: STORAGE_KEY,
-    value: JSON.stringify(cards.value)
-  });
+  saveValue(cards.value);
 };
 
 watch(cards, cacheCards);
@@ -21,8 +18,7 @@ watch(cards, cacheCards);
 const loadSaved = async () => {
   isLoading.value = true;
 
-  const storageResp = await Preferences.get({ key: STORAGE_KEY });
-  const cardsOnDisk: KPopCard[] = storageResp.value ? JSON.parse(storageResp.value) : [];
+  const cardsOnDisk = (await loadValue()) || [];
 
   // // If running on the web...
   // if (!isPlatform('hybrid')) {

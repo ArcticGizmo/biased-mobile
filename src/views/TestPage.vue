@@ -8,23 +8,17 @@
 
 <script setup lang="ts">
 import BasePage from './BasePage.vue';
-import { IonButton, modalController } from '@ionic/vue';
-import ImageEditorModal from '@/components/ImageEditorModal.vue';
-import { onMounted } from 'vue';
+import { IonButton } from '@ionic/vue';
+import { useViteMessaging } from '@/vite/messaging';
 
-const URL = 'https://pbs.twimg.com/media/FuXgrrjWIAAH9_l?format=jpg&name=4096x4096';
+const { sendData } = useViteMessaging('store');
 
 const onGo = async () => {
-  const modal = await modalController.create({
-    component: ImageEditorModal,
-    componentProps: { src: URL }
-  });
-
-  modal.present();
-
-  const resp = await modal.onWillDismiss();
-  console.dir(resp);
+  try {
+    const resp = await sendData('eggplant');
+    console.dir(resp);
+  } catch (error) {
+    console.error(error);
+  }
 };
-
-onMounted(() => onGo());
 </script>

@@ -5,7 +5,16 @@ import checker from 'vite-plugin-checker';
 
 // https://vitejs.dev/config/
 export default defineConfig({
-  plugins: [vue(), checker({ vueTsc: true })],
+  plugins: [
+    vue({
+      template: {
+        compilerOptions: {
+          isCustomElement: tag => tag.startsWith('cropper-')
+        }
+      }
+    }),
+    checker({ vueTsc: true })
+  ],
   resolve: {
     alias: {
       '@': path.resolve(__dirname, './src')

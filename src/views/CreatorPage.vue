@@ -95,7 +95,7 @@ import BasePage from './BasePage.vue';
 import KImg from '@/components/KImg.vue';
 import { KPhotoResponse, useImageImport } from '@/composables/imageImport';
 import { ref, watch, computed } from 'vue';
-import { sadOutline, people, person, musicalNotes, calendar, heart, book, checkbox, closeCircle, checkmarkCircle } from 'ionicons/icons';
+import { sadOutline, people, person, musicalNotes, calendar, heart, closeCircle, checkmarkCircle } from 'ionicons/icons';
 import VTransition from '@/components/VTransition.vue';
 import PickerInput from '@/components/PickerInput.vue';
 

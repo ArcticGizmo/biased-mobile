@@ -12,6 +12,7 @@ import { sad } from 'ionicons/icons';
 
 export interface KPhoto {
   base64Uri: string;
+  format: string;
 }
 
 export type KPhotoResponse = { ok: true; photo: KPhoto } | { ok: false; error: any };
@@ -31,8 +32,56 @@ const convertBlobToBase64Uri = (blob: Blob) => {
   });
 };
 
+const limitDimensions = (width: number, height: number, maxSize: number) => {
+  if (width <= maxSize && height <= maxSize) {
+    return { width, height };
+  }
+
+  const aspectRatio = width / height;
+
+  if (aspectRatio > 1) {
+    return { width: maxSize, height: (height * maxSize) / width };
+  } else {
+    return { height: maxSize, width: (width * maxSize) / height };
+  }
+};
+
+const resizeMaxDimension = async (base64Uri: string, maxSize: number) => {
+  return new Promise<string>((resolve, reject) => {
+    const img = document.createElement('img');
+
+    img.onload = () => {
+      const canvas = document.createElement('canvas');
+      const ctx = canvas.getContext('2d')!;
+
+      const { width, height } = limitDimensions(img.width, img.height, maxSize);
+
+      canvas.width = width;
+      canvas.height = height;
+
+      ctx.drawImage(img, 0, 0, width, height);
+
+      const dataURI = canvas.toDataURL(getMimeFromBase64Uri(base64Uri));
+
+      resolve(dataURI);
+    };
+
+    img.onerror = e => reject(e);
+
+    img.src = base64Uri;
+  });
+};
+
+const getMimeFromBase64Uri = (base64Uri: string) => {
+  return base64Uri.split(';', 1)[0].replace('data:', '');
+};
+
 export const useImageImport = () => {
   const { showToast } = useToast();
+
+  const createOkPhoto = (base64Uri: string): KPhotoResponse => {
+    return { ok: true, photo: { base64Uri, format: getMimeFromBase64Uri(base64Uri) || 'image/jpeg' } };
+  };
 
   const handleError = (error: any, message: string): KPhotoResponse => {
     const msg = error.message || '';
@@ -70,7 +119,7 @@ export const useImageImport = () => {
         quality: 10
       });
 
-      return { ok: true, photo: { base64Uri: encodeBase64Uri(photo.base64String!, photo.format) } };
+      return createOkPhoto(encodeBase64Uri(photo.base64String!, photo.format));
     } catch (error) {
       return handleError(error, "We couldn't take a picture");
     }
@@ -91,7 +140,7 @@ export const useImageImport = () => {
 
       const base64Uri = await photoToBase64Uri(photo);
 
-      return { ok: true, photo: { base64Uri } };
+      return createOkPhoto(base64Uri);
     } catch (error) {
       return handleError(error, "We couldn't read from your gallery");
     }
@@ -124,12 +173,12 @@ export const useImageImport = () => {
       const resp = await fetch(url);
       const blob = await resp.blob();
       const base64Uri = (await convertBlobToBase64Uri(blob)) as string;
-      return { ok: true, photo: { base64Uri } };
+      return createOkPhoto(base64Uri);
     } catch (error: any) {
       console.error('unable to parse from url', error);
       return handleError(error, "That link didn't work. Check your connection or try another one!");
     }
   };
 
-  return { takePhoto, photoFromGallery, photoFromUrl };
+  return { takePhoto, photoFromGallery, photoFromUrl, resizeMaxDimension };
 };

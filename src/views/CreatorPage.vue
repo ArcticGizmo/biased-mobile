@@ -14,14 +14,25 @@
             </template>
           </template>
         </KImg>
-        <IonButton @click="onTakePicture()">Camera</IonButton>
-        <IonButton @click="onGetFromGallery()">Gallery</IonButton>
-        <IonButton @click="onGetFromUrl()">From URL</IonButton>
+        <div class="pic-actions">
+          <IonButton fill="outline" @click="onTakePicture()">
+            <IonIcon slot="icon-only" :icon="cameraOutline" />
+          </IonButton>
+          <IonButton fill="outline" @click="onGetFromGallery()">
+            <IonIcon slot="icon-only" :icon="imagesOutline" />
+          </IonButton>
+          <IonButton fill="outline" @click="onGetFromUrl()">
+            <IonIcon slot="icon-only" :icon="globeOutline" />
+          </IonButton>
+          <IonButton fill="outline" :disabled="!imageSrc" @click="onEditImage()">
+            <IonIcon slot="icon-only" :icon="pencilOutline" />
+          </IonButton>
+        </div>
       </div>
 
       <!-- ======= who ======== -->
       <!-- artist -->
-      <IonInput class="mt-4" v-model="artist" label="Artist" label-placement="stacked" fill="outline" inputmode="text" />
+      <IonInput class="mt-4" v-model="artist" label="Artist*" label-placement="stacked" fill="outline" inputmode="text" />
 
       <!-- is soloist selection -->
       <IonSegment class="mt-4" v-model="artistType" mode="ios">
@@ -40,7 +51,7 @@
       </VTransition>
 
       <!-- ======= where from ======== -->
-      <IonSegment class="mt-4" v-model="whereType" mode="ios">
+      <IonSegment class="mt-4" v-model="whereFrom" mode="ios">
         <IonSegmentButton value="album" layout="icon-top">
           <IonLabel>Album</IonLabel>
           <IonIcon :icon="musicalNotes" />
@@ -54,15 +65,15 @@
       <!-- album -->
       <IonInput
         class="mt-4"
-        v-model="albumOrEventName"
-        :label="albumbOrEventNameLabel"
+        v-model="whereFromName"
+        :label="whereFromNameLabel"
         label-placement="stacked"
         fill="outline"
         inputmode="text"
       />
 
       <!-- album version (optional) -->
-      <VTransition :show="whereType === 'album'">
+      <VTransition :show="whereFrom === 'album'">
         <IonInput class="mt-4" v-model="albumVersion" label="Album Version" label-placement="stacked" fill="outline" inputmode="text" />
       </VTransition>
 
@@ -85,25 +96,38 @@
           <IonIcon :icon="checkmarkCircle" color="success" />
         </IonSegmentButton>
       </IonSegment>
+
+      <IonButton class="mt-6 h-12" expand="block" type="submit" :disabled="!canSubmit" @click="onSubmit()">Add</IonButton>
     </div>
   </BasePage>
 </template>
 
 <script setup lang="ts">
-import { IonButton, IonIcon, IonInput, IonLabel, IonSegment, IonSegmentButton } from '@ionic/vue';
+import { IonButton, IonIcon, IonInput, IonLabel, IonSegment, IonSegmentButton, modalController } from '@ionic/vue';
 import BasePage from './BasePage.vue';
 import KImg from '@/components/KImg.vue';
 import { KPhotoResponse, useImageImport } from '@/composables/imageImport';
 import { ref, watch, computed } from 'vue';
-import { sadOutline, people, person, musicalNotes, calendar, heart, closeCircle, checkmarkCircle } from 'ionicons/icons';
+import {
+  sadOutline,
+  people,
+  person,
+  musicalNotes,
+  calendar,
+  heart,
+  closeCircle,
+  checkmarkCircle,
+  cameraOutline,
+  imagesOutline,
+  globeOutline,
+  pencilOutline
+} from 'ionicons/icons';
 import VTransition from '@/components/VTransition.vue';
 import PickerInput from '@/components/PickerInput.vue';
+import ImageEditorModal from '@/components/ImageEditorModal.vue';
+import type { ArtistType, WhereFrom, OwnershipType, KPopPc } from '@/types';
 
-type ArtistType = 'group' | 'solo';
-type WhereType = 'album' | 'event';
-type OwnershipType = 'have' | 'want' | 'none';
-
-const { takePhoto, photoFromGallery, photoFromUrl } = useImageImport();
+const { takePhoto, photoFromGallery, photoFromUrl, resizeMaxDimension } = useImageImport();
 
 const thisYear = new Date().getFullYear();
 const dateOptions = Array.from({ length: 50 }, (_, i) => {
@@ -112,19 +136,24 @@ const dateOptions = Array.from({ length: 50 }, (_, i) => {
 });
 
 const imageSrc = ref('');
+const originalImgSrc = ref('');
 const artist = ref('');
 const artistType = ref<ArtistType>('group');
 const groupName = ref('');
 
-const whereType = ref<WhereType>('album');
-const albumOrEventName = ref('');
+const whereFrom = ref<WhereFrom>('album');
+const whereFromName = ref('');
 const albumVersion = ref('');
 
 const year = ref(`${thisYear}`);
 const ownershipType = ref<OwnershipType>('none');
 
-const albumbOrEventNameLabel = computed(() => {
-  return whereType.value === 'album' ? 'Album' : 'Event';
+const whereFromNameLabel = computed(() => {
+  return whereFrom.value === 'album' ? 'Album*' : 'Event*';
+});
+
+const canSubmit = computed(() => {
+  return imageSrc.value && artist.value && whereFromName.value;
 });
 
 watch(artistType, type => {
@@ -133,25 +162,60 @@ watch(artistType, type => {
   }
 });
 
-const setImage = (resp: KPhotoResponse) => {
+const setImage = async (resp: KPhotoResponse) => {
   if (resp.ok) {
     imageSrc.value = resp.photo.base64Uri;
+    originalImgSrc.value = resp.photo.base64Uri;
   }
 };
 
 const onTakePicture = async () => {
   const resp = await takePhoto();
-  setImage(resp);
+  await setImage(resp);
 };
 
 const onGetFromGallery = async () => {
   const resp = await photoFromGallery();
-  setImage(resp);
+  await setImage(resp);
 };
 
 const onGetFromUrl = async () => {
   const resp = await photoFromUrl();
-  setImage(resp);
+  await setImage(resp);
+};
+
+const onEditImage = async () => {
+  const modal = await modalController.create({
+    component: ImageEditorModal,
+    componentProps: { src: originalImgSrc.value }
+  });
+
+  modal.present();
+
+  const resp = await modal.onWillDismiss<string>();
+  if (resp.role === 'accept') {
+    imageSrc.value = resp.data!;
+  }
+};
+
+const onSubmit = async () => {
+  const scaledImage = await resizeMaxDimension(imageSrc.value, 500);
+
+  const data: KPopPc = {
+    imageSrc: scaledImage,
+    artist: artist.value,
+    artistType: artistType.value,
+    groupName: groupName.value,
+    whereFrom: whereFrom.value,
+    whereFromName: whereFromName.value,
+    albumVersion: albumVersion.value,
+    year: year.value,
+    ownershipType: ownershipType.value
+  };
+
+  console.dir(data);
+
+  // console.log(scaledImage);
 };
 </script>
 
@@ -162,5 +226,13 @@ const onGetFromUrl = async () => {
   max-width: 3rem;
   max-height: 3rem;
   margin-bottom: 1rem;
+}
+
+.pic-actions {
+  display: flex;
+}
+
+.pic-actions > * {
+  width: 100%;
 }
 </style>

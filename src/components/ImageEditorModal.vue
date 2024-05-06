@@ -72,7 +72,7 @@ const onReset = () => {
 
 const onAccept = async () => {
   const canvas = await cropperSelection.value!.$toCanvas();
-  modalController.dismiss('accept', canvas.toDataURL());
+  modalController.dismiss(canvas.toDataURL(), 'accept');
 };
 </script>
 

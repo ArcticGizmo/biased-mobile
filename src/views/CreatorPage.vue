@@ -125,9 +125,11 @@ import {
 import VTransition from '@/components/VTransition.vue';
 import PickerInput from '@/components/PickerInput.vue';
 import ImageEditorModal from '@/components/ImageEditorModal.vue';
-import type { ArtistType, WhereFrom, OwnershipType, KPopPc } from '@/types';
+import type { ArtistType, WhereFrom, OwnershipType, KPopCard } from '@/types';
+import { useKPopCards } from '@/composables/kPopCards';
 
 const { takePhoto, photoFromGallery, photoFromUrl, resizeMaxDimension } = useImageImport();
+const { add: addCard } = useKPopCards();
 
 const thisYear = new Date().getFullYear();
 const dateOptions = Array.from({ length: 50 }, (_, i) => {
@@ -147,6 +149,19 @@ const albumVersion = ref('');
 
 const year = ref(`${thisYear}`);
 const ownershipType = ref<OwnershipType>('none');
+
+const resetForm = () => {
+  imageSrc.value = '';
+  originalImgSrc.value = '';
+  artist.value = '';
+  artistType.value = 'group';
+  groupName.value = '';
+  whereFrom.value = 'album';
+  whereFromName.value = '';
+  albumVersion.value = '';
+  year.value = `${thisYear}`;
+  ownershipType.value = 'none';
+};
 
 const whereFromNameLabel = computed(() => {
   return whereFrom.value === 'album' ? 'Album*' : 'Event*';
@@ -201,7 +216,7 @@ const onEditImage = async () => {
 const onSubmit = async () => {
   const scaledImage = await resizeMaxDimension(imageSrc.value, 500);
 
-  const data: KPopPc = {
+  const data: KPopCard = {
     imageSrc: scaledImage,
     artist: artist.value,
     artistType: artistType.value,
@@ -213,9 +228,8 @@ const onSubmit = async () => {
     ownershipType: ownershipType.value
   };
 
-  console.dir(data);
-
-  // console.log(scaledImage);
+  addCard(data);
+  resetForm();
 };
 </script>
 

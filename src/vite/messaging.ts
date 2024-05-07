@@ -37,7 +37,7 @@ export const useViteMessaging = <Req = any, Resp = any>(name: string) => {
   hot.on(`${name}:response`, (resp: ViteMessageResponse<Resp>) => {
     const prom = proms[resp.id];
     if (!prom) {
-      console.error(`[vite msg] could not find promise for request ${resp.id}`);
+      // usually means another instance caught it
       return;
     }
 

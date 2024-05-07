@@ -1,7 +1,8 @@
 import vue from '@vitejs/plugin-vue';
 import path from 'path';
-import { type ViteDevServer, defineConfig } from 'vite';
+import { type ViteDevServer, defineConfig, Plugin } from 'vite';
 import checker from 'vite-plugin-checker';
+import * as fs from 'node:fs';
 
 type Reply = <T = any>(data: T) => void;
 type Reject = <T = any>(error: T) => void;
@@ -23,6 +24,42 @@ const addMessageHandler = <ReqData = any>(
   });
 };
 
+const viteStoragePlugin = (): Plugin => {
+  return {
+    name: 'ViteMesaging',
+    configureServer(server) {
+      if (!fs.existsSync('./vite-storage')) {
+        fs.mkdirSync('./vite-storage');
+      }
+
+      addMessageHandler<{ key: string; value: any }>(server, 'storage:save', async (req, reply, reject) => {
+        fs.writeFile(`./.vite-storage/${req.key}.txt`, JSON.stringify(req.value), { flag: 'w+' }, err => {
+          if (err) {
+            console.error('[vite storage] error while saving', req.key, err);
+            reject(err);
+          } else {
+            console.log('[vite storage] save |', req.key);
+            reply('ok');
+          }
+        });
+      });
+
+      addMessageHandler<{ key: string }>(server, 'storage:load', (req, reply, reject) => {
+        fs.readFile(`./.vite-storage/${req.key}.txt`, 'utf8', (err, data) => {
+          if (err) {
+            // TODO: catch file does not exist
+            console.error('[vite storage] error while laoding', req.key, err);
+            reject(err);
+          } else {
+            console.log('[vite storage load |', req.key);
+            reply(data);
+          }
+        });
+      });
+    }
+  };
+};
+
 // https://vitejs.dev/config/
 export default defineConfig({
   plugins: [
@@ -34,15 +71,7 @@ export default defineConfig({
       }
     }),
     checker({ vueTsc: true }),
-    {
-      name: 'ViteMesaging',
-      configureServer(server) {
-        addMessageHandler(server, 'store', (req, reply) => {
-          console.log(req);
-          reply('apples');
-        });
-      }
-    }
+    viteStoragePlugin()
   ],
   resolve: {
     alias: {

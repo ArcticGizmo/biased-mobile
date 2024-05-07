@@ -1,7 +1,8 @@
 <template>
   <BasePage title="Test Page">
     <div class="m-8">
-      <IonButton @click="onGo()">Go</IonButton>
+      <IonButton @click="onSave()">Save</IonButton>
+      <IonButton @click="onLoad()">Load</IonButton>
     </div>
   </BasePage>
 </template>
@@ -9,16 +10,21 @@
 <script setup lang="ts">
 import BasePage from './BasePage.vue';
 import { IonButton } from '@ionic/vue';
-import { useViteMessaging } from '@/vite/messaging';
+import { useStorage } from '@/composables/storage';
 
-const { sendData } = useViteMessaging('store');
+interface MyData {
+  id: string;
+  count: number;
+}
 
-const onGo = async () => {
-  try {
-    const resp = await sendData('eggplant');
-    console.dir(resp);
-  } catch (error) {
-    console.error(error);
-  }
+const { saveValue, loadValue } = useStorage<MyData[]>('my-data');
+
+const onSave = async () => {
+  await saveValue([{ id: 'aaaa', count: 10 }]);
+};
+
+const onLoad = async () => {
+  const resp = await loadValue();
+  console.dir(resp);
 };
 </script>

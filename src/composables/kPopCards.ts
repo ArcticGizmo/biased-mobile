@@ -40,7 +40,7 @@ export const useKPopCards = () => {
   onMounted(loadSaved);
 
   const add = (card: KPopCard) => {
-    cards.value.push(card);
+    cards.value = [...cards.value, card];
   };
 
   // const importTemplate = async () => {};

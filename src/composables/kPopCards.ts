@@ -3,6 +3,7 @@ import { onMounted, readonly, ref, watch } from 'vue';
 import { Filesystem, Directory } from '@capacitor/filesystem';
 import { isPlatform } from '@ionic/vue';
 import { useStorage } from './storage';
+import { deleteFile } from './localFileSystem';
 
 const { saveValue, loadValue } = useStorage<KPopCard[]>('kpop-cards');
 
@@ -24,12 +25,15 @@ const loadSaved = async () => {
 export const useKPopCards = () => {
   onMounted(loadSaved);
 
-  const add = (card: KPopCard) => {
+  const addCard = (card: KPopCard) => {
     cards.value = [...cards.value, card];
   };
 
-  const clear = () => {
-    // Will need to delete the file from here as well
+  const clearCards = () => {
+    // fire and forget
+    for (const card of cards.value) {
+      deleteFile(card.imageFile);
+    }
     cards.value = [];
   };
 
@@ -39,5 +43,5 @@ export const useKPopCards = () => {
 
   // const importBackup
 
-  return { cards: readonly(cards), add, clear };
+  return { cards: readonly(cards), addCard, clearCards };
 };

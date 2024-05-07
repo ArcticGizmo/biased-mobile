@@ -1,14 +1,10 @@
-import { ref, onMounted, watch } from 'vue';
-import { Camera, CameraResultType, CameraSource, GalleryPhoto, Photo } from '@capacitor/camera';
-import { Filesystem, Directory } from '@capacitor/filesystem';
-import { Preferences } from '@capacitor/preferences';
+import { Camera, CameraResultType, CameraSource, GalleryPhoto } from '@capacitor/camera';
+import { Filesystem } from '@capacitor/filesystem';
 import { alertController, isPlatform } from '@ionic/vue';
-import { Capacitor } from '@capacitor/core';
 import { useToast } from '@/composables/toast';
 import { sad } from 'ionicons/icons';
 
 // TODO: deal with permissions
-// TODO: allow image scaling to reduce file size
 
 export interface KPhoto {
   base64Uri: string;
@@ -74,26 +70,6 @@ const resizeMaxDimension = async (base64Uri: string, maxSize: number) => {
 
 const getMimeFromBase64Uri = (base64Uri: string) => {
   return base64Uri.split(';', 1)[0].replace('data:', '');
-};
-
-/*
-Used to efficiently store data on disk for better retrieval.
-Web will return the input data
-*/
-const saveImage = async (base64Uri: string) => {
-  if (!isPlatform('hybrid')) {
-    return base64Uri;
-  }
-
-  const savedFile = await Filesystem.writeFile({
-    // TODO: make the file random
-    // TODO: make the file information have optional id
-    path: 'my-file.png',
-    data: base64Uri,
-    directory: Directory.Data
-  });
-
-  return Capacitor.convertFileSrc(savedFile.uri);
 };
 
 export const useImageImport = () => {
@@ -200,5 +176,5 @@ export const useImageImport = () => {
     }
   };
 
-  return { takePhoto, photoFromGallery, photoFromUrl, resizeMaxDimension, saveImage };
+  return { takePhoto, photoFromGallery, photoFromUrl, resizeMaxDimension };
 };

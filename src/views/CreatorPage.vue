@@ -98,7 +98,7 @@
       </IonSegment>
 
       <IonButton class="mt-6 h-12" expand="block" type="submit" :disabled="!canSubmit" @click="onSubmit()">Add</IonButton>
-      <IonButton class="mt-6 h-12" expand="block"  router-link="/home">Home</IonButton>
+      <IonButton class="mt-6 h-12" expand="block" router-link="/home">Home</IonButton>
     </div>
   </BasePage>
 </template>
@@ -129,8 +129,10 @@ import ImageEditorModal from '@/components/ImageEditorModal.vue';
 import type { ArtistType, WhereFrom, OwnershipType, KPopCard } from '@/types';
 import { useKPopCards } from '@/composables/kPopCards';
 
-const { takePhoto, photoFromGallery, photoFromUrl, resizeMaxDimension, saveImage } = useImageImport();
-const { add: addCard } = useKPopCards();
+import { newBase64Image } from '@/composables/localFileSystem';
+
+const { takePhoto, photoFromGallery, photoFromUrl, resizeMaxDimension } = useImageImport();
+const { addCard } = useKPopCards();
 
 const thisYear = new Date().getFullYear();
 const dateOptions = Array.from({ length: 50 }, (_, i) => {
@@ -140,12 +142,12 @@ const dateOptions = Array.from({ length: 50 }, (_, i) => {
 
 const imageSrc = ref('');
 const originalImgSrc = ref('');
-const artist = ref('');
+const artist = ref('J');
 const artistType = ref<ArtistType>('group');
 const groupName = ref('');
 
 const whereFrom = ref<WhereFrom>('album');
-const whereFromName = ref('');
+const whereFromName = ref('J');
 const albumVersion = ref('');
 
 const year = ref(`${thisYear}`);
@@ -216,10 +218,11 @@ const onEditImage = async () => {
 
 const onSubmit = async () => {
   const scaledImage = await resizeMaxDimension(imageSrc.value, 500);
-  const compressedUri = await saveImage(scaledImage);
+  const imageFile = await newBase64Image(scaledImage);
+  console.dir(imageFile);
 
   const data: KPopCard = {
-    imageSrc: compressedUri,
+    imageFile,
     artist: artist.value,
     artistType: artistType.value,
     groupName: groupName.value,

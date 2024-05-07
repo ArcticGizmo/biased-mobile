@@ -98,6 +98,7 @@
       </IonSegment>
 
       <IonButton class="mt-6 h-12" expand="block" type="submit" :disabled="!canSubmit" @click="onSubmit()">Add</IonButton>
+      <IonButton class="mt-6 h-12" expand="block"  router-link="/home">Home</IonButton>
     </div>
   </BasePage>
 </template>
@@ -128,7 +129,7 @@ import ImageEditorModal from '@/components/ImageEditorModal.vue';
 import type { ArtistType, WhereFrom, OwnershipType, KPopCard } from '@/types';
 import { useKPopCards } from '@/composables/kPopCards';
 
-const { takePhoto, photoFromGallery, photoFromUrl, resizeMaxDimension } = useImageImport();
+const { takePhoto, photoFromGallery, photoFromUrl, resizeMaxDimension, saveImage } = useImageImport();
 const { add: addCard } = useKPopCards();
 
 const thisYear = new Date().getFullYear();
@@ -215,9 +216,10 @@ const onEditImage = async () => {
 
 const onSubmit = async () => {
   const scaledImage = await resizeMaxDimension(imageSrc.value, 500);
+  const compressedUri = await saveImage(scaledImage);
 
   const data: KPopCard = {
-    imageSrc: scaledImage,
+    imageSrc: compressedUri,
     artist: artist.value,
     artistType: artistType.value,
     groupName: groupName.value,

@@ -17,22 +17,7 @@ watch(cards, cacheCards);
 
 const loadSaved = async () => {
   isLoading.value = true;
-
-  const cardsOnDisk = (await loadValue()) || [];
-
-  // // If running on the web...
-  // if (!isPlatform('hybrid')) {
-  //   for (const photo of photosInPreferences) {
-  //     const file = await Filesystem.readFile({
-  //       path: photo.filepath,
-  //       directory: Directory.Data
-  //     });
-  //     // Web platform only: Load the photo as base64 data
-  //     photo.webviewPath = `data:image/jpeg;base64,${file.data}`;
-  //   }
-  // }
-
-  cards.value = cardsOnDisk;
+  cards.value = (await loadValue()) || [];
   isLoading.value = false;
 };
 
@@ -43,11 +28,16 @@ export const useKPopCards = () => {
     cards.value = [...cards.value, card];
   };
 
+  const clear = () => {
+    // Will need to delete the file from here as well
+    cards.value = [];
+  };
+
   // const importTemplate = async () => {};
 
   // const exportBackup
 
   // const importBackup
 
-  return { cards: readonly(cards), add };
+  return { cards: readonly(cards), add, clear };
 };

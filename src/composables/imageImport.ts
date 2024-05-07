@@ -76,6 +76,26 @@ const getMimeFromBase64Uri = (base64Uri: string) => {
   return base64Uri.split(';', 1)[0].replace('data:', '');
 };
 
+/*
+Used to efficiently store data on disk for better retrieval.
+Web will return the input data
+*/
+const saveImage = async (base64Uri: string) => {
+  if (!isPlatform('hybrid')) {
+    return base64Uri;
+  }
+
+  const savedFile = await Filesystem.writeFile({
+    // TODO: make the file random
+    // TODO: make the file information have optional id
+    path: 'my-file.png',
+    data: base64Uri,
+    directory: Directory.Data
+  });
+
+  return Capacitor.convertFileSrc(savedFile.uri);
+};
+
 export const useImageImport = () => {
   const { showToast } = useToast();
 
@@ -180,5 +200,5 @@ export const useImageImport = () => {
     }
   };
 
-  return { takePhoto, photoFromGallery, photoFromUrl, resizeMaxDimension };
+  return { takePhoto, photoFromGallery, photoFromUrl, resizeMaxDimension, saveImage };
 };

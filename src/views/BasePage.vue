@@ -3,7 +3,7 @@
     <IonHeader v-if="title">
       <IonToolbar>
         <IonButtons slot="start">
-          <IonBackButton :defaultHref="defaultBackHref"></IonBackButton>
+          <IonBackButton v-if="!hideBackRef" :defaultHref="defaultBackHref || '/home'"></IonBackButton>
         </IonButtons>
         <IonTitle>{{ title }}</IonTitle>
       </IonToolbar>
@@ -26,6 +26,7 @@ const props = defineProps<{
   title?: string;
   centered?: boolean;
   defaultBackHref?: string;
+  hideBackRef?: boolean;
   pad?: boolean;
   loading?: boolean;
 }>();

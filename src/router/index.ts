@@ -25,6 +25,11 @@ const routes: Array<RouteRecordRaw> = [
     component: CreatorPage
   },
   {
+    path: '/cards/:id',
+    props: true,
+    component: () => import('@/views/CardViewPage.vue')
+  },
+  {
     path: '/:pathMatch(.*)*',
     name: 'NotFound',
     component: () => import('@/views/NotFoundPage.vue')

@@ -35,32 +35,14 @@
       <IonInput class="mt-4" v-model="artist" label="Artist*" label-placement="stacked" fill="outline" inputmode="text" />
 
       <!-- is soloist selection -->
-      <IonSegment class="mt-4" v-model="artistType" mode="ios">
-        <IonSegmentButton value="group" layout="icon-top">
-          <IonLabel>Group</IonLabel>
-          <IonIcon :icon="people" />
-        </IonSegmentButton>
-        <IonSegmentButton value="solo" layout="icon-top">
-          <IonLabel>Solo</IonLabel>
-          <IonIcon :icon="person" />
-        </IonSegmentButton>
-      </IonSegment>
+      <ArtistTypeInput class="mt-4" v-model="artistType" />
 
       <VTransition :show="artistType === 'group'">
         <IonInput class="mt-4" v-model="groupName" label="Group Name" label-placement="stacked" fill="outline" inputmode="text" />
       </VTransition>
 
       <!-- ======= where from ======== -->
-      <IonSegment class="mt-4" v-model="whereFrom" mode="ios">
-        <IonSegmentButton value="album" layout="icon-top">
-          <IonLabel>Album</IonLabel>
-          <IonIcon :icon="musicalNotes" />
-        </IonSegmentButton>
-        <IonSegmentButton value="event" layout="icon-top">
-          <IonLabel>Event</IonLabel>
-          <IonIcon :icon="calendar" />
-        </IonSegmentButton>
-      </IonSegment>
+      <WhereFromInput class="mt-4" v-model="whereFrom" />
 
       <!-- album -->
       <IonInput
@@ -81,21 +63,7 @@
       <PickerInput class="mt-4" v-model="year" :options="dateOptions" label="Year" label-placement="stacked" fill="outline" />
 
       <!-- Ownership -->
-      <IonSegment class="mt-4" v-model="ownershipType" mode="ios">
-        <IonSegmentButton value="none" layout="icon-top">
-          <IonLabel>Don't Have</IonLabel>
-          <IonIcon :icon="closeCircle" color="dark" />
-        </IonSegmentButton>
-
-        <IonSegmentButton value="want" layout="icon-top">
-          <IonLabel>Want</IonLabel>
-          <IonIcon :icon="heart" color="danger" />
-        </IonSegmentButton>
-        <IonSegmentButton value="have" layout="icon-top">
-          <IonLabel>Have</IonLabel>
-          <IonIcon :icon="checkmarkCircle" color="success" />
-        </IonSegmentButton>
-      </IonSegment>
+      <OwnershipInput class="mt-4" v-model="ownershipType" />
 
       <IonButton class="mt-6 h-12" expand="block" type="submit" :disabled="!canSubmit" @click="onSubmit()">Add</IonButton>
       <IonButton class="mt-6 h-12" expand="block" router-link="/home">Home</IonButton>
@@ -104,25 +72,15 @@
 </template>
 
 <script setup lang="ts">
-import { IonButton, IonIcon, IonInput, IonLabel, IonSegment, IonSegmentButton, modalController } from '@ionic/vue';
+import { IonButton, IonIcon, IonInput, modalController } from '@ionic/vue';
 import BasePage from './BasePage.vue';
 import KImg from '@/components/KImg.vue';
+import OwnershipInput from '@/components/OwnershipInput.vue';
+import ArtistTypeInput from '@/components/ArtistTypeInput.vue';
+import WhereFromInput from '@/components/WhereFromInput.vue';
 import { KPhotoResponse, useImageImport } from '@/composables/imageImport';
 import { ref, watch, computed } from 'vue';
-import {
-  sadOutline,
-  people,
-  person,
-  musicalNotes,
-  calendar,
-  heart,
-  closeCircle,
-  checkmarkCircle,
-  cameraOutline,
-  imagesOutline,
-  globeOutline,
-  pencilOutline
-} from 'ionicons/icons';
+import { sadOutline, musicalNotes, calendar, cameraOutline, imagesOutline, globeOutline, pencilOutline } from 'ionicons/icons';
 import VTransition from '@/components/VTransition.vue';
 import PickerInput from '@/components/PickerInput.vue';
 import ImageEditorModal from '@/components/ImageEditorModal.vue';
@@ -132,7 +90,7 @@ import { useKPopCards } from '@/composables/kPopCards';
 import { newBase64Image } from '@/composables/localFileSystem';
 
 const { takePhoto, photoFromGallery, photoFromUrl, resizeMaxDimension } = useImageImport();
-const { addCard } = useKPopCards();
+const { addCard, generateId } = useKPopCards();
 
 const thisYear = new Date().getFullYear();
 const dateOptions = Array.from({ length: 50 }, (_, i) => {
@@ -221,6 +179,7 @@ const onSubmit = async () => {
   const imageFile = await newBase64Image(scaledImage);
 
   const data: KPopCard = {
+    id: generateId(),
     imageFile,
     artist: artist.value,
     artistType: artistType.value,
@@ -231,7 +190,6 @@ const onSubmit = async () => {
     year: year.value,
     ownershipType: ownershipType.value
   };
-
 
   console.dir(data);
 

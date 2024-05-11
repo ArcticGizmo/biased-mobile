@@ -5,14 +5,14 @@
       <IonCardTitle class="text-sm text-ellipsis overflow-hidden whitespace-nowrap">{{ title }}</IonCardTitle>
       <IonCardSubtitle v-if="subtitle" class="text-xs text-ellipsis overflow-hidden whitespace-nowrap">{{ subtitle }}</IonCardSubtitle>
     </IonCardContent>
-    <IonIcon v-if="status === 'want'" class="absolute top-2 right-2" color="danger" size="large" :icon="heartCircle" />
-    <IonIcon v-if="status === 'have'" class="absolute top-2 right-2" color="warning" size="large" :icon="ribbon" />
+    <IonIcon v-if="status === 'want'" class="text-xl absolute top-2 right-2" color="danger" :icon="heartCircle" />
+    <IonIcon v-if="status === 'have'" class="text-xl absolute top-2 right-2" color="warning" :icon="ribbon" />
   </IonCard>
 </template>
 
 <script setup lang="ts">
 import { IonCard, IonIcon, IonCardContent, IonCardTitle, IonCardSubtitle } from '@ionic/vue';
-import { heartCircle, ribbon, happy } from 'ionicons/icons';
+import { heartCircle, ribbon } from 'ionicons/icons';
 import KImg from './KImg.vue';
 import { OwnershipType } from '@/types';
 import { computed } from 'vue';

@@ -1,5 +1,5 @@
 <template>
-  <BasePage title="Creator">
+  <BasePage title="Creator" default-back-href="/home">
     <div class="content p-8">
       <div class="upload-pic">
         <KImg height="50vh" :src="imageSrc" background>
@@ -219,7 +219,6 @@ const onEditImage = async () => {
 const onSubmit = async () => {
   const scaledImage = await resizeMaxDimension(imageSrc.value, 500);
   const imageFile = await newBase64Image(scaledImage);
-  console.dir(imageFile);
 
   const data: KPopCard = {
     imageFile,
@@ -232,6 +231,9 @@ const onSubmit = async () => {
     year: year.value,
     ownershipType: ownershipType.value
   };
+
+
+  console.dir(data);
 
   addCard(data);
   resetForm();

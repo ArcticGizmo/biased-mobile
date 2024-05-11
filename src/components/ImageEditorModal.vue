@@ -1,11 +1,12 @@
 <template>
   <div class="image-editor-modal">
     <div class="editor">
-      <cropper-canvas v-if="show" background>
+      <cropper-canvas v-if="show" class="rounded-md" background>
         <cropper-image ref="cropperImage" :src="src" alt="image to edit" crossOrigin="anonymous" />
         <cropper-shade hidden />
         <cropper-handle action="select" plain />
-        <cropper-selection ref="cropperSelection" initial-coverage="0.95" outlined movable resizable zoomable>
+        <cropper-handle action="move" plain />
+        <cropper-selection ref="cropperSelection" initial-coverage="0.95" initial-aspect-ratio="0.7" outlined movable resizable>
           <cropper-grid role="grid" covered />
           <cropper-crosshair centered />
           <cropper-handle action="move" theme-color="rgba(255, 255, 255, 0.35)" />
@@ -87,7 +88,7 @@ const onAccept = async () => {
 .editor {
   height: 100%;
   width: 100%;
-  padding: 1rem;
+  padding: 1.5rem;
   padding-bottom: 0;
   background-color: rgb(24, 24, 24);
 }

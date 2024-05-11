@@ -15,16 +15,16 @@
           </template>
         </KImg>
         <div class="pic-actions">
-          <IonButton fill="outline" @click="onTakePicture()">
+          <IonButton @click="onTakePicture()">
             <IonIcon slot="icon-only" :icon="cameraOutline" />
           </IonButton>
-          <IonButton fill="outline" @click="onGetFromGallery()">
+          <IonButton @click="onGetFromGallery()">
             <IonIcon slot="icon-only" :icon="imagesOutline" />
           </IonButton>
-          <IonButton fill="outline" @click="onGetFromUrl()">
+          <IonButton @click="onGetFromUrl()">
             <IonIcon slot="icon-only" :icon="globeOutline" />
           </IonButton>
-          <IonButton fill="outline" :disabled="!imageSrc" @click="onEditImage()">
+          <IonButton :disabled="!imageSrc" @click="onEditImage()">
             <IonIcon slot="icon-only" :icon="pencilOutline" />
           </IonButton>
         </div>

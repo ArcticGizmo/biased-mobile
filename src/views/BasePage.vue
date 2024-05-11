@@ -35,10 +35,6 @@ const hasToolbar = computed(() => !!props.title);
 </script>
 
 <style scoped>
-ion-toolbar {
-  --background: transparent;
-}
-
 .ion-page {
   justify-content: unset;
 }

@@ -48,11 +48,9 @@ const onChange = (value: T) => emits('change', value);
   pointer-events: none;
 }
 
-.segment-button-checked::part(indicator-background) {
-  border-bottom: 4px solid #0054e9;
-}
-
 .readonly .segment-button-checked::part(indicator-background) {
   background-color: transparent;
 }
+
+/* there are styles that exist globally for easy of access */
 </style>

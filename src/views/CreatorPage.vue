@@ -60,7 +60,7 @@
       </VTransition>
 
       <!-- year -->
-      <PickerInput class="mt-4" v-model="year" :options="dateOptions" label="Year" label-placement="stacked" fill="outline" />
+      <PickerInput class="mt-4" v-model="year" :options="dateOptions" label="Released" label-placement="stacked" fill="outline" />
 
       <!-- Ownership -->
       <OwnershipInput class="mt-4" v-model="ownershipType" />
@@ -80,7 +80,7 @@ import ArtistTypeInput from '@/components/ArtistTypeInput.vue';
 import WhereFromInput from '@/components/WhereFromInput.vue';
 import { KPhotoResponse, useImageImport } from '@/composables/imageImport';
 import { ref, watch, computed } from 'vue';
-import { sadOutline, musicalNotes, calendar, cameraOutline, imagesOutline, globeOutline, pencilOutline } from 'ionicons/icons';
+import { sadOutline, cameraOutline, imagesOutline, globeOutline, pencilOutline } from 'ionicons/icons';
 import VTransition from '@/components/VTransition.vue';
 import PickerInput from '@/components/PickerInput.vue';
 import ImageEditorModal from '@/components/ImageEditorModal.vue';
@@ -190,8 +190,6 @@ const onSubmit = async () => {
     year: year.value,
     ownershipType: ownershipType.value
   };
-
-  console.dir(data);
 
   addCard(data);
   resetForm();

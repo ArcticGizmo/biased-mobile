@@ -20,11 +20,12 @@
 
 <script setup lang="ts">
 import BasePage from './BasePage.vue';
-import { IonButton, useIonRouter } from '@ionic/vue';
+import { IonButton } from '@ionic/vue';
+import { useSimpleRouter } from '@/composables/router';
 import { useKPopCards } from '@/composables/kPopCards';
 import KCard from '@/components/KCard.vue';
 
-const router = useIonRouter();
+const router = useSimpleRouter();
 const { cards, clearCards } = useKPopCards();
 
 const onOpenCard = (id: string) => {

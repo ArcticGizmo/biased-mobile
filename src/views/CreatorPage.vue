@@ -66,13 +66,13 @@
       <OwnershipInput class="mt-4" v-model="ownershipType" />
 
       <IonButton class="mt-6 h-12" expand="block" type="submit" :disabled="!canSubmit" @click="onSubmit()">Add</IonButton>
-      <IonButton class="mt-6 h-12" expand="block" router-link="/home">Home</IonButton>
     </div>
   </BasePage>
 </template>
 
 <script setup lang="ts">
-import { IonButton, IonIcon, IonInput, modalController } from '@ionic/vue';
+import { IonButton, IonIcon, IonInput, alertController, modalController } from '@ionic/vue';
+import { useSimpleRouter } from '@/composables/router';
 import BasePage from './BasePage.vue';
 import KImg from '@/components/KImg.vue';
 import OwnershipInput from '@/components/OwnershipInput.vue';
@@ -91,6 +91,7 @@ import { newBase64Image } from '@/composables/localFileSystem';
 
 const { takePhoto, photoFromGallery, photoFromUrl, resizeMaxDimension } = useImageImport();
 const { addCard, generateId } = useKPopCards();
+const router = useSimpleRouter();
 
 const thisYear = new Date().getFullYear();
 const dateOptions = Array.from({ length: 50 }, (_, i) => {
@@ -193,6 +194,23 @@ const onSubmit = async () => {
 
   addCard(data);
   resetForm();
+
+  const alert = await alertController.create({
+    header: 'Added!',
+    message: 'Do you still have more to add?',
+    buttons: [
+      { role: 'more', text: 'Add more' },
+      { role: 'done', text: 'Done' }
+    ]
+  });
+
+  alert.present();
+
+  const resp = await alert.onWillDismiss<void>();
+
+  if (resp.role === 'done') {
+    router.back({ fallback: '/home' });
+  }
 };
 </script>
 

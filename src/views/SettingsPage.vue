@@ -16,14 +16,16 @@ import { useKPopCards } from '@/composables/kPopCards';
 import { showLoading } from '@/composables/modals';
 import { createBackup, loadBackup } from '@/composables/backup';
 
-const { cards } = useKPopCards();
+const { cards, importBackup } = useKPopCards();
 
 const onCreateBackup = async () => {
   const loading = await showLoading();
 
   try {
     const resp = await createBackup([...cards.value]);
-    console.dir(resp);
+    if (resp.ok) {
+      console.log('backup created at', resp.path);
+    }
   } catch (error) {
     console.error(error);
   } finally {
@@ -33,6 +35,13 @@ const onCreateBackup = async () => {
 
 const onLoadBackup = async () => {
   const resp = await loadBackup();
-  console.dir(resp);
+
+  if (!resp.ok) {
+    console.error('could not load backup');
+    return;
+  }
+
+  await importBackup(resp.cards);
+  console.log('backup import complete');
 };
 </script>

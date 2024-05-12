@@ -87,7 +87,6 @@ import ImageEditorModal from '@/components/ImageEditorModal.vue';
 import type { ArtistType, WhereFrom, OwnershipType, KPopCard } from '@/types';
 import { useKPopCards } from '@/composables/kPopCards';
 import { FileStore } from '@/composables/fileStore';
-import { v4 as uuidv4 } from 'uuid';
 import { getExtensionFromBase64Uri } from '@/composables/mime';
 
 const { takePhoto, photoFromGallery, photoFromUrl, resizeMaxDimension } = useImageImport();
@@ -180,7 +179,7 @@ const onSubmit = async () => {
   const scaledImage = await resizeMaxDimension(imageSrc.value, 500);
   const extension = getExtensionFromBase64Uri(scaledImage);
 
-  const fileResult = await FileStore.saveImage(`photo-cards/${uuidv4()}.${extension}`, scaledImage);
+  const fileResult = await FileStore.saveImage(`photo-cards/${generateId()}.${extension}`, scaledImage);
 
   if (!fileResult.ok) {
     console.error('[creator] could not save file to disk');

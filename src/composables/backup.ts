@@ -51,7 +51,7 @@ const getBackupName = () => {
   return `${year}${month}${date}-${hour}${minutes}${seconds}`;
 };
 
-export const loadBackup = async () => {
+export const loadBackup = async (): Promise<LoadBackupResponse> => {
   try {
     const result = await FilePicker.pickFiles({ types: ['text/plain'], readData: true });
     const file = result.files[0];
@@ -61,7 +61,7 @@ export const loadBackup = async () => {
     }
 
     const rawData = atob(file.data as string) || '[]';
-    return { ok: true, data: JSON.parse(rawData) };
+    return { ok: true, cards: JSON.parse(rawData) };
   } catch (error) {
     console.error('[backup] unable to load backup', error);
     return { ok: false, error };

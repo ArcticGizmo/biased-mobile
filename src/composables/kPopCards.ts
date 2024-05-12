@@ -1,8 +1,10 @@
-import { KPopCard, OptionalFields } from '@/types';
+import { KPopCard, KPopCardPackable, OptionalFields } from '@/types';
 import { onMounted, readonly, ref, watch } from 'vue';
 import { KvStore } from './kvStore';
 import { FileStore } from './fileStore';
 import { v1 as uuidv1 } from 'uuid';
+import { getExtensionFromBase64Uri } from './mime';
+import { v4 as uuidv4 } from 'uuid';
 
 const STORAGE_KEY = 'kpop-cards';
 
@@ -48,11 +50,44 @@ export const useKPopCards = () => {
     cards.value = [...cards.value];
   };
 
+  const importBackup = async (items: KPopCardPackable[]) => {
+    const newCards: KPopCard[] = [];
+
+    for (const item of items) {
+      const extension = getExtensionFromBase64Uri(item.imageSrc, 'image/png');
+      const fileResult = await FileStore.saveImage(`photo-cards/${uuidv1()}.${extension}`, item.imageSrc);
+
+      if (!fileResult.ok) {
+        console.error('[import backup] unable to store file', item);
+        throw 'unable to store file';
+      }
+
+      // TODO: this will need to check to see if the file already exists
+
+      const card: KPopCard = {
+        id: uuidv1(),
+        imageFilePath: fileResult.path,
+        artist: item.artist,
+        artistType: item.artistType,
+        groupName: item.groupName,
+        whereFrom: item.whereFrom,
+        whereFromName: item.whereFromName,
+        albumVersion: item.albumVersion,
+        year: item.year,
+        ownershipType: item.ownershipType
+      };
+
+      newCards.push(card);
+    }
+
+    cards.value = [...cards.value, ...newCards];
+  };
+
   // const importTemplate = async () => {};
 
   // const exportBackup
 
   // const importBackup
 
-  return { cards: readonly(cards), addCard, update, clearCards, generateId: () => uuidv1() };
+  return { cards: readonly(cards), addCard, update, clearCards, importBackup, generateId: () => uuidv1() };
 };

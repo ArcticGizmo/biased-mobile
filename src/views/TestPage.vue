@@ -55,7 +55,7 @@ const onSaveImage = async () => {
     return;
   }
 
-  const saveResp = await FileStore.save('face-2.png', photoResp.photo.base64Uri, { directory: Directory.Documents, encoding: 'base64' });
+  const saveResp = await FileStore.saveImage('face-2.png', photoResp.photo.base64Uri);
 
   if (!saveResp.ok) {
     return;
@@ -65,7 +65,7 @@ const onSaveImage = async () => {
 };
 
 const onLoadImage = async () => {
-  const data = await FileStore.load(imagePath.value, { encoding: 'base64' });
+  const data = await FileStore.loadImage(imagePath.value);
   console.dir(data);
 };
 

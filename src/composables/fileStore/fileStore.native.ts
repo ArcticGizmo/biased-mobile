@@ -1,5 +1,14 @@
 import { Directory, Encoding, Filesystem } from '@capacitor/filesystem';
-import type { FileSaveResult, FileLoadResult, FileSaveOptions, IFileStore, FileRemoveResult, FileLoadOptions, FileEncoding } from './types';
+import type {
+  FileSaveResult,
+  FileLoadResult,
+  FileSaveOptions,
+  IFileStore,
+  FileRemoveResult,
+  FileLoadOptions,
+  FileEncoding,
+  ImageSaveOptions
+} from './types';
 import { Capacitor } from '@capacitor/core';
 import { getMimeType } from './mime';
 
@@ -32,17 +41,15 @@ export class FileStoreNative implements IFileStore {
     }
   }
 
+  async saveImage(path: string, base64Data: string, opts?: ImageSaveOptions | undefined): Promise<FileSaveResult> {
+    return await this.save(path, base64Data, { directory: opts?.directory, encoding: 'base64' });
+  }
+
   async load(path: string, opts?: FileLoadOptions): Promise<FileLoadResult> {
     const encoding = getEncoding(opts?.encoding || 'utf8');
 
     try {
       const resp = await Filesystem.readFile({ path, encoding });
-
-      // base64
-      if (!encoding) {
-        const mime = getMimeType(path, 'image/png');
-        return { ok: true, data: `data:${mime};base64,${resp.data}` };
-      }
 
       // blob is only allowed on the web, so it will always be string
       return { ok: true, data: resp.data as string };
@@ -50,6 +57,17 @@ export class FileStoreNative implements IFileStore {
       console.error('[file store | native] unable to load', error);
       return { ok: false, error };
     }
+  }
+
+  async loadImage(path: string): Promise<FileLoadResult> {
+    const resp = await this.load(path, { encoding: 'base64' });
+
+    if (resp.ok) {
+      const mime = getMimeType(path, 'image/png');
+      resp.data = `data:${mime};base64,${resp.data}`;
+    }
+
+    return resp;
   }
 
   async remove(path: string): Promise<FileRemoveResult> {

@@ -1,7 +1,16 @@
 // TODO: consider the result pattern for this one as it can be complicated
 
 import { ViteMessaging } from '@/vite/messaging';
-import type { FileSaveResult, FileLoadResult, FileRemoveResult, IFileStore, FileSaveOptions, FileEncoding, FileLoadOptions } from './types';
+import type {
+  FileSaveResult,
+  FileLoadResult,
+  FileRemoveResult,
+  IFileStore,
+  FileSaveOptions,
+  FileEncoding,
+  FileLoadOptions,
+  ImageSaveOptions
+} from './types';
 import { Directory } from '@capacitor/filesystem';
 import { getMimeType } from './mime';
 
@@ -37,22 +46,32 @@ export class FileStoreWeb implements IFileStore {
     }
   }
 
+  async saveImage(path: string, base64Data: string, opts?: ImageSaveOptions | undefined): Promise<FileSaveResult> {
+    return await this.save(path, base64Data, { directory: opts?.directory, encoding: 'base64' });
+  }
+
   async load(path: string, opts?: FileLoadOptions): Promise<FileLoadResult> {
     path = trimPrefix(path);
     const encoding = opts?.encoding || 'utf8';
     try {
-      let data = await ViteMessaging.request<LoadRequest, string | undefined>('storage:load', { path, encoding });
-
-      if (encoding === 'base64') {
-        const mime = getMimeType(path, 'image/png');
-        data = `data:${mime};base64,${data}`;
-      }
+      const data = await ViteMessaging.request<LoadRequest, string | undefined>('storage:load', { path, encoding });
 
       return { ok: true, data };
     } catch (error) {
       console.error('[file store | web] unable to load', error);
       return { ok: false, error };
     }
+  }
+
+  async loadImage(path: string): Promise<FileLoadResult> {
+    const resp = await this.load(path, { encoding: 'base64' });
+
+    if (resp.ok) {
+      const mime = getMimeType(path, 'image/png');
+      resp.data = `data:${mime};base64,${resp.data}`;
+    }
+
+    return resp;
   }
 
   async remove(path: string): Promise<FileRemoveResult> {

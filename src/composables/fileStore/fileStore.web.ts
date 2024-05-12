@@ -1,7 +1,7 @@
 // TODO: consider the result pattern for this one as it can be complicated
 
 import { ViteMessaging } from '@/vite/messaging';
-import type { FileSaveResult, FileLoadResult, IFileStore, FileSaveOptions } from './types';
+import type { FileSaveResult, FileLoadResult, FileRemoveResult, IFileStore, FileSaveOptions } from './types';
 import { Directory } from '@capacitor/filesystem';
 
 interface SaveRequest {
@@ -32,6 +32,16 @@ export class FileStoreWeb implements IFileStore {
     try {
       const data = await ViteMessaging.request<LoadRequest, string | undefined>('storage:load', { path });
       return { ok: true, data };
+    } catch (error) {
+      console.error('[file store | web] unable to load', error);
+      return { ok: false, error };
+    }
+  }
+
+  async remove(path: string): Promise<FileRemoveResult> {
+    try {
+      await ViteMessaging.request<LoadRequest, 'ok'>('storage:remove', { path });
+      return { ok: true };
     } catch (error) {
       console.error('[file store | web] unable to load', error);
       return { ok: false, error };

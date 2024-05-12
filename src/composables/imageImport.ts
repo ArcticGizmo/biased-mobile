@@ -72,12 +72,12 @@ const getMimeFromBase64Uri = (base64Uri: string) => {
   return base64Uri.split(';', 1)[0].replace('data:', '');
 };
 
+const createOkPhoto = (base64Uri: string): KPhotoResponse => {
+  return { ok: true, photo: { base64Uri, format: getMimeFromBase64Uri(base64Uri) || 'image/jpeg' } };
+};
+
 export const useImageImport = () => {
   const { showToast } = useToast();
-
-  const createOkPhoto = (base64Uri: string): KPhotoResponse => {
-    return { ok: true, photo: { base64Uri, format: getMimeFromBase64Uri(base64Uri) || 'image/jpeg' } };
-  };
 
   const handleError = (error: any, message: string): KPhotoResponse => {
     const msg = error.message || '';

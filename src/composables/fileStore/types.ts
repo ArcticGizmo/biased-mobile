@@ -11,9 +11,12 @@ export type FileSaveResult = { ok: true; path: string } | { ok: false; error: an
 
 export type FileLoadResult = { ok: true; data: string | undefined } | { ok: false; error: any };
 
+export type FileRemoveResult = { ok: true } | { ok: false; error: any };
+
 export interface IFileStore {
   type: 'web' | 'native';
 
   save(path: string, data: string, opts?: FileSaveOptions): Promise<FileSaveResult>;
   load(path: string): Promise<FileLoadResult>;
+  remove(path: string): Promise<FileRemoveResult>;
 }

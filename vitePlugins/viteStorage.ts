@@ -5,7 +5,10 @@ import nodePath from 'node:path';
 
 const DIR = './.vite-storage';
 
-const buildPath = (path: string) => nodePath.join(DIR, path);
+const buildPath = (unsafePath: string) => {
+  const safePath = nodePath.normalize(unsafePath).replace(/^(\.\.(\/|\\|$))+/, '');
+  return nodePath.join(DIR, safePath);
+};
 
 export const viteStoragePlugin = (): Plugin => {
   return {
@@ -17,7 +20,6 @@ export const viteStoragePlugin = (): Plugin => {
 
       addMessageHandler<{ path: string; value: string }>(server, 'storage:save', async (req, reply, reject) => {
         const path = buildPath(req.path);
-        console.log(req.value);
         fs.mkdirSync(nodePath.dirname(path), { recursive: true });
         fs.writeFile(path, req.value, { flag: 'w+' }, err => {
           if (err) {
@@ -35,11 +37,25 @@ export const viteStoragePlugin = (): Plugin => {
         fs.readFile(path, 'utf8', (err, data) => {
           if (err && err.code !== 'ENOENT') {
             // TODO: catch file does not exist
-            console.error('[vite storage] error while laoding', path, err);
+            console.error('[vite storage] error while loading', path, err);
             reject(err);
           } else {
-            console.log('[vite storage load |', path);
+            console.log('[vite storage] load |', path);
             reply(data);
+          }
+        });
+      });
+
+      addMessageHandler<{ path: string }>(server, 'storage:remove', (req, reply, reject) => {
+        const path = buildPath(req.path);
+        fs.rm(path, err => {
+          if (err) {
+            // TODO: catch file does not exist
+            console.error('[vite storage] error while loading', path, err);
+            reject(err);
+          } else {
+            console.log('[vite storage] load |', path);
+            reply('ok');
           }
         });
       });

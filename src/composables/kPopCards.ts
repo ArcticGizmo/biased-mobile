@@ -1,26 +1,25 @@
 import { KPopCard, OptionalFields } from '@/types';
 import { onMounted, readonly, ref, watch } from 'vue';
-import { useStorage } from './storage';
+import { KvStore } from './kvStore';
 import { deleteFile } from './localFileSystem';
 import { v1 as uuidv1 } from 'uuid';
 
-type KPopCardUpdate = Omit<OptionalFields<KPopCard>, 'id'>;
+const STORAGE_KEY = 'kpop-cards';
 
-const { saveValue, loadValue } = useStorage<KPopCard[]>('kpop-cards');
+type KPopCardUpdate = Omit<OptionalFields<KPopCard>, 'id'>;
 
 const cards = ref<KPopCard[]>([]);
 const isLoading = ref(true);
 
 const cacheCards = () => {
-  saveValue(cards.value);
+  KvStore.saveJson(STORAGE_KEY, cards.value);
 };
 
 watch(cards, cacheCards);
 
 const loadSaved = async () => {
   isLoading.value = true;
-  cards.value = (await loadValue()) || [];
-
+  cards.value = (await KvStore.loadJson<KPopCard[]>(STORAGE_KEY)) || [];
   isLoading.value = false;
 };
 

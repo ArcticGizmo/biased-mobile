@@ -1,5 +1,5 @@
 import { Directory, Encoding, Filesystem } from '@capacitor/filesystem';
-import type { FileSaveResult, FileLoadResult, FileSaveOptions, IFileStore } from './types';
+import type { FileSaveResult, FileLoadResult, FileSaveOptions, IFileStore, FileRemoveResult } from './types';
 
 export class FileStoreNative implements IFileStore {
   type: 'web' | 'native' = 'native';
@@ -28,6 +28,16 @@ export class FileStoreNative implements IFileStore {
       return { ok: true, data: resp.data as string };
     } catch (error) {
       console.error('[file store | native] unable to load', error);
+      return { ok: false, error };
+    }
+  }
+
+  async remove(path: string): Promise<FileRemoveResult> {
+    try {
+      await Filesystem.deleteFile({ path });
+      return { ok: true };
+    } catch (error) {
+      console.error('[file store | native] unable to remove', error);
       return { ok: false, error };
     }
   }

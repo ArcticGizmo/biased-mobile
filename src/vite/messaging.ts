@@ -68,15 +68,3 @@ class ViteMessagingClient {
 }
 
 export const ViteMessaging = new ViteMessagingClient();
-
-// TODO: remove
-/**
- * @deprecated just a placeholder
- */
-export const useViteMessaging = <Req = any, Resp = any>(name: string) => {
-  const sendData = (data: Req) => {
-    throw 'not implemented';
-  };
-
-  return { sendData };
-};

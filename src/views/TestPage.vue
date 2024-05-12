@@ -6,6 +6,7 @@
       <br />
       <br />
       <IonButton @click="onSaveAndLoadFile()">Save and Load file</IonButton>
+      <IonButton @click="onDeleteFile()">Delete File</IonButton>
     </div>
   </BasePage>
 </template>
@@ -38,4 +39,8 @@ const onSaveAndLoadFile = async () => {
   const loadResp = await FileStore.load(saveResp.path);
   console.log('loaded', loadResp);
 };
+
+const onDeleteFile = async () => {
+  await FileStore.remove("DATA/my-file.txt")
+}
 </script>

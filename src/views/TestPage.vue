@@ -5,8 +5,7 @@
       <IonButton @click="onLoadKv()">Load KV</IonButton>
       <br />
       <br />
-      <IonButton @click="onSaveFile()">Save File</IonButton>
-      <IonButton @click="onLoadFile()">Load File</IonButton>
+      <IonButton @click="onSaveAndLoadFile()">Save and Load file</IonButton>
     </div>
   </BasePage>
 </template>
@@ -15,6 +14,7 @@
 import BasePage from './BasePage.vue';
 import { IonButton } from '@ionic/vue';
 import { KvStore } from '@/composables/kvStore';
+import { FileStore } from '@/composables/fileStore';
 
 type MyKvData = { egg: number } | { duck: string };
 
@@ -29,7 +29,13 @@ const onLoadKv = async () => {
   console.dir(resp);
 };
 
-const onSaveFile = async () => {};
-
-const onLoadFile = async () => {};
+const onSaveAndLoadFile = async () => {
+  const saveResp = await FileStore.save('my-file.txt', 'my fun message');
+  if (!saveResp.ok) {
+    return;
+  }
+  console.log('saved', saveResp);
+  const loadResp = await FileStore.load(saveResp.path);
+  console.log('loaded', loadResp);
+};
 </script>

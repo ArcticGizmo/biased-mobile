@@ -15,10 +15,11 @@ export const viteStoragePlugin = (): Plugin => {
         fs.mkdirSync(DIR);
       }
 
-      addMessageHandler<{ path: string; value: any }>(server, 'storage:save', async (req, reply, reject) => {
+      addMessageHandler<{ path: string; value: string }>(server, 'storage:save', async (req, reply, reject) => {
         const path = buildPath(req.path);
+        console.log(req.value);
         fs.mkdirSync(nodePath.dirname(path), { recursive: true });
-        fs.writeFile(path, JSON.stringify(req.value), { flag: 'w+' }, err => {
+        fs.writeFile(path, req.value, { flag: 'w+' }, err => {
           if (err) {
             console.error('[vite storage] error while saving', path, err);
             reject(err);

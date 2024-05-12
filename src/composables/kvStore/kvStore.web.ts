@@ -10,7 +10,7 @@ interface LoadRequest {
   path: string;
 }
 
-const getPath = (key: string) => `kv-store/${key}.txt`;
+const getPath = (key: string) => `.kv-store/${key}.txt`;
 
 export class KvStoreWeb implements IKvStore {
   type: 'web' | 'native' = 'web';

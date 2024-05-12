@@ -1,3 +1,5 @@
+// TODO: this become KVStore
+
 import { useViteMessaging } from '@/vite/messaging';
 import { Preferences } from '@capacitor/preferences';
 import { isPlatform } from '@ionic/vue';
@@ -24,11 +26,11 @@ const useNativeStorage = <T>(key: string, parser?: Parser<T>) => {
 };
 
 const useWebStorage = <T>(key: string, parser?: Parser<T>) => {
-  const { sendData: sendSaveRequest } = useViteMessaging<{ key: string; value: T | undefined }, 'ok'>('storage:save');
-  const { sendData: sendLoadRequest } = useViteMessaging<{ key: string }, string | undefined>('storage:load');
+  const { sendData: sendSaveRequest } = useViteMessaging<{ path: string; value: T | undefined }, 'ok'>('storage:save');
+  const { sendData: sendLoadRequest } = useViteMessaging<{ path: string }, string | undefined>('storage:load');
 
   const loadValue = async () => {
-    const resp = await sendLoadRequest({ key });
+    const resp = await sendLoadRequest({ path: `${key}.txt` });
 
     if (parser) {
       return parser(resp);
@@ -41,7 +43,7 @@ const useWebStorage = <T>(key: string, parser?: Parser<T>) => {
   };
 
   const saveValue = async (value: T | undefined) => {
-    await sendSaveRequest({ key, value });
+    await sendSaveRequest({ path: `${key}.txt`, value });
   };
 
   return { loadValue, saveValue };

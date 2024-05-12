@@ -14,7 +14,7 @@
 
 <script setup lang="ts">
 import { IonTabBar, IonTabButton, IonTabs, IonLabel, IonIcon, IonPage, IonRouterOutlet } from '@ionic/vue';
-import { home, settings } from 'ionicons/icons';
+import { home, settings, addCircle } from 'ionicons/icons';
 
 interface NavItem {
   tab: string;
@@ -24,6 +24,12 @@ interface NavItem {
 }
 
 const items: NavItem[] = [
+  {
+    tab: 'create',
+    href: '/creator',
+    icon: addCircle,
+    text: 'Create'
+  },
   {
     tab: 'home',
     href: '/home',
@@ -38,3 +44,9 @@ const items: NavItem[] = [
   }
 ];
 </script>
+
+<style>
+.tab-selected {
+  color: var(--ion-color-primary-shade);
+}
+</style>

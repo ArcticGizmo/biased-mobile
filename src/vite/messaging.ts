@@ -5,57 +5,77 @@ type Reject = (error: any) => void;
 
 let REQ_ID = 1;
 
-const getHot = () => {
-  if (!import.meta.env.DEV) {
-    throw 'Vite hot reloading not available outside of DEV';
+class ViteMessagingClient {
+  // TODO: need to keep track of event handlers
+  private _listeningFor: string[] = [];
+  private _proms: Record<string, { resolve: Resolve; reject: Reject }> = {};
+
+  private get hot() {
+    if (!import.meta.env.DEV) {
+      throw 'Vite hot reloading not available outside of DEV';
+    }
+
+    const hot = import.meta.hot;
+
+    if (!hot) {
+      throw 'Vite hot reloading not available';
+    }
+
+    return hot;
   }
 
-  const hot = import.meta.hot;
-
-  if (!hot) {
-    throw 'Vite hot reloading not available';
-  }
-
-  return hot;
-};
-
-export const sendMessage = <T = any>(event: string, data: T) => {
-  const hot = getHot();
-  hot.send(event, data);
-};
-
-export const listenForMessage = <T = any>(event: string, callback: (payload: T) => void) => {
-  const hot = getHot();
-  hot.on(event, callback);
-};
-
-export const useViteMessaging = <Req = any, Resp = any>(name: string) => {
-  const hot = getHot();
-
-  const proms: Record<string, { resolve: Resolve; reject: Reject }> = {};
-
-  hot.on(`${name}:response`, (resp: ViteMessageResponse<Resp>) => {
-    const prom = proms[resp.id];
-    if (!prom) {
-      // usually means another instance caught it
+  private registerListener<TResp>(event: string) {
+    if (this._listeningFor.includes(event)) {
       return;
     }
 
-    if (resp.ok) {
-      prom.resolve(resp.data);
-    } else {
-      prom.reject(resp.error);
-    }
+    this.hot.on(`${event}:response`, (resp: ViteMessageResponse<TResp>) => {
+      const prom = this._proms[resp.id];
+      if (!prom) {
+        // usually means another instance caught it
+        return;
+      }
 
-    delete proms[resp.id];
-  });
+      if (resp.ok) {
+        prom.resolve(resp.data);
+      } else {
+        prom.reject(resp.error);
+      }
 
-  const sendData = (data: Req) => {
-    return new Promise<Resp>((resolve, reject) => {
-      const id = REQ_ID++;
-      proms[id] = { resolve, reject };
-      hot.send(`${name}:request`, { id, data });
+      delete this._proms[resp.id];
     });
+
+    this._listeningFor.push(event);
+  }
+
+  async request<TData, TResp>(event: string, data: TData) {
+    this.registerListener<TResp>(event);
+
+    return new Promise<TResp>((resolve, reject) => {
+      const id = REQ_ID++;
+      this._proms[id] = { resolve, reject };
+      this.hot.send(`${event}:request`, { id, data });
+    });
+  }
+
+  send<TData>(event: string, data: TData) {
+    this.hot.send(`${event}:request`, data);
+  }
+
+  on<TResp>(event: string, callback: (payload: TResp) => void) {
+    this.hot.on(`${event}:response`, callback);
+  }
+}
+
+export const ViteMessaging = new ViteMessagingClient();
+
+// TODO: remove
+/**
+ * @deprecated just a placeholder
+ */
+export const useViteMessaging = <Req = any, Resp = any>(name: string) => {
+  const sendData = (data: Req) => {
+    throw 'not implemented';
   };
 
   return { sendData };

@@ -179,6 +179,8 @@ const onSubmit = async () => {
   const scaledImage = await resizeMaxDimension(imageSrc.value, 500);
   const imageFile = await newBase64Image(scaledImage);
 
+  console.dir(imageFile);
+
   const data: KPopCard = {
     id: generateId(),
     imageFile,

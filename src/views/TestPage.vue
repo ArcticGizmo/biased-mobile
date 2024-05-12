@@ -1,8 +1,12 @@
 <template>
   <BasePage title="Test Page">
     <div class="m-8">
-      <IonButton @click="onSave()">Save</IonButton>
-      <IonButton @click="onLoad()">Load</IonButton>
+      <IonButton @click="onSaveKv()">Save KV</IonButton>
+      <IonButton @click="onLoadKv()">Load KV</IonButton>
+      <br />
+      <br />
+      <IonButton @click="onSaveFile()">Save File</IonButton>
+      <IonButton @click="onLoadFile()">Load File</IonButton>
     </div>
   </BasePage>
 </template>
@@ -10,21 +14,22 @@
 <script setup lang="ts">
 import BasePage from './BasePage.vue';
 import { IonButton } from '@ionic/vue';
-import { useStorage } from '@/composables/storage';
+import { KvStore } from '@/composables/kvStore';
 
-interface MyData {
-  id: string;
-  count: number;
-}
+type MyKvData = { egg: number } | { duck: string };
 
-const { saveValue, loadValue } = useStorage<MyData[]>('my-data');
+const data = [{ egg: 7 }, { duck: 'lettuce' }];
 
-const onSave = async () => {
-  await saveValue([{ id: 'aaaa', count: 10 }]);
+const onSaveKv = async () => {
+  await KvStore.saveJson<MyKvData[]>('my-data', data);
 };
 
-const onLoad = async () => {
-  const resp = await loadValue();
+const onLoadKv = async () => {
+  const resp = await KvStore.loadJson<MyKvData[]>('my-data');
   console.dir(resp);
 };
+
+const onSaveFile = async () => {};
+
+const onLoadFile = async () => {};
 </script>

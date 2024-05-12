@@ -30,7 +30,7 @@ import { KvStore } from '@/composables/kvStore';
 import { FileStore } from '@/composables/fileStore';
 import { ref } from 'vue';
 import { useImageImport } from '@/composables/imageImport';
-import { Directory, Encoding } from '@capacitor/filesystem';
+import { Directory } from '@capacitor/filesystem';
 
 const { photoFromGallery } = useImageImport();
 
@@ -75,7 +75,7 @@ const onRemoveImage = async () => {
 };
 
 const onSaveFile = async () => {
-  const resp = await FileStore.save('example/bacon.txt', 'bacon');
+  const resp = await FileStore.save('example/bacon.txt', 'bacon', { directory: Directory.Documents });
   if (!resp.ok) {
     return;
   }

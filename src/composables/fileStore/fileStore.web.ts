@@ -12,7 +12,7 @@ import type {
   ImageSaveOptions
 } from './types';
 import { Directory } from '@capacitor/filesystem';
-import { getMimeType } from './mime';
+import { getMimeTypeFromPath } from '../mime';
 
 interface SaveRequest {
   path: string;
@@ -67,7 +67,7 @@ export class FileStoreWeb implements IFileStore {
     const resp = await this.load(path, { encoding: 'base64' });
 
     if (resp.ok) {
-      const mime = getMimeType(path, 'image/png');
+      const mime = getMimeTypeFromPath(path, 'image/png');
       resp.data = `data:${mime};base64,${resp.data}`;
     }
 

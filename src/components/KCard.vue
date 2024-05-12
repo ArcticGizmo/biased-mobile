@@ -1,7 +1,6 @@
 <template>
   <IonCard class="m-1">
     <KImg :class="{ 'grayscale opacity-60': greyOut }" aspect-ratio="0.7" :src="src" />
-    {{ src }}
     <IonCardContent class="flex flex-col justify-center p-1 h-14">
       <IonCardTitle class="text-sm text-ellipsis overflow-hidden whitespace-nowrap">{{ title }}</IonCardTitle>
       <IonCardSubtitle v-if="subtitle" class="text-xs text-ellipsis overflow-hidden whitespace-nowrap">{{ subtitle }}</IonCardSubtitle>

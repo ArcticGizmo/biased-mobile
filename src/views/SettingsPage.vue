@@ -53,7 +53,7 @@ const buildBackup = async () => {
   const packedCards: KPopCardPackable[] = [];
 
   for (const card of cards.value) {
-    const loadResult = await FileStore.load(card.imageFilePath);
+    const loadResult = await FileStore.loadImage(card.imageFilePath);
     if (!loadResult.ok) {
       console.error('could not load file', card.imageFilePath, loadResult.error);
       return;
@@ -77,7 +77,7 @@ const buildBackup = async () => {
 };
 
 const onLoadBackup = async () => {
-  // await pickFile();
+  await pickFile();
 };
 
 // const onDownload = async () => {

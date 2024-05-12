@@ -1,10 +1,17 @@
-import type { Directory, Encoding } from '@capacitor/filesystem';
+import type { Directory } from '@capacitor/filesystem';
+
+export type FileEncoding = 'base64' | 'utf8';
 
 export interface FileSaveOptions {
   /** Default: Directory.Data */
   directory?: Directory;
   /** Defualt: Encoding.UTF8. Is ignored on web */
-  encoding?: Encoding;
+  encoding?: FileEncoding;
+}
+
+export interface FileLoadOptions {
+  /** Defualt: Encoding.UTF8. Is ignored on web */
+  encoding?: FileEncoding;
 }
 
 export type FileSaveResult = { ok: true; path: string } | { ok: false; error: any };
@@ -17,6 +24,7 @@ export interface IFileStore {
   type: 'web' | 'native';
 
   save(path: string, data: string, opts?: FileSaveOptions): Promise<FileSaveResult>;
-  load(path: string): Promise<FileLoadResult>;
+  load(path: string, opts?: FileLoadOptions): Promise<FileLoadResult>;
   remove(path: string): Promise<FileRemoveResult>;
+  toHref(pathOrBase64: string): string;
 }

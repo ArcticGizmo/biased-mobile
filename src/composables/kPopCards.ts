@@ -1,7 +1,7 @@
 import { KPopCard, OptionalFields } from '@/types';
 import { onMounted, readonly, ref, watch } from 'vue';
 import { KvStore } from './kvStore';
-import { deleteFile } from './localFileSystem';
+import { FileStore } from './fileStore';
 import { v1 as uuidv1 } from 'uuid';
 
 const STORAGE_KEY = 'kpop-cards';
@@ -31,9 +31,10 @@ export const useKPopCards = () => {
   };
 
   const clearCards = () => {
-    // fire and forget
     for (const card of cards.value) {
-      deleteFile(card.imageFile);
+      // TODO: revisit
+      // fire and forget so it just happens in the background
+      FileStore.remove(card.imageFilePath);
     }
     cards.value = [];
   };

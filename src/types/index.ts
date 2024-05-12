@@ -1,5 +1,3 @@
-import { LocalFile } from '@/composables/localFileSystem';
-
 export type OptionalFields<T> = {
   [P in keyof T]?: T[P];
 };
@@ -23,7 +21,7 @@ export interface KPopData {
 
 export interface KPopCard extends KPopData {
   id: string;
-  imageFile: LocalFile; 
+  imageFilePath: string;
 }
 
 export interface KPopCardPackable extends KPopData {

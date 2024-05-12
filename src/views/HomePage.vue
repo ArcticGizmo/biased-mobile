@@ -10,7 +10,7 @@
         :key="index"
         :title="card.artist"
         :subtitle="card.whereFromName"
-        :src="card.imageFile.webviewPath"
+        :src="FileStore.toHref(card.imageFilePath)"
         :status="card.ownershipType"
         @click="onOpenCard(card.id)"
       />
@@ -24,6 +24,7 @@ import { IonButton } from '@ionic/vue';
 import { useSimpleRouter } from '@/composables/router';
 import { useKPopCards } from '@/composables/kPopCards';
 import KCard from '@/components/KCard.vue';
+import { FileStore } from '@/composables/fileStore';
 
 const router = useSimpleRouter();
 const { cards, clearCards } = useKPopCards();

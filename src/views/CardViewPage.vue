@@ -1,7 +1,7 @@
 <template>
   <BasePage :title="card?.artist">
     <div v-if="card" class="card-view p-4">
-      <KImg :src="card.imageFile.webviewPath" />
+      <KImg :src="FileStore.toHref(card.imageFilePath)" />
       <OwnershipInput :model-value="card.ownershipType" @change="onOwnershipChange" />
       <!-- ======= who ======== -->
       <IonInput
@@ -52,6 +52,7 @@ import OwnershipInput from '@/components/OwnershipInput.vue';
 import { useKPopCards } from '@/composables/kPopCards';
 import { computed } from 'vue';
 import { OwnershipType } from '@/types';
+import { FileStore } from '@/composables/fileStore';
 
 const props = defineProps<{
   id: string;

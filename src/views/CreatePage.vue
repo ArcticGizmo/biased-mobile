@@ -86,8 +86,9 @@ import PickerInput from '@/components/PickerInput.vue';
 import ImageEditorModal from '@/components/ImageEditorModal.vue';
 import type { ArtistType, WhereFrom, OwnershipType, KPopCard } from '@/types';
 import { useKPopCards } from '@/composables/kPopCards';
-
-import { newBase64Image } from '@/composables/localFileSystem';
+import { getMimeFromBase64Uri, getExtensionFromMimeType } from '@/composables/image';
+import { FileStore } from '@/composables/fileStore';
+import { v4 as uuidv4 } from 'uuid';
 
 const { takePhoto, photoFromGallery, photoFromUrl, resizeMaxDimension } = useImageImport();
 const { addCard, generateId } = useKPopCards();
@@ -177,13 +178,20 @@ const onEditImage = async () => {
 
 const onSubmit = async () => {
   const scaledImage = await resizeMaxDimension(imageSrc.value, 500);
-  const imageFile = await newBase64Image(scaledImage);
+  // const imageFile = await newBase64Image(scaledImage);
+  const mimeType = getMimeFromBase64Uri(scaledImage);
+  const ext = getExtensionFromMimeType(mimeType) || 'png';
 
-  console.dir(imageFile);
+  const fileResult = await FileStore.save(`photo-cards/${uuidv4()}.${ext}`, scaledImage);
+
+  if (!fileResult.ok) {
+    console.error('[creator] could not save file to disk');
+    return;
+  }
 
   const data: KPopCard = {
     id: generateId(),
-    imageFile,
+    imageFilePath: fileResult.path,
     artist: artist.value,
     artistType: artistType.value,
     groupName: groupName.value,

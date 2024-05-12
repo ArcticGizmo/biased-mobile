@@ -31,11 +31,11 @@ const routes: Array<RouteRecordRaw> = [
     props: true,
     component: () => import('@/views/CardViewPage.vue')
   },
-  {
-    path: '/:pathMatch(.*)*',
-    name: 'NotFound',
-    component: () => import('@/views/NotFoundPage.vue')
-  }
+  // {
+  //   path: '/:pathMatch(.*)*',
+  //   name: 'NotFound',
+  //   component: () => import('@/views/NotFoundPage.vue')
+  // }
 ];
 
 if (import.meta.env.DEV) {

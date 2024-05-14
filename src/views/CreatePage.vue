@@ -101,12 +101,12 @@ const dateOptions = Array.from({ length: 50 }, (_, i) => {
 
 const imageSrc = ref('');
 const originalImgSrc = ref('');
-const artist = ref('J');
+const artist = ref('');
 const artistType = ref<ArtistType>('group');
 const groupName = ref('');
 
 const whereFrom = ref<WhereFrom>('album');
-const whereFromName = ref('J');
+const whereFromName = ref('');
 const albumVersion = ref('');
 
 const year = ref(`${thisYear}`);
@@ -182,7 +182,7 @@ const onSubmit = async () => {
   const fileResult = await FileStore.saveImage(`photo-cards/${generateId()}.${extension}`, scaledImage);
 
   if (!fileResult.ok) {
-    console.error('[creator] could not save file to disk');
+    console.error('[creator] could not save file to disk', fileResult.error);
     return;
   }
 
@@ -198,8 +198,6 @@ const onSubmit = async () => {
     year: year.value,
     ownershipType: ownershipType.value
   };
-
-  console.dir(data);
 
   addCard(data);
   resetForm();

@@ -4,7 +4,6 @@ import { KvStore } from './kvStore';
 import { FileStore } from './fileStore';
 import { v1 as uuidv1 } from 'uuid';
 import { getExtensionFromBase64Uri } from './mime';
-import { v4 as uuidv4 } from 'uuid';
 
 const STORAGE_KEY = 'kpop-cards';
 

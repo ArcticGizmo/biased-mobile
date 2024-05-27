@@ -6,23 +6,45 @@ import { sad } from 'ionicons/icons';
 
 // TODO: deal with permissions
 
-export interface KPhoto {
-  base64Uri: string;
-  format: string;
+export type ImageFormat = 'png' | 'jpeg';
+
+export interface B64Image {
+  b64Data: string;
+  format: ImageFormat;
 }
 
-export type KPhotoResponse = { ok: true; photo: KPhoto } | { ok: false; error: any };
+export type KPhotoResponse = { ok: true; image: B64Image } | { ok: false; error: any };
 
-const encodeBase64Uri = (base64Data: string, format: string) => {
-  return `data:image/${format};base64,${base64Data}`;
+const ensureFormat = (format: string) => {
+  if (['png', 'jpeg'].includes(format)) {
+    return format as ImageFormat;
+  }
+
+  throw 'invalid format';
 };
 
-const convertBlobToBase64Uri = (blob: Blob) => {
+const b64UriToImage = (b64Uri: string): B64Image => {
+  const [preamble, b64Data] = b64Uri.split(',');
+
+  const format = ensureFormat(preamble.replace('data:image/', '').split(';')[0]);
+
+  return { b64Data, format };
+};
+
+const imageToB64Uri = (image: B64Image): string => {
+  return `data:image/${image.format};base64,${image.b64Data}`;
+};
+
+// const encodeBase64Uri = (base64Data: string, format: string) => {
+//   return `data:image/${format};base64,${base64Data}`;
+// };
+
+const convertBlobToBase64Uri = (blob: Blob): Promise<string> => {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
     reader.onerror = reject;
     reader.onload = () => {
-      resolve(reader.result);
+      resolve(reader.result as string);
     };
     reader.readAsDataURL(blob);
   });
@@ -42,6 +64,35 @@ const limitDimensions = (width: number, height: number, maxSize: number) => {
   }
 };
 
+// const b64toBlob = (b64Data: string, contentType = '', sliceSize = 512) => {
+//   const byteCharacters = atob(b64Data);
+//   const byteArrays = [];
+
+//   for (let offset = 0; offset < byteCharacters.length; offset += sliceSize) {
+//     const slice = byteCharacters.slice(offset, offset + sliceSize);
+
+//     const byteNumbers = new Array(slice.length);
+//     for (let i = 0; i < slice.length; i++) {
+//       byteNumbers[i] = slice.charCodeAt(i);
+//     }
+
+//     const byteArray = new Uint8Array(byteNumbers);
+//     byteArrays.push(byteArray);
+//   }
+
+//   const blob = new Blob(byteArrays, { type: contentType });
+//   return blob;
+// };
+
+// const splitBase64Uri = (base64Uri: string) => {
+//   const [first, second] = base64Uri.split(',');
+
+//   if (first.startsWith('data:')) {
+//     return ''
+//   }
+
+// }
+
 const resizeMaxDimension = async (base64Uri: string, maxSize: number) => {
   return new Promise<string>((resolve, reject) => {
     const img = document.createElement('img');
@@ -57,7 +108,7 @@ const resizeMaxDimension = async (base64Uri: string, maxSize: number) => {
 
       ctx.drawImage(img, 0, 0, width, height);
 
-      const dataURI = canvas.toDataURL(getMimeFromBase64Uri(base64Uri));
+      const dataURI = canvas.toDataURL('image/jpeg');
 
       resolve(dataURI);
     };
@@ -68,12 +119,36 @@ const resizeMaxDimension = async (base64Uri: string, maxSize: number) => {
   });
 };
 
-const getMimeFromBase64Uri = (base64Uri: string) => {
-  return base64Uri.split(';', 1)[0].replace('data:', '');
+// const getMimeFromBase64Uri = (base64Uri: string) => {
+//   return base64Uri.split(';', 1)[0].replace('data:', '');
+// };
+
+const createOkPhoto = (b64Data: string, format: string): KPhotoResponse => {
+  const a: KPhotoResponse = { ok: true, image: { b64Data, format: ensureFormat(format) } };
+  console.log('created', a);
+  return a;
 };
 
-const createOkPhoto = (base64Uri: string): KPhotoResponse => {
-  return { ok: true, photo: { base64Uri, format: getMimeFromBase64Uri(base64Uri) || 'image/jpeg' } };
+// const createOkPhoto = (base64Uri: string): KPhotoResponse => {
+//   console.log('create photo', base64Uri);
+//   return { ok: true, image: { b64Data: '', format: '' } };
+// };
+
+const photoTob64Image = async (photo: GalleryPhoto): Promise<B64Image> => {
+  if (isPlatform('hybrid')) {
+    const file = await Filesystem.readFile({
+      path: photo.path!
+    });
+    const data = file.data as string;
+
+    return { b64Data: data, format: ensureFormat(photo.format) };
+  }
+
+  // Fetch the photo, read as a blob, then convert to base64 format
+  const response = await fetch(photo.webPath!);
+  const blob = await response.blob();
+  const base64Uri = await convertBlobToBase64Uri(blob);
+  return b64UriToImage(base64Uri);
 };
 
 export const useImageImport = () => {
@@ -88,34 +163,17 @@ export const useImageImport = () => {
     return { ok: false, error };
   };
 
-  const photoToBase64Uri = async (photo: GalleryPhoto) => {
-    if (isPlatform('hybrid')) {
-      const file = await Filesystem.readFile({
-        path: photo.path!
-      });
-      const data = file.data as string;
-      if (data.startsWith('data:')) {
-        return data;
-      }
-
-      return encodeBase64Uri(data, photo.format);
-    }
-
-    // Fetch the photo, read as a blob, then convert to base64 format
-    const response = await fetch(photo.webPath!);
-    const blob = await response.blob();
-    return (await convertBlobToBase64Uri(blob)) as string;
-  };
-
   const takePhoto = async (): Promise<KPhotoResponse> => {
     try {
       const photo = await Camera.getPhoto({
         resultType: CameraResultType.Base64,
         source: CameraSource.Camera,
-        quality: 10
+        quality: 100
       });
 
-      return createOkPhoto(encodeBase64Uri(photo.base64String!, photo.format));
+      console.dir(photo);
+
+      return createOkPhoto(photo.base64String!, photo.format);
     } catch (error) {
       return handleError(error, "We couldn't take a picture");
     }
@@ -134,9 +192,14 @@ export const useImageImport = () => {
         throw 'no photos selected';
       }
 
-      const base64Uri = await photoToBase64Uri(photo);
+      // const base64Uri = await photoToBase64Uri(photo);
+      // console.log(base64Uri);
+      // const image = b64UriToImageData(base64Uri);
+      const image = await photoTob64Image(photo);
 
-      return createOkPhoto(base64Uri);
+      console.log(image);
+
+      return createOkPhoto(image.b64Data, image.format);
     } catch (error) {
       return handleError(error, "We couldn't read from your gallery");
     }
@@ -169,7 +232,8 @@ export const useImageImport = () => {
       const resp = await fetch(url);
       const blob = await resp.blob();
       const base64Uri = (await convertBlobToBase64Uri(blob)) as string;
-      return createOkPhoto(base64Uri);
+      const image = b64UriToImage(base64Uri);
+      return createOkPhoto(image.b64Data, image.format);
     } catch (error: any) {
       console.error('unable to parse from url', error);
       return handleError(error, "That link didn't work. Check your connection or try another one!");

@@ -141,8 +141,8 @@ watch(artistType, type => {
 
 const setImage = async (resp: KPhotoResponse) => {
   if (resp.ok) {
-    imageSrc.value = resp.photo.base64Uri;
-    originalImgSrc.value = resp.photo.base64Uri;
+    imageSrc.value = resp.image.b64Data;
+    originalImgSrc.value = resp.image.b64Data;
   }
 };
 
@@ -180,6 +180,11 @@ const onSubmit = async () => {
   const extension = getExtensionFromBase64Uri(scaledImage);
 
   const fileResult = await FileStore.saveImage(`photo-cards/${generateId()}.${extension}`, scaledImage);
+
+  if ("dddd".length) {
+    console.log(scaledImage);
+    return;
+  }
 
   if (!fileResult.ok) {
     console.error('[creator] could not save file to disk', fileResult.error);

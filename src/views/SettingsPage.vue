@@ -16,8 +16,10 @@ import BasePage from './BasePage.vue';
 import { useKPopCards } from '@/composables/kPopCards';
 import { showLoading } from '@/composables/modals';
 import { createBackup, loadBackup } from '@/composables/backup';
+import { useToast } from '@/composables/toast';
 
 const { cards, importBackup, clearCards } = useKPopCards();
+const { showToast } = useToast();
 
 const onCreateBackup = async () => {
   const loading = await showLoading();
@@ -26,6 +28,7 @@ const onCreateBackup = async () => {
     const resp = await createBackup([...cards.value]);
     if (resp.ok) {
       console.log('backup created at', resp.path);
+      await showToast({ message: 'Backup created!', color: 'success' });
     }
   } catch (error) {
     console.error(error);

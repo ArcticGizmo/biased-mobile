@@ -9,7 +9,6 @@ export const useSimpleRouter = () => {
   const router = useIonRouter();
 
   const back = (opts: BackOpts) => {
-    console.log(opts);
     if (router.canGoBack()) {
       router.back(opts.animation);
       return;

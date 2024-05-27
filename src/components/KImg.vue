@@ -1,12 +1,19 @@
 <template>
-  <div class="k-img" :class="{ background }" :style="{ aspectRatio, width, height }">
+  <div class="k-img" :class="{ background }" :style="{ aspectRatio, width, height, maxWidth, maxHeight }">
     <div v-if="state === 'fallback'" class="centered-container">
       <slot name="fallback">
         <IonIcon class="fallback-icon" :icon="imageOutline" />
       </slot>
     </div>
 
-    <div v-if="state === 'loading'" class="centered-container">
+    <div v-if="state === 'errored'" class="centered-container">
+      <slot name="error">
+        <IonIcon class="fallback-icon" :icon="sad" />
+        Broken Image
+      </slot>
+    </div>
+
+    <div v-else-if="state === 'loading'" class="centered-container">
       <slot name="loading">
         <IonSpinner name="dots" />
       </slot>
@@ -24,14 +31,18 @@
 
 <script setup lang="ts">
 import { IonIcon, IonImg, IonSpinner } from '@ionic/vue';
-import { imageOutline } from 'ionicons/icons';
+import { imageOutline, sad } from 'ionicons/icons';
 import { computed, ref } from 'vue';
+
+type Size = number | string;
 
 const props = defineProps<{
   src?: string;
   aspectRatio?: number | string;
-  width?: number | string;
-  height?: number | string;
+  width?: Size;
+  height?: Size;
+  maxWidth?: Size;
+  maxHeight?: Size;
   cover?: boolean;
   background?: boolean;
 }>();
@@ -40,8 +51,12 @@ const loading = ref(true);
 const errored = ref(false);
 
 const state = computed(() => {
-  if (errored.value || !props.src) {
+  if (!props.src) {
     return 'fallback';
+  }
+
+  if (errored.value) {
+    return 'errored';
   }
 
   if (loading.value) {

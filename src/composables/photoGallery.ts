@@ -48,8 +48,6 @@ const savePicture = async (photo: Photo, fileName: string): Promise<UserPhoto> =
     directory: Directory.Data
   });
 
-  console.log('saved file', savedFile);
-
   if (isPlatform('hybrid')) {
     // Display the new image by rewriting the 'file://' path to HTTP
     // Details: https://ionicframework.com/docs/building/webview#file-protocol
@@ -74,7 +72,6 @@ const takePhoto = async () => {
     quality: 100
   });
 
-  console.log('photo', photo);
   // could be webPath or path depending on platform
 
   const fileName = Date.now() + '.jpeg';

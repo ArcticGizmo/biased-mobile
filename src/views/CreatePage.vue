@@ -2,7 +2,7 @@
   <BasePage title="Creator" default-back-href="/home">
     <div class="content p-8">
       <div class="upload-pic">
-        <KImg height="50vh" :src="imageSrc" background>
+        <KImg :src="imageSrc" background height="50vh">
           <template #fallback>
             <template v-if="imageSrc">
               <IonIcon class="bad-image-icon" :icon="sadOutline" />
@@ -87,9 +87,9 @@ import ImageEditorModal from '@/components/ImageEditorModal.vue';
 import type { ArtistType, WhereFrom, OwnershipType, KPopCard } from '@/types';
 import { useKPopCards } from '@/composables/kPopCards';
 import { FileStore } from '@/composables/fileStore';
-import { getExtensionFromBase64Uri } from '@/composables/mime';
+import { Base64Uri } from '@/composables/base64';
 
-const { takePhoto, photoFromGallery, photoFromUrl, resizeMaxDimension } = useImageImport();
+const { takePhoto, photoFromGallery, photoFromUrl } = useImageImport();
 const { addCard, generateId } = useKPopCards();
 const router = useSimpleRouter();
 
@@ -141,8 +141,8 @@ watch(artistType, type => {
 
 const setImage = async (resp: KPhotoResponse) => {
   if (resp.ok) {
-    imageSrc.value = resp.image.b64Data;
-    originalImgSrc.value = resp.image.b64Data;
+    imageSrc.value = resp.base64Uri.toString();
+    originalImgSrc.value = resp.base64Uri.toString();
   }
 };
 
@@ -176,15 +176,9 @@ const onEditImage = async () => {
 };
 
 const onSubmit = async () => {
-  const scaledImage = await resizeMaxDimension(imageSrc.value, 500);
-  const extension = getExtensionFromBase64Uri(scaledImage);
+  const scaledImage = await Base64Uri.fromUri(imageSrc.value).compress({ quality: 0.75, maxHeight: 1024, maxWidth: 1024 });
 
-  const fileResult = await FileStore.saveImage(`photo-cards/${generateId()}.${extension}`, scaledImage);
-
-  if ("dddd".length) {
-    console.log(scaledImage);
-    return;
-  }
+  const fileResult = await FileStore.saveImage(`photo-cards/${generateId()}.${scaledImage.type()}`, scaledImage.toString());
 
   if (!fileResult.ok) {
     console.error('[creator] could not save file to disk', fileResult.error);

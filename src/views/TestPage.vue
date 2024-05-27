@@ -55,8 +55,7 @@ const onSaveImage = async () => {
     return;
   }
 
-  // TODO: fix
-  const saveResp = await FileStore.saveImage('face-2.png', photoResp.image.b64Data);
+  const saveResp = await FileStore.saveImage('face-2.png', photoResp.base64Uri.toString());
 
   if (!saveResp.ok) {
     return;

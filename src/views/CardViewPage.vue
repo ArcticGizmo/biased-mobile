@@ -1,7 +1,7 @@
 <template>
   <BasePage :title="card?.artist">
     <div v-if="card" class="card-view p-4">
-      <KImg :src="FileStore.toHref(card.imageFilePath)" />
+      <KImg :src="FileStore.toHref(card.imageFilePath)" style="margin: auto" max-width="350px" />
       <OwnershipInput :model-value="card.ownershipType" @change="onOwnershipChange" />
       <!-- ======= who ======== -->
       <IonInput

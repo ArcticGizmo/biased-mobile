@@ -18,7 +18,8 @@ export const useToast = () => {
       ...opts,
       position: 'bottom',
       duration: opts.duration || DEFAULT_TOAST_DURATION,
-      animated: true
+      animated: true,
+      cssClass: 'toast-bottom'
     });
     t.present();
   };

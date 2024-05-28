@@ -1,9 +1,10 @@
-import { KPopCard, KPopCardPackable, OptionalFields } from '@/types';
+import { KPopCard, OptionalFields } from '@/types';
 import { onMounted, readonly, ref, watch } from 'vue';
 import { KvStore } from './kvStore';
 import { FileStore } from './fileStore';
 import { v1 as uuidv1 } from 'uuid';
 import { getExtensionFromBase64Uri } from './mime';
+import { Backup } from './backup';
 
 const STORAGE_KEY = 'kpop-cards';
 
@@ -22,6 +23,14 @@ const loadSaved = async () => {
   isLoading.value = true;
   cards.value = (await KvStore.loadJson<KPopCard[]>(STORAGE_KEY)) || [];
   isLoading.value = false;
+};
+
+const backupToPackedCards = (backup: Backup) => {
+  if (backup.version === 1) {
+    return backup.cards;
+  }
+
+  throw 'unknown backup version';
 };
 
 export const useKPopCards = () => {
@@ -49,7 +58,8 @@ export const useKPopCards = () => {
     cards.value = [...cards.value];
   };
 
-  const importBackup = async (items: KPopCardPackable[]) => {
+  const importBackup = async (backup: Backup) => {
+    const items = backupToPackedCards(backup);
     const newCards: KPopCard[] = [];
 
     for (const item of items) {

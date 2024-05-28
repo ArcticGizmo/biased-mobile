@@ -17,6 +17,7 @@ import { useKPopCards } from '@/composables/kPopCards';
 import { showLoading } from '@/composables/modals';
 import { createBackup, loadBackup } from '@/composables/backup';
 import { useToast } from '@/composables/toast';
+import { happyOutline, sadOutline } from 'ionicons/icons';
 
 const { cards, importBackup, clearCards } = useKPopCards();
 const { showToast } = useToast();
@@ -41,11 +42,13 @@ const onLoadBackup = async () => {
   const resp = await loadBackup();
 
   if (!resp.ok) {
-    console.error('could not load backup');
+    console.error('could not load backup', resp.error);
+    await showToast({ color: 'danger', message: 'Could not import backup', icon: sadOutline });
     return;
   }
 
-  await importBackup(resp.cards);
+  await importBackup(resp.backup);
+  await showToast({ color: 'success', message: 'Backup imported successfully!', icon: happyOutline });
   console.log('backup import complete');
 };
 </script>

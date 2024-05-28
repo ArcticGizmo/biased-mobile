@@ -7,5 +7,6 @@ import starBox from '@mdi/svg/svg/star-box.svg';
 import noCard from '@mdi/svg/svg/book-remove.svg';
 import pencil from '@mdi/svg/svg/pencil.svg';
 import web from '@mdi/svg/svg/web.svg';
+import trash from '@mdi/svg/svg/delete.svg';
 
-export { imageAlbum, imageBroken, imageFrame, calendar, musicBox, starBox, noCard, pencil, web };
+export { imageAlbum, imageBroken, imageFrame, calendar, musicBox, starBox, noCard, pencil, web, trash };

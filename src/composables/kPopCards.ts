@@ -47,6 +47,17 @@ export const useKPopCards = () => {
     cards.value = [];
   };
 
+  const deleteCard = async (id: string) => {
+    const matchingCard = cards.value.find(c => c.id === id);
+
+    if (!matchingCard) {
+      return;
+    }
+
+    await FileStore.remove(matchingCard.imageFilePath);
+    cards.value = cards.value.filter(c => c.id !== id);
+  };
+
   const update = (id: string, changes: KPopCardUpdate) => {
     const card = cards.value.find(c => c.id === id)!;
 
@@ -96,5 +107,5 @@ export const useKPopCards = () => {
 
   // const importBackup
 
-  return { cards: readonly(cards), addCard, update, clearCards, importBackup, generateId: () => uuidv1() };
+  return { cards: readonly(cards), addCard, deleteCard, update, clearCards, importBackup, generateId: () => uuidv1() };
 };

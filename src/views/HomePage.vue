@@ -1,5 +1,5 @@
 <template>
-  <BasePage title="Home" hide-back-ref>
+  <BasePage title="My Cards" hide-back-ref>
     <div class="grid gap-0 py-4" :class="colsClass">
       <KCard
         v-for="(card, index) of cards"
@@ -10,6 +10,10 @@
         :status="card.ownershipType"
         @click="onOpenCard(card.id)"
       />
+    </div>
+    <div v-if="!cards.length" class="placeholder text-center m-3">
+      <IonText>Looks like you are about to start your journey!</IonText>
+      <IonButton class="mt-4" router-link="/creator">Add first card!</IonButton>
     </div>
   </BasePage>
 </template>
@@ -22,6 +26,7 @@ import KCard from '@/components/KCard.vue';
 import { FileStore } from '@/composables/fileStore';
 import { useWindowSize } from '@vueuse/core';
 import { computed } from 'vue';
+import { IonButton, IonText } from '@ionic/vue';
 
 const { width } = useWindowSize();
 

@@ -1,5 +1,5 @@
 <template>
-  <BasePage title="Settings">
+  <BasePage title="Settings" max-width="500px">
     <div class="content m-4">
       <IonButton expand="full" @click="onCreateBackup()">Create Backup</IonButton>
       <IonButton expand="full" @click="onLoadBackup()">Load Backup</IonButton>

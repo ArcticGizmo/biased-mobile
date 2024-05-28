@@ -10,7 +10,9 @@
     </IonHeader>
     <IonLoading :is-open="loading" class="transparent-loading" />
     <IonContent>
-      <slot></slot>
+      <div class="content" :style="{ maxWidth }">
+        <slot></slot>
+      </div>
     </IonContent>
     <IonFooter>
       <slot name="footer"></slot>
@@ -27,8 +29,8 @@ const props = defineProps<{
   centered?: boolean;
   defaultBackHref?: string;
   hideBackRef?: boolean;
-  pad?: boolean;
   loading?: boolean;
+  maxWidth?: string;
 }>();
 
 const hasToolbar = computed(() => !!props.title);
@@ -37,6 +39,10 @@ const hasToolbar = computed(() => !!props.title);
 <style scoped>
 .ion-page {
   justify-content: unset;
+}
+
+.content {
+  margin: 0 auto;
 }
 
 .ion-page.fill-height.has-toolbar {

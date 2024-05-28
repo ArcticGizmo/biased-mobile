@@ -1,17 +1,15 @@
 <template>
-  <BasePage title="Creator" default-back-href="/home">
+  <BasePage title="Creator" default-back-href="/home" max-width="500px">
     <div class="content p-8">
       <div class="upload-pic">
         <KImg :src="imageSrc" background height="50vh">
           <template #fallback>
-            <template v-if="imageSrc">
-              <IonIcon class="bad-image-icon" :icon="sadOutline" />
-              <p>That image did not appear to work!</p>
-              <p>Maybe try a different one?</p>
-            </template>
-            <template v-else>
-              <p>Upload your PC!</p>
-            </template>
+            <p>Upload your PC!</p>
+          </template>
+          <template #error>
+            <IonIcon class="bad-image-icon" :icon="imageBroken" />
+            <p>That image did not appear to work!</p>
+            <p>Maybe try a different one?</p>
           </template>
         </KImg>
         <div class="pic-actions">
@@ -22,10 +20,10 @@
             <IonIcon slot="icon-only" :icon="imagesOutline" />
           </IonButton>
           <IonButton @click="onGetFromUrl()">
-            <IonIcon slot="icon-only" :icon="globeOutline" />
+            <IonIcon slot="icon-only" :icon="web" />
           </IonButton>
           <IonButton :disabled="!imageSrc" @click="onEditImage()">
-            <IonIcon slot="icon-only" :icon="pencilOutline" />
+            <IonIcon slot="icon-only" :icon="pencil" />
           </IonButton>
         </div>
       </div>
@@ -80,7 +78,7 @@ import ArtistTypeInput from '@/components/ArtistTypeInput.vue';
 import WhereFromInput from '@/components/WhereFromInput.vue';
 import { KPhotoResponse, useImageImport } from '@/composables/imageImport';
 import { ref, watch, computed } from 'vue';
-import { sadOutline, cameraOutline, imagesOutline, globeOutline, pencilOutline } from 'ionicons/icons';
+import { cameraOutline, imagesOutline } from 'ionicons/icons';
 import VTransition from '@/components/VTransition.vue';
 import PickerInput from '@/components/PickerInput.vue';
 import ImageEditorModal from '@/components/ImageEditorModal.vue';
@@ -88,6 +86,7 @@ import type { ArtistType, WhereFrom, OwnershipType, KPopCard } from '@/types';
 import { useKPopCards } from '@/composables/kPopCards';
 import { FileStore } from '@/composables/fileStore';
 import { Base64Uri } from '@/composables/base64';
+import { imageBroken, pencil, web } from '@/icons';
 
 const { takePhoto, photoFromGallery, photoFromUrl } = useImageImport();
 const { addCard, generateId } = useKPopCards();

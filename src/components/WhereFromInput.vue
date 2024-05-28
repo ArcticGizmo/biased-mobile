@@ -4,8 +4,8 @@
 
 <script setup lang="ts">
 import { WhereFrom } from '@/types';
-import { musicalNotes, calendar } from 'ionicons/icons';
 import SegmentInput, { type SegmentControlProps } from './SegmentInput.vue';
+import { calendar, musicBox } from '@/icons';
 
 const model = defineModel<WhereFrom>({ required: true });
 
@@ -15,7 +15,7 @@ const OPTIONS = [
   {
     value: 'album',
     text: 'Album',
-    icon: musicalNotes
+    icon: musicBox
   },
   {
     value: 'event',

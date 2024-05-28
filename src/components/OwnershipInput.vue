@@ -4,8 +4,9 @@
 
 <script setup lang="ts">
 import { OwnershipType } from '@/types';
-import { heart, closeCircle, ribbon } from 'ionicons/icons';
+import { heart } from 'ionicons/icons';
 import SegmentInput, { type SegmentControlProps } from './SegmentInput.vue';
+import { noCard, starBox } from '@/icons';
 
 const model = defineModel<OwnershipType>({ required: true });
 
@@ -15,7 +16,7 @@ const OPTIONS = [
   {
     value: 'none',
     text: "Don't Have",
-    icon: closeCircle,
+    icon: noCard,
     iconColor: 'dark'
   },
   {
@@ -27,7 +28,7 @@ const OPTIONS = [
   {
     value: 'have',
     text: 'Have',
-    icon: ribbon,
+    icon: starBox,
     iconColor: 'warning'
   }
 ];

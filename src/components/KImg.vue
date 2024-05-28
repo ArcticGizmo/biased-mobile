@@ -2,13 +2,13 @@
   <div class="k-img" :class="{ background }" :style="{ aspectRatio, width, height, maxWidth, maxHeight }">
     <div v-if="state === 'fallback'" class="centered-container">
       <slot name="fallback">
-        <IonIcon class="fallback-icon" :icon="imageOutline" />
+        <IonIcon class="fallback-icon" :icon="imageFrame" />
       </slot>
     </div>
 
     <div v-if="state === 'errored'" class="centered-container">
       <slot name="error">
-        <IonIcon class="fallback-icon" :icon="sad" />
+        <IonIcon class="fallback-icon" :icon="imageBroken" />
         Broken Image
       </slot>
     </div>
@@ -30,8 +30,8 @@
 </template>
 
 <script setup lang="ts">
+import { imageBroken, imageFrame } from '@/icons';
 import { IonIcon, IonImg, IonSpinner } from '@ionic/vue';
-import { imageOutline, sad } from 'ionicons/icons';
 import { computed, ref } from 'vue';
 
 type Size = number | string;

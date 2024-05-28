@@ -1,11 +1,10 @@
 <template>
   <BasePage title="Settings">
     <div class="content m-4">
-      <IonButton @click="onCreateBackup()">Create Backup</IonButton>
-      <IonButton @click="onLoadBackup()">Load Backup</IonButton>
-      <IonButton @click="clearCards()">Clear All Cards</IonButton>
-      <IonButton router-link="/test">test</IonButton>
-      <!-- <IonButton :href="a.webviewPath" download="my-file.json" >Download</IonButton> -->
+      <IonButton expand="full" @click="onCreateBackup()">Create Backup</IonButton>
+      <IonButton expand="full" @click="onLoadBackup()">Load Backup</IonButton>
+      <IonButton expand="full" @click="onClearAllCards()">Clear All Cards</IonButton>
+      <IonButton v-if="ENV.DEV" expand="full" router-link="/test">test</IonButton>
     </div>
   </BasePage>
 </template>
@@ -14,19 +13,27 @@
 import { IonButton } from '@ionic/vue';
 import BasePage from './BasePage.vue';
 import { useKPopCards } from '@/composables/kPopCards';
-import { showLoading } from '@/composables/modals';
+import { showLoading, showSimpleAlert } from '@/composables/modals';
 import { createBackup, loadBackup } from '@/composables/backup';
 import { useToast } from '@/composables/toast';
 import { alertOutline, happyOutline, sadOutline } from 'ionicons/icons';
+import { ENV } from '@/env';
 
 const { cards, importBackup, clearCards } = useKPopCards();
 const { showToast } = useToast();
 
+const delay = (duration: number) => new Promise(r => setTimeout(r, duration));
+
+async function withDelay<T>(task: Promise<T>, minDuration: number) {
+  const [resp] = await Promise.all([task, delay(minDuration)]);
+  return resp;
+}
+
 const onCreateBackup = async () => {
-  const loading = await showLoading();
+  const loading = await showLoading('Creating Backup');
 
   try {
-    const resp = await createBackup([...cards.value]);
+    const resp = await withDelay(createBackup([...cards.value]), 2_000);
     if (resp.ok) {
       console.log('backup created at', resp.path);
       await showToast({ message: 'Backup created!', color: 'success' });
@@ -39,7 +46,7 @@ const onCreateBackup = async () => {
 };
 
 const onLoadBackup = async () => {
-  const loading = await showLoading();
+  const loading = await showLoading('Loading backup');
 
   try {
     const resp = await loadBackup();
@@ -50,7 +57,7 @@ const onLoadBackup = async () => {
       return;
     }
 
-    await importBackup(resp.backup);
+    await withDelay(importBackup(resp.backup), 2000);
     await showToast({ color: 'success', message: 'Backup imported successfully!', icon: happyOutline });
   } catch (error) {
     console.error(error);
@@ -59,4 +66,34 @@ const onLoadBackup = async () => {
     loading.dismiss();
   }
 };
+
+const onClearAllCards = async () => {
+  const resp = await showSimpleAlert({
+    header: 'Remove all cards?',
+    message: 'This will remove everything and cannot be undone',
+    okName: 'delete'
+  });
+
+  if (resp !== 'delete') {
+    return;
+  }
+
+  const loading = await showLoading('Deleting cards');
+
+  try {
+    await clearCards();
+    await showToast({ color: 'success', message: 'All cards removed!' });
+  } catch (error) {
+    console.error('failed to delete cards', error);
+    await showToast({ color: 'danger', message: "Unable to remove your cards :'(", icon: alertOutline });
+  } finally {
+    loading.dismiss();
+  }
+};
 </script>
+
+<style scoped>
+ion-button {
+  margin-bottom: 1rem;
+}
+</style>

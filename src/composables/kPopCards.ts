@@ -40,11 +40,9 @@ export const useKPopCards = () => {
     cards.value = [...cards.value, card];
   };
 
-  const clearCards = () => {
+  const clearCards = async () => {
     for (const card of cards.value) {
-      // TODO: revisit
-      // fire and forget so it just happens in the background
-      FileStore.remove(card.imageFilePath);
+      await FileStore.remove(card.imageFilePath);
     }
     cards.value = [];
   };

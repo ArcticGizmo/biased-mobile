@@ -26,7 +26,7 @@ http://ionicframework.com/docs/theming/ */
 
   --ion-color-success: #00a82d;
   --ion-color-success-rgb: 0, 168, 45;
-  --ion-color-success-contrast: #000000;
+  --ion-color-success-contrast: whitesmoke;
   --ion-color-success-contrast-rgb: 0, 0, 0;
   --ion-color-success-shade: #009428;
   --ion-color-success-tint: #1ab142;

@@ -46,7 +46,7 @@
 </template>
 
 <script setup lang="ts">
-import { IonIcon, IonInput, useIonRouter } from '@ionic/vue';
+import { IonIcon, IonInput } from '@ionic/vue';
 import KImg from '@/components/KImg.vue';
 import BasePage from './BasePage.vue';
 import OwnershipInput from '@/components/OwnershipInput.vue';

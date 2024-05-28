@@ -69,7 +69,7 @@
 </template>
 
 <script setup lang="ts">
-import { IonButton, IonIcon, IonInput, alertController, modalController } from '@ionic/vue';
+import { IonButton, IonIcon, IonInput, alertController, modalController, onIonViewDidEnter } from '@ionic/vue';
 import { useSimpleRouter } from '@/composables/router';
 import BasePage from './BasePage.vue';
 import KImg from '@/components/KImg.vue';
@@ -123,6 +123,10 @@ const resetForm = () => {
   year.value = `${thisYear}`;
   ownershipType.value = 'none';
 };
+
+onIonViewDidEnter(() => {
+  resetForm();
+});
 
 const whereFromNameLabel = computed(() => {
   return whereFrom.value === 'album' ? 'Album*' : 'Event*';

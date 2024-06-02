@@ -6,7 +6,7 @@
         <cropper-shade hidden />
         <cropper-handle action="select" plain />
         <cropper-handle action="move" plain />
-        <cropper-selection ref="cropperSelection" initial-coverage="0.95" initial-aspect-ratio="0.7" outlined movable resizable>
+        <cropper-selection ref="cropperSelection" initial-coverage="0.8" initial-aspect-ratio="0.7" outlined movable resizable>
           <cropper-grid role="grid" covered />
           <cropper-crosshair centered />
           <cropper-handle action="move" theme-color="rgba(255, 255, 255, 0.35)" />

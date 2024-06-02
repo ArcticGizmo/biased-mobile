@@ -1,11 +1,12 @@
 <template>
   <BasePage title="My Cards" hide-back-ref>
+    <div v-if="cards.length" class="text-center pt-4">There are {{ cards.length }} cards in this collection</div>
     <div class="grid gap-0 py-4" :class="colsClass">
       <KCard
         v-for="(card, index) of cards"
         :key="index"
         :title="card.artist"
-        :subtitle="card.whereFromName"
+        :subtitle="cardSubtitle(card)"
         :src="FileStore.toHref(card.imageFilePath)"
         :status="card.ownershipType"
         @click="onOpenCard(card.id)"
@@ -27,6 +28,7 @@ import { FileStore } from '@/composables/fileStore';
 import { useWindowSize } from '@vueuse/core';
 import { computed } from 'vue';
 import { IonButton, IonText } from '@ionic/vue';
+import { KPopCard } from '@/types';
 
 const { width } = useWindowSize();
 
@@ -53,5 +55,13 @@ const { cards } = useKPopCards();
 
 const onOpenCard = (id: string) => {
   router.push(`/cards/${id}`);
+};
+
+const cardSubtitle = (card: KPopCard) => {
+  if (card.albumVersion) {
+    return `${card.whereFromName} (${card.albumVersion})`;
+  }
+
+  return card.whereFromName;
 };
 </script>

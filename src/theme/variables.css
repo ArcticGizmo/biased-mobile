@@ -74,3 +74,8 @@ http://ionicframework.com/docs/theming/ */
 .toast-bottom {
   transform: translateY(-50px);
 }
+
+.modal-fullscreen::part(content) {
+  width: 100vw;
+  height: 100vh;
+}

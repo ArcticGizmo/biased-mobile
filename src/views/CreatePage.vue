@@ -77,7 +77,7 @@ import OwnershipInput from '@/components/OwnershipInput.vue';
 import ArtistTypeInput from '@/components/ArtistTypeInput.vue';
 import WhereFromInput from '@/components/WhereFromInput.vue';
 import { KPhotoResponse, useImageImport } from '@/composables/imageImport';
-import { ref, watch, computed } from 'vue';
+import { ref, watch, computed, onMounted } from 'vue';
 import { cameraOutline, imagesOutline } from 'ionicons/icons';
 import VTransition from '@/components/VTransition.vue';
 import PickerInput from '@/components/PickerInput.vue';
@@ -93,6 +93,7 @@ const { addCard, generateId } = useKPopCards();
 const router = useSimpleRouter();
 
 const thisYear = new Date().getFullYear();
+
 const dateOptions = Array.from({ length: 50 }, (_, i) => {
   const value = `${thisYear - i}`;
   return { text: value, value };
@@ -125,6 +126,10 @@ const resetForm = () => {
 };
 
 onIonViewDidEnter(() => {
+  resetForm();
+});
+
+onMounted(() => {
   resetForm();
 });
 
@@ -167,7 +172,8 @@ const onGetFromUrl = async () => {
 const onEditImage = async () => {
   const modal = await modalController.create({
     component: ImageEditorModal,
-    componentProps: { src: originalImgSrc.value }
+    componentProps: { src: originalImgSrc.value },
+    cssClass: 'modal-fullscreen'
   });
 
   modal.present();

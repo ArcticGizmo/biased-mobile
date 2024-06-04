@@ -2,10 +2,12 @@
   <IonPage :class="{ 'has-toolbar': hasToolbar }">
     <IonHeader v-if="title">
       <IonToolbar>
-        <IonButtons slot="start">
-          <IonBackButton v-if="!hideBackRef" :defaultHref="defaultBackHref || '/home'"></IonBackButton>
-        </IonButtons>
-        <IonTitle>{{ title }}</IonTitle>
+        <slot name="header">
+          <IonButtons slot="start">
+            <IonBackButton v-if="!hideBackRef" :defaultHref="defaultBackHref || '/home'"></IonBackButton>
+          </IonButtons>
+          <IonTitle>{{ title }}</IonTitle>
+        </slot>
       </IonToolbar>
     </IonHeader>
     <IonLoading :is-open="loading" class="transparent-loading" />

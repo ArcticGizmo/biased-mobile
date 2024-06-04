@@ -41,6 +41,6 @@ const items = computed(() => {
 
 <style scoped>
 ion-icon {
-  font-size: 2.5rem;
+  font-size: 1rem;
 }
 </style>

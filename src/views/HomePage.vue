@@ -1,20 +1,35 @@
 <template>
   <BasePage title="My Cards" hide-back-ref>
-    <CardSummary v-if="cards.length" class="mt-2" v-bind="cardSummary" />
-    <div class="grid gap-0 py-4" :class="colsClass">
-      <KCard
-        v-for="(card, index) of cards"
-        :key="index"
-        :title="card.artist"
-        :subtitle="cardSubtitle(card)"
-        :src="FileStore.toHref(card.imageFilePath)"
-        :status="card.ownershipType"
-        @click="onOpenCard(card.id)"
-      />
-    </div>
-    <div v-if="!cards.length" class="placeholder text-center m-3">
-      <IonText>Looks like you are about to start your journey!</IonText>
-      <IonButton class="mt-4" router-link="/creator">Add first card!</IonButton>
+    <template #header>
+      <div class="flex items-center justify-between w-100 mx-4">
+        <h4 class="my-2">My Cards</h4>
+        <CardSummary v-if="cards.length" v-bind="cardSummary" />
+        <IonButton fill="clear" color="dark" @click="onOpenFilter()">
+          <IonIcon slot="icon-only" :icon="filter" />
+        </IonButton>
+      </div>
+    </template>
+
+    <template v-if="cards.length">
+      <div class="grid gap-0 py-4" :class="colsClass">
+        <KCard
+          v-for="(card, index) of cards"
+          :key="index"
+          :title="card.artist"
+          :subtitle="cardSubtitle(card)"
+          :src="FileStore.toHref(card.imageFilePath)"
+          :status="card.ownershipType"
+          @click="onOpenCard(card.id)"
+        />
+      </div>
+    </template>
+    <div v-else class="placeholder text-center m-3">
+      <div>
+        <IonText>Looks like you are about to start your journey!</IonText>
+      </div>
+      <div>
+        <IonButton class="mt-4" router-link="/creator">Add first card!</IonButton>
+      </div>
     </div>
   </BasePage>
 </template>
@@ -27,9 +42,11 @@ import KCard from '@/components/KCard.vue';
 import { FileStore } from '@/composables/fileStore';
 import { useWindowSize } from '@vueuse/core';
 import { computed } from 'vue';
-import { IonButton, IonText } from '@ionic/vue';
+import { IonButton, IonIcon, IonText, IonTitle, modalController } from '@ionic/vue';
 import { KPopCard, OwnershipType } from '@/types';
 import CardSummary from '@/components/CardSummary.vue';
+import { filter } from '@/icons';
+import FilterModal from '@/components/FilterModal.vue';
 
 const { width } = useWindowSize();
 
@@ -78,6 +95,18 @@ const cardSubtitle = (card: KPopCard) => {
   }
 
   return card.whereFromName;
+};
+
+const onOpenFilter = async () => {
+  const modal = await modalController.create({
+    component: FilterModal,
+    cssClass: 'modal-fullscreen'
+  });
+
+  modal.present();
+
+  const resp = await modal.onWillDismiss();
+  console.dir(resp);
 };
 </script>
 

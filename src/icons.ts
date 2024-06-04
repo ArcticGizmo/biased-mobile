@@ -8,5 +8,6 @@ import noCard from '@mdi/svg/svg/book-remove.svg';
 import pencil from '@mdi/svg/svg/pencil.svg';
 import web from '@mdi/svg/svg/web.svg';
 import trash from '@mdi/svg/svg/delete.svg';
+import filter from '@mdi/svg/svg/tune-variant.svg'
 
-export { imageAlbum, imageBroken, imageFrame, calendar, musicBox, starBox, noCard, pencil, web, trash };
+export { imageAlbum, imageBroken, imageFrame, calendar, musicBox, starBox, noCard, pencil, web, trash, filter };

@@ -1,6 +1,6 @@
 <template>
   <BasePage title="My Cards" hide-back-ref>
-    <div v-if="cards.length" class="text-center pt-4">There are {{ cards.length }} cards in this collection</div>
+    <CardSummary v-if="cards.length" class="mt-2" v-bind="cardSummary" />
     <div class="grid gap-0 py-4" :class="colsClass">
       <KCard
         v-for="(card, index) of cards"
@@ -28,7 +28,8 @@ import { FileStore } from '@/composables/fileStore';
 import { useWindowSize } from '@vueuse/core';
 import { computed } from 'vue';
 import { IonButton, IonText } from '@ionic/vue';
-import { KPopCard } from '@/types';
+import { KPopCard, OwnershipType } from '@/types';
+import CardSummary from '@/components/CardSummary.vue';
 
 const { width } = useWindowSize();
 
@@ -56,6 +57,16 @@ const colsClass = computed(() => {
 
 const router = useSimpleRouter();
 const { cards } = useKPopCards();
+
+const ownershipCount = (cards: Readonly<KPopCard[]>, type: OwnershipType) => cards.filter(c => c.ownershipType === type).length;
+
+const cardSummary = computed(() => {
+  return {
+    have: ownershipCount(cards.value, 'have'),
+    want: ownershipCount(cards.value, 'want'),
+    missing: ownershipCount(cards.value, 'none')
+  };
+});
 
 const onOpenCard = (id: string) => {
   router.push(`/cards/${id}`);

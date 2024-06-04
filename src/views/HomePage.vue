@@ -47,7 +47,11 @@ const colsClass = computed(() => {
     return 'grid-cols-4';
   }
 
-  return 'grid-cols-5';
+  if (w < 1350) {
+    return 'grid-cols-5';
+  }
+
+  return 'grid-cols-6';
 });
 
 const router = useSimpleRouter();
@@ -65,3 +69,20 @@ const cardSubtitle = (card: KPopCard) => {
   return card.whereFromName;
 };
 </script>
+
+<style scoped>
+:deep(.grid-cols-4 .icon-want),
+:deep(.grid-cols-4 .icon-have) {
+  font-size: 2rem;
+}
+
+:deep(.grid-cols-5 .icon-want),
+:deep(.grid-cols-5 .icon-have) {
+  font-size: 2rem;
+}
+
+:deep(.grid-cols-6 .icon-want),
+:deep(.grid-cols-6 .icon-have) {
+  font-size: 3rem;
+}
+</style>

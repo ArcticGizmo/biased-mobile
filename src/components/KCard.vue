@@ -5,8 +5,8 @@
       <IonCardTitle class="text-sm text-ellipsis overflow-hidden whitespace-nowrap">{{ title }}</IonCardTitle>
       <IonCardSubtitle v-if="subtitle" class="text-xs text-ellipsis overflow-hidden whitespace-nowrap">{{ subtitle }}</IonCardSubtitle>
     </IonCardContent>
-    <IonIcon v-if="status === 'want'" class="text-xl absolute top-2 right-2" color="danger" :icon="heartCircle" />
-    <IonIcon v-if="status === 'have'" class="text-xl absolute top-2 right-2" color="warning" :icon="starBox" />
+    <IonIcon v-if="status === 'want'" class="icon-want text-xl absolute top-2 right-2" color="danger" :icon="heartCircle" />
+    <IonIcon v-if="status === 'have'" class="icon-have text-xl absolute top-2 right-2" color="warning" :icon="starBox" />
   </IonCard>
 </template>
 

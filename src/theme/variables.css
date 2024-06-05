@@ -79,3 +79,7 @@ http://ionicframework.com/docs/theming/ */
   width: 100vw;
   height: 100vh;
 }
+
+.skeleton-text-animated {
+  animation-duration: 1.75s;
+}

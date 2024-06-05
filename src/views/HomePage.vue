@@ -1,5 +1,5 @@
 <template>
-  <BasePage title="My Cards" hide-back-ref>
+  <BasePage title="My Cards" hide-back-ref fixed-content-height>
     <template #header>
       <div class="flex items-center justify-between w-100 mx-4">
         <h4 class="my-2">My Cards</h4>
@@ -10,18 +10,41 @@
       </div>
     </template>
 
-    <template v-if="cards.length">
-      <div class="grid gap-0 py-4" :class="colsClass">
-        <KCard
-          v-for="(card, index) of cards"
-          :key="index"
-          :title="card.artist"
-          :subtitle="cardSubtitle(card)"
-          :src="FileStore.toHref(card.imageFilePath)"
-          :status="card.ownershipType"
-          @click="onOpenCard(card.id)"
-        />
-      </div>
+    <template v-if="isLoading">
+      <RecycleScroller
+        class="p-4 h-full"
+        :class="`cols-${gridInformation.count}`"
+        :items="SKELETON_CARDS"
+        :item-size="gridInformation.height"
+        :item-secondary-size="gridInformation.width"
+        :grid-items="gridInformation.count"
+      >
+        <template #default="{ index }">
+          <KCard :key="index" skeleton />
+        </template>
+      </RecycleScroller>
+    </template>
+
+    <template v-else-if="cards.length">
+      <RecycleScroller
+        class="p-4 h-full"
+        :class="`cols-${gridInformation.count}`"
+        :items="cards"
+        :item-size="gridInformation.height"
+        :item-secondary-size="gridInformation.width"
+        :grid-items="gridInformation.count"
+      >
+        <template #default="{ item: card, index }">
+          <KCard
+            :key="index"
+            :title="card.artist"
+            :subtitle="cardSubtitle(card)"
+            :src="FileStore.toHref(card.imageFilePath)"
+            :status="card.ownershipType"
+            @click="onOpenCard(card.id)"
+          />
+        </template>
+      </RecycleScroller>
     </template>
     <div v-else class="placeholder text-center m-3">
       <div>
@@ -42,38 +65,34 @@ import KCard from '@/components/KCard.vue';
 import { FileStore } from '@/composables/fileStore';
 import { useWindowSize } from '@vueuse/core';
 import { computed } from 'vue';
-import { IonButton, IonIcon, IonText, IonTitle, modalController } from '@ionic/vue';
+import { IonButton, IonIcon, IonText, modalController } from '@ionic/vue';
 import { KPopCard, OwnershipType } from '@/types';
 import CardSummary from '@/components/CardSummary.vue';
 import { filter } from '@/icons';
 import FilterModal from '@/components/FilterModal.vue';
+import { RecycleScroller } from 'vue-virtual-scroller';
 
 const { width } = useWindowSize();
 
-const colsClass = computed(() => {
-  const w = width.value;
+const SKELETON_CARDS = Array.from({ length: 30 }, (v, index) => ({ id: index }));
 
-  if (w < 300) {
-    return 'grid-cols-2';
-  }
+const getColumnCount = (w: number) => {
+  if (w < 300) return 2;
+  if (w < 450) return 3;
+  if (w < 900) return 4;
+  if (w < 1350) return 5;
+  return 6;
+};
 
-  if (w < 450) {
-    return 'grid-cols-3';
-  }
+const gridInformation = computed(() => {
+  const columnCount = getColumnCount(width.value);
+  const gridWidth = width.value / columnCount;
 
-  if (w < 900) {
-    return 'grid-cols-4';
-  }
-
-  if (w < 1350) {
-    return 'grid-cols-5';
-  }
-
-  return 'grid-cols-6';
+  return { count: columnCount, height: gridWidth / 0.7 + 56, width: gridWidth - 10 };
 });
 
 const router = useSimpleRouter();
-const { cards } = useKPopCards();
+const { cards, isLoading } = useKPopCards();
 
 const ownershipCount = (cards: Readonly<KPopCard[]>, type: OwnershipType) => cards.filter(c => c.ownershipType === type).length;
 
@@ -111,18 +130,18 @@ const onOpenFilter = async () => {
 </script>
 
 <style scoped>
-:deep(.grid-cols-4 .icon-want),
-:deep(.grid-cols-4 .icon-have) {
+:deep(.cols-4 .icon-want),
+:deep(.cols-4 .icon-have) {
   font-size: 2rem;
 }
 
-:deep(.grid-cols-5 .icon-want),
-:deep(.grid-cols-5 .icon-have) {
+:deep(.cols-5 .icon-want),
+:deep(.cols-5 .icon-have) {
   font-size: 2rem;
 }
 
-:deep(.grid-cols-6 .icon-want),
-:deep(.grid-cols-6 .icon-have) {
+:deep(.cols-6 .icon-want),
+:deep(.cols-6 .icon-have) {
   font-size: 3rem;
 }
 </style>

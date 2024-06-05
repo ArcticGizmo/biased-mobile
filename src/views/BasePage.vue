@@ -12,7 +12,7 @@
     </IonHeader>
     <IonLoading :is-open="loading" class="transparent-loading" />
     <IonContent>
-      <div class="content" :style="{ maxWidth }">
+      <div class="content" :class="{ 'h-full': fixedContentHeight }" :style="{ maxWidth }">
         <slot></slot>
       </div>
     </IonContent>
@@ -33,6 +33,7 @@ const props = defineProps<{
   hideBackRef?: boolean;
   loading?: boolean;
   maxWidth?: string;
+  fixedContentHeight?: boolean;
 }>();
 
 const hasToolbar = computed(() => !!props.title);

@@ -51,3 +51,9 @@ const items: NavItem[] = [
   color: var(--ion-color-primary-shade);
 }
 </style>
+
+<style scoped>
+ion-tab-bar {
+  box-shadow: 10px 10px 10px 10px;
+}
+</style>

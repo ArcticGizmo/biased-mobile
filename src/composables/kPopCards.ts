@@ -11,7 +11,7 @@ const STORAGE_KEY = 'kpop-cards';
 type KPopCardUpdate = Omit<OptionalFields<KPopCard>, 'id'>;
 
 const cards = ref<KPopCard[]>([]);
-const isLoading = ref(true);
+const isLoading = ref(false);
 
 const cacheCards = () => {
   KvStore.saveJson(STORAGE_KEY, cards.value);
@@ -34,7 +34,11 @@ const backupToPackedCards = (backup: Backup) => {
 };
 
 export const useKPopCards = () => {
-  onMounted(loadSaved);
+  onMounted(() => {
+    if (!isLoading.value) {
+      loadSaved();
+    }
+  });
 
   const addCard = (card: KPopCard) => {
     cards.value = [...cards.value, card];
@@ -107,5 +111,14 @@ export const useKPopCards = () => {
 
   // const importBackup
 
-  return { cards: readonly(cards), addCard, deleteCard, update, clearCards, importBackup, generateId: () => uuidv1() };
+  return {
+    cards: readonly(cards),
+    isLoading: readonly(isLoading),
+    addCard,
+    deleteCard,
+    update,
+    clearCards,
+    importBackup,
+    generateId: () => uuidv1()
+  };
 };

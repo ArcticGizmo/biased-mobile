@@ -11,6 +11,9 @@
       </slot>
     </template>
     <slot></slot>
+    <template #footer>
+      <slot name="footer"></slot>
+    </template>
   </BasePage>
 </template>
 

@@ -12,8 +12,14 @@ const model = defineModel<boolean>();
 
 defineProps<{ text: string; icon?: string; selected?: boolean }>();
 
+const emits = defineEmits<{
+  (e: 'changed', value: boolean): void;
+}>();
+
 const onToggle = () => {
-  model.value = !model.value;
+  const newValue = !model.value;
+  model.value = newValue;
+  emits('changed', newValue);
 };
 </script>
 

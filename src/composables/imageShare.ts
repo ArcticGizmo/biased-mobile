@@ -2,10 +2,11 @@
 TODO: is there a way to make it so I can get the data out of the image?
 */
 
-import { KPopCard } from '@/types';
+import { KPopCard, OwnershipType } from '@/types';
 import { FileStore } from './fileStore';
 import { groupBy } from '@/util/groupBy';
 import { Base64Uri } from './base64';
+import { checkmarkCircle, heart, paperPlane } from 'ionicons/icons';
 
 interface LayoutRow {
   album: string;
@@ -17,10 +18,43 @@ interface Pos {
   y: number;
 }
 
-const TARGET_SIZE = { width: 110, height: 165 };
+interface Size {
+  width: number;
+  height: number;
+}
+
+const TARGET_SIZE: Size = { width: 110, height: 165 };
 const MAX_ITEMS_PER_ROW = 5;
 const PADDING = 25;
 const GAP = 5;
+
+const getFillColor = (ownershipType: OwnershipType) => {
+  switch (ownershipType) {
+    case 'have':
+      return 'green';
+    case 'in-transit':
+      return 'orange';
+    case 'want':
+      return 'red';
+    default:
+      return 'transparent';
+  }
+};
+
+const withSvgFill = (dataUrl: string, color: string) => dataUrl.replace('<svg', `<svg fill='${color}'`);
+
+const getSvg = (ownershipType: OwnershipType) => {
+  switch (ownershipType) {
+    case 'have':
+      return withSvgFill(checkmarkCircle, getFillColor(ownershipType));
+    case 'in-transit':
+      return withSvgFill(paperPlane, getFillColor(ownershipType));
+    case 'want':
+      return withSvgFill(heart, getFillColor(ownershipType));
+    default:
+      return;
+  }
+};
 
 class ImageBuilder {
   private canvas = document.createElement('canvas');
@@ -59,10 +93,25 @@ class ImageBuilder {
       const imagePos = { x: pos.x + colIndex * (TARGET_SIZE.width + GAP), y: pos.y };
       await this.drawImage(card.imageFilePath, imagePos);
 
+      // draw ownership outline + icon
+      this.ctx.strokeStyle = getFillColor(card.ownershipType);
+      this.ctx.lineWidth = 2;
+      this.ctx.strokeRect(imagePos.x, imagePos.y, TARGET_SIZE.width, TARGET_SIZE.height);
+
+      const svgIcon = getSvg(card.ownershipType);
+      if (svgIcon) {
+        await this.drawSvg(svgIcon, imagePos, { width: 25, height: 25 });
+      }
+
       colIndex++;
     }
 
     this.pos = { x: PADDING, y: pos.y + TARGET_SIZE.height + PADDING };
+  }
+
+  private async drawSvg(dataUrl: string, pos: Pos, size: Size) {
+    const img = await buildImage(dataUrl);
+    this.ctx.drawImage(img, pos.x, pos.y, size.width, size.height);
   }
 
   private drawText(text: string, fontSize: number, pos: Pos) {
@@ -107,9 +156,15 @@ export const createImage = async (cards: KPopCard[]) => {
 
   const builder = new ImageBuilder();
 
-  for (const row of layout) {
-    await builder.addRow(row);
-  }
+  // TODO: add a title zone for who they are?
+
+  // for (const row of layout) {
+  //   await builder.addRow(row);
+  // }
+
+  await builder.addRow(layout[0]);
+  await builder.addRow(layout[1]);
+  await builder.addRow(layout[2]);
 
   // downloadFile('kpop-template', builder.toDataUrl());
 
@@ -134,6 +189,16 @@ const buildLayout = (cards: KPopCard[]): LayoutRow[] => {
   });
 };
 
+const buildImage = async (src: string): Promise<HTMLImageElement> => {
+  const img = new Image();
+  return new Promise((resolve, reject) => {
+    img.onload = () => resolve(img);
+    img.onerror = (error: any) => reject(error);
+
+    img.src = src;
+  });
+};
+
 const loadImage = async (filePath: string, maxWidth: number, maxHeight: number): Promise<HTMLImageElement> => {
   const file = await FileStore.loadImage(filePath);
 
@@ -143,13 +208,7 @@ const loadImage = async (filePath: string, maxWidth: number, maxHeight: number):
 
   const scaledData = await Base64Uri.fromUri(file.data!).compress({ maxHeight, maxWidth });
 
-  const img = new Image();
-  return new Promise((resolve, reject) => {
-    img.onload = () => resolve(img);
-    img.onerror = (error: any) => reject(error);
-
-    img.src = scaledData.toString();
-  });
+  return await buildImage(scaledData.toString());
 };
 
 const downloadFile = (filename: string, dataUrl: string) => {

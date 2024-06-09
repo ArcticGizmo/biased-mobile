@@ -71,7 +71,18 @@ export const useKPopCards = () => {
     const items = backupToPackedCards(backup);
     const newCards: KPopCard[] = [];
 
+    const existingIds = new Set(cards.value.map(c => c.id));
+
+    const summary = {
+      imported: 0,
+      skipped: 0
+    };
+
     for (const item of items) {
+      if (item.id && existingIds.has(item.id)) {
+        summary.skipped++;
+        continue;
+      }
       const extension = getExtensionFromBase64Uri(item.imageSrc, 'image/png');
       const fileResult = await FileStore.saveImage(`photo-cards/${uuidv1()}.${extension}`, item.imageSrc);
 
@@ -83,7 +94,7 @@ export const useKPopCards = () => {
       // TODO: this will need to check to see if the file already exists
 
       const card: KPopCard = {
-        id: uuidv1(),
+        id: item.id || uuidv1(),
         imageFilePath: fileResult.path,
         artist: item.artist,
         artistType: item.artistType,
@@ -96,9 +107,13 @@ export const useKPopCards = () => {
       };
 
       newCards.push(card);
+
+      summary.imported++;
     }
 
     cards.value = [...cards.value, ...newCards];
+
+    return summary;
   };
 
   return {

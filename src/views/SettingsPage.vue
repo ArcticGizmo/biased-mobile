@@ -57,8 +57,23 @@ const onLoadBackup = async () => {
       return;
     }
 
-    await withDelay(importBackup(resp.backup), 2000);
-    await showToast({ color: 'success', message: 'Backup imported successfully!', icon: happyOutline });
+    const { imported, skipped } = await withDelay(importBackup(resp.backup), 2000);
+    if (imported === 0 && skipped === 0) {
+      await showToast({ color: 'warning', message: 'No items to import', icon: alertOutline });
+      return;
+    }
+
+    if (imported === 0 && skipped > 0) {
+      await showToast({ color: 'warning', message: 'Those cards already exist!', icon: alertOutline });
+      return;
+    }
+
+    if (imported > 0 && skipped === 0) {
+      await showToast({ color: 'success', message: `${imported} cards imported`, icon: happyOutline });
+      return;
+    }
+
+    await showToast({ color: 'success', message: `${imported} cards imported. Skipped ${skipped} `, icon: happyOutline });
   } catch (error) {
     console.error(error);
     await showToast({ color: 'danger', message: 'Something went wrong :(', icon: alertOutline });

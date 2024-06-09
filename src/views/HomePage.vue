@@ -61,6 +61,7 @@ import { heart, people, person } from 'ionicons/icons';
 import { sort } from '@/util/sort';
 import { KPopCard, OwnershipType } from '@/types';
 import { noCard, starBox } from '@/icons';
+import { groupBy } from '@/util/groupBy';
 
 type Grouping = 'group' | 'artist';
 
@@ -92,18 +93,6 @@ const getCardSummary = (cards: KPopCard[]): CardSummary => {
     missing: ownershipCount(cards, 'none')
   };
 };
-
-function groupBy<T>(items: T[], grouper: (item: T) => any) {
-  const groups: Record<string, T[]> = {};
-
-  for (const item of items) {
-    const key = grouper(item);
-    groups[key] = groups[key] || [];
-    groups[key].push(item);
-  }
-
-  return groups;
-}
 
 const artistItems = computed<ItemGroup[]>(() => {
   const groups = groupBy(cards.value, c => c.artist);

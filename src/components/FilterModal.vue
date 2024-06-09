@@ -77,7 +77,7 @@ const onReset = () => {
   ];
 
   for (const old of oldFilters) {
-    const match = sections.find(s => s.name === old.key);
+    const match = sections.find(s => s.key === old.key);
     if (match) {
       match.values = [...old.values];
     }

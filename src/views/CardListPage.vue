@@ -110,7 +110,7 @@ const applyAdvancedFilter = (cards: KPopCard[], filters: Filter[]) => {
 const filteredCards = computed(() => {
   let cards = applyBasicFilter(initialCardFilter.value);
   cards = applyAdvancedFilter(cards, activeFilters.value);
-  return multiSort(cards, ['artist', 'whereFrom', 'albumVersion'], search.value);
+  return multiSort(cards, ['artist', 'whereFromName', 'albumVersion', 'year'], search.value);
 });
 
 const onOpenFilter = async () => {

@@ -37,7 +37,7 @@
 <script setup lang="ts">
 import { KPopCard } from '@/types';
 import BaseModal from '@/views/BaseModal.vue';
-import { IonTitle, IonButtons, IonButton, IonIcon, modalController } from '@ionic/vue';
+import { IonTitle, IonButtons, IonButton, IonIcon, modalController, onIonViewWillEnter } from '@ionic/vue';
 import { arrowBack } from 'ionicons/icons';
 import FilterItem from './FilterItem.vue';
 import { onMounted, reactive, ref } from 'vue';
@@ -66,7 +66,7 @@ const createFilterSection = (name: string, key: string) => {
   return reactive({ name, key, values: [], options });
 };
 
-const onReset = () => {
+const onReset = (useInitial = false) => {
   const oldFilters = props.activeFilters || [];
 
   const sections: FilterSection[] = [
@@ -76,10 +76,12 @@ const onReset = () => {
     createFilterSection('Year', 'year')
   ];
 
-  for (const old of oldFilters) {
-    const match = sections.find(s => s.key === old.key);
-    if (match) {
-      match.values = [...old.values];
+  if (useInitial) {
+    for (const old of oldFilters) {
+      const match = sections.find(s => s.key === old.key);
+      if (match) {
+        match.values = [...old.values];
+      }
     }
   }
 
@@ -87,7 +89,11 @@ const onReset = () => {
 };
 
 onMounted(() => {
-  onReset();
+  onReset(true);
+});
+
+onIonViewWillEnter(() => {
+  onReset(true);
 });
 
 const onClose = () => {
@@ -115,5 +121,3 @@ const onApply = () => {
   modalController.dismiss(filterRequests, 'accept');
 };
 </script>
-
-<style scoped></style>

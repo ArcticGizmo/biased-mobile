@@ -27,6 +27,16 @@ const routes: Array<RouteRecordRaw> = [
     ]
   },
   {
+    path: '/cards',
+    props: r => {
+      return {
+        artist: r.query.artist,
+        group: r.query.group
+      };
+    },
+    component: () => import('@/views/CardsPage.vue')
+  },
+  {
     path: '/cards/:id',
     props: true,
     component: () => import('@/views/CardViewPage.vue')

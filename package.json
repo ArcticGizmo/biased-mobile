@@ -4,7 +4,7 @@
     "version": "0.0.1",
     "type": "module",
     "scripts": {
-        "dev": "ionic serve --no-open --port=8100",
+        "dev": "vite --port=8100",
         "dev:android": "ionic capacitor run android -l --external --target=Pixel5_34",
         "build": "vue-tsc && vite build && ionic build && ionic cap sync",
         "build:android": "npm run build && cd android && gradlew assembleDebug && cd .. && shx cp ./android/app/build/outputs/apk/debug/app-debug.apk ./apks/app-debug.apk ",
@@ -36,6 +36,7 @@
         "autoprefixer": "^10.4.19",
         "compressorjs": "^1.2.1",
         "cropperjs": "^2.0.0-beta.5",
+        "fuzzysort": "^3.0.1",
         "ionicons": "^7.0.0",
         "postcss": "^8.4.38",
         "tailwindcss": "^3.4.3",

@@ -87,7 +87,7 @@ const onDelete = async () => {
   try {
     await deleteCard(props.id);
     await showToast({ color: 'success', message: 'Card deleted!' });
-    router.replace('/');
+    router.back({ fallback: '/' });
   } catch (error) {
     console.error('unable to remove card', error);
   }

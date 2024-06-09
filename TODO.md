@@ -1,8 +1,5 @@
 # TODO
 
-- create a group/soloist
-  - edit
-  - backup
   - create template (for others)
 - view list of cards
 - add labels
@@ -11,6 +8,14 @@
   - year
   - want
   - have
+- make the home page save the scroll position when you go back after selecting a PC
+- group PCs by either
+    - group
+    - artist
+and make them searchable (fuzzy)
+- then inside of that have a filter + search
+    - filter can be album (check box), year range, sort order, artist (if more than 1), solo vs group (if more than 1)
+    - ownership status 
 
 # Issues
 

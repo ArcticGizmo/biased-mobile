@@ -1,5 +1,5 @@
 import { KPopCard, OptionalFields } from '@/types';
-import { onMounted, readonly, ref, watch } from 'vue';
+import { ComputedRef, onMounted, readonly, ref, watch } from 'vue';
 import { KvStore } from './kvStore';
 import { FileStore } from './fileStore';
 import { v1 as uuidv1 } from 'uuid';
@@ -112,7 +112,7 @@ export const useKPopCards = () => {
   // const importBackup
 
   return {
-    cards: readonly(cards),
+    cards: readonly(cards) as ComputedRef<KPopCard[]>,
     isLoading: readonly(isLoading),
     addCard,
     deleteCard,

@@ -48,7 +48,7 @@ import FilterItem from '@/components/FilterItem.vue';
 import { useSimpleRouter } from '@/composables/router';
 import { filter, noCard, starBox } from '@/icons';
 import { heart } from 'ionicons/icons';
-import { multiSort } from '@/util/sort';
+import { multiSort, sortBy } from '@/util/sort';
 import FilterModal, { type Filter } from '@/components/FilterModal.vue';
 import { useQueryParam } from '@/composables/useQueryParam';
 
@@ -71,14 +71,11 @@ const onOpenCard = (card: KPopCard) => {
 };
 
 const initialCardFilter = computed(() => {
-  if (group.value) {
-    return cards.value.filter(c => (c.groupName || '').toUpperCase() === group.value!.toUpperCase());
-  }
-  if (artist.value) {
-    return cards.value.filter(c => c.artist.toUpperCase() === artist.value!.toUpperCase());
-  }
+  let filteredCards = [...cards.value];
+  if (group.value) filteredCards = filteredCards.filter(c => (c.groupName || '').toUpperCase() === group.value!.toUpperCase());
+  if (artist.value) filteredCards = filteredCards.filter(c => c.artist.toUpperCase() === artist.value!.toUpperCase());
 
-  return cards.value;
+  return sortBy(filteredCards, [{ key: 'year', desc: true }, { key: 'whereFromName' }, { key: 'artist' }]);
 });
 
 const applyBasicFilter = (cards: KPopCard[]) => {

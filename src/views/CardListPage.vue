@@ -14,9 +14,10 @@
       </div>
 
       <div class="filter-items mx-2">
-        <FilterItem v-model="filterHave" :icon="starBox" text="Have" />
-        <FilterItem v-model="filterWant" :icon="heart" text="Want" />
         <FilterItem v-model="filterMissing" :icon="noCard" text="Missing" />
+        <FilterItem v-model="filterWant" :icon="heart" text="Want" />
+        <FilterItem v-model="filterInTransit" :icon="paperPlane" text="Coming" />
+        <FilterItem v-model="filterHave" :icon="checkmarkCircle" text="Have" />
       </div>
     </template>
 
@@ -46,8 +47,8 @@ import KCardList from '@/components/KCardList.vue';
 import { KPopCard } from '@/types';
 import FilterItem from '@/components/FilterItem.vue';
 import { useSimpleRouter } from '@/composables/router';
-import { filter, noCard, starBox } from '@/icons';
-import { heart } from 'ionicons/icons';
+import { filter, noCard } from '@/icons';
+import { checkmarkCircle, heart, paperPlane } from 'ionicons/icons';
 import { multiSort, sortBy } from '@/util/sort';
 import FilterModal, { type Filter } from '@/components/FilterModal.vue';
 import { useQueryParam } from '@/composables/useQueryParam';
@@ -58,9 +59,10 @@ const artist = useQueryParam('artist');
 const router = useSimpleRouter();
 
 const search = ref('');
-const filterHave = ref(false);
-const filterWant = ref(false);
 const filterMissing = ref(false);
+const filterWant = ref(false);
+const filterInTransit = ref(false);
+const filterHave = ref(false);
 
 const activeFilters = ref<Filter[]>([]);
 
@@ -79,15 +81,16 @@ const initialCardFilter = computed(() => {
 });
 
 const applyBasicFilter = (cards: KPopCard[]) => {
-  if (!filterHave.value && !filterWant.value && !filterMissing.value) {
+  if (!filterMissing.value && !filterInTransit.value && !filterWant.value && !filterHave.value) {
     return [...cards];
   }
 
   return cards.filter(c => {
     return (
-      (filterHave.value && c.ownershipType === 'have') ||
+      (filterMissing.value && c.ownershipType === 'none') ||
       (filterWant.value && c.ownershipType === 'want') ||
-      (filterMissing.value && c.ownershipType === 'none')
+      (filterInTransit.value && c.ownershipType === 'in-transit') ||
+      (filterHave.value && c.ownershipType === 'have')
     );
   });
 };

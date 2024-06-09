@@ -14,18 +14,17 @@
         <IonCardSubtitle v-if="subtitle" class="text-xs text-ellipsis overflow-hidden whitespace-nowrap">{{ subtitle }}</IonCardSubtitle>
       </IonCardContent>
       <IonIcon v-if="status === 'want'" class="icon-want text-xl absolute top-2 right-2" color="danger" :icon="heartCircle" />
-      <IonIcon v-if="status === 'have'" class="icon-have text-xl absolute top-2 right-2" color="warning" :icon="starBox" />
-      <IonIcon v-if="status === 'in-transit'" class="icon-have text-xl absolute top-2 right-2" color="secondary" :icon="paperPlane" />
+      <IonIcon v-if="status === 'in-transit'" class="icon-have text-xl absolute top-2 right-2" color="warning" :icon="paperPlane" />
+      <IonIcon v-if="status === 'have'" class="icon-have text-xl absolute top-2 right-2" color="secondary" :icon="checkmarkCircle" />
     </template>
   </IonCard>
 </template>
 
 <script setup lang="ts">
 import { IonCard, IonIcon, IonCardContent, IonCardTitle, IonCardSubtitle, IonSkeletonText } from '@ionic/vue';
-import { heartCircle, paperPlane } from 'ionicons/icons';
+import { checkmarkCircle, heartCircle, paperPlane } from 'ionicons/icons';
 import KImg from './KImg.vue';
 import { OwnershipType } from '@/types';
-import { starBox } from '@/icons';
 
 const ASPECT_RATIO = 0.7;
 
@@ -42,12 +41,8 @@ withDefaults(defineProps<KCardProps>(), { status: 'none' });
 
 <style scoped>
 .k-card {
-  border-top-width: 3px;
-  border-bottom-width: 3px;
-}
-
-.have {
-  border-color: var(--ion-color-warning);
+  border-top-width: 5px;
+  border-bottom-width: 5px;
 }
 
 .want {
@@ -55,6 +50,10 @@ withDefaults(defineProps<KCardProps>(), { status: 'none' });
 }
 
 .in-transit {
+  border-color: var(--ion-color-warning);
+}
+
+.have {
   border-color: var(--ion-color-secondary);
 }
 </style>

@@ -4,9 +4,9 @@
 
 <script setup lang="ts">
 import { OwnershipType } from '@/types';
-import { heart, paperPlane } from 'ionicons/icons';
+import { checkmarkCircle, heart, paperPlane } from 'ionicons/icons';
 import SegmentInput, { type SegmentControlProps } from './SegmentInput.vue';
-import { noCard, starBox } from '@/icons';
+import { noCard } from '@/icons';
 
 const model = defineModel<OwnershipType>({ required: true });
 
@@ -15,7 +15,7 @@ const props = defineProps<SegmentControlProps>();
 const OPTIONS = [
   {
     value: 'none',
-    text: "Missing",
+    text: 'Missing',
     icon: noCard,
     iconColor: 'dark'
   },
@@ -29,13 +29,13 @@ const OPTIONS = [
     value: 'in-transit',
     text: 'Coming',
     icon: paperPlane,
-    iconColor: 'secondary'
+    iconColor: 'warning'
   },
   {
     value: 'have',
     text: 'Have',
-    icon: starBox,
-    iconColor: 'warning'
+    icon: checkmarkCircle,
+    iconColor: 'secondary'
   }
 ];
 </script>

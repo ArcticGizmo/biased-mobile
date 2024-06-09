@@ -4,7 +4,7 @@
       <slot name="header">
         <IonButtons slot="start">
           <IonButton @click="onClose()">
-            <IonIcon slot="icon-only" />
+            <IonIcon slot="icon-only" :icon="close" />
           </IonButton>
         </IonButtons>
         <IonTitle>{{ title }}</IonTitle>
@@ -17,6 +17,7 @@
 <script setup lang="ts">
 import BasePage from './BasePage.vue';
 import { IonTitle, IonButtons, IonButton, IonIcon } from '@ionic/vue';
+import { close } from 'ionicons/icons';
 
 defineProps<{
   title: string;

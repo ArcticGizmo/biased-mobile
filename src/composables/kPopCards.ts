@@ -1,5 +1,5 @@
 import { KPopCard, OptionalFields } from '@/types';
-import { ComputedRef, onMounted, readonly, ref, watch } from 'vue';
+import { ComputedRef, readonly, ref, watch } from 'vue';
 import { KvStore } from './kvStore';
 import { FileStore } from './fileStore';
 import { v1 as uuidv1 } from 'uuid';
@@ -33,13 +33,9 @@ const backupToPackedCards = (backup: Backup) => {
   throw 'unknown backup version';
 };
 
-export const useKPopCards = () => {
-  onMounted(() => {
-    if (!isLoading.value) {
-      loadSaved();
-    }
-  });
+loadSaved();
 
+export const useKPopCards = () => {
   const addCard = (card: KPopCard) => {
     cards.value = [...cards.value, card];
   };

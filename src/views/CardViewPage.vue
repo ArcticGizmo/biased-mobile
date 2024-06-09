@@ -2,7 +2,7 @@
   <BasePage :title="card?.artist" max-width="500px">
     <div v-if="card" class="card-view p-4">
       <IonIcon class="top-5 right-5 absolute" :icon="trash" size="large" color="danger" @click="onDelete()" />
-      <KImg :src="FileStore.toHref(card.imageFilePath)" style="margin: auto" max-width="350px" />
+      <KImg :src="FileStore.toHref(card.imageFilePath)" :aspect-ratio="0.7" style="margin: auto" max-width="350px" />
       <OwnershipInput :model-value="card.ownershipType" @change="onOwnershipChange" />
       <!-- ======= who ======== -->
       <IonInput

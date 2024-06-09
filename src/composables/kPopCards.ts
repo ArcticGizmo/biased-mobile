@@ -101,12 +101,6 @@ export const useKPopCards = () => {
     cards.value = [...cards.value, ...newCards];
   };
 
-  // const importTemplate = async () => {};
-
-  // const exportBackup
-
-  // const importBackup
-
   return {
     cards: readonly(cards) as ComputedRef<KPopCard[]>,
     isLoading: readonly(isLoading),

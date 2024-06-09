@@ -2,7 +2,7 @@
   <BasePage title="Settings" max-width="500px">
     <div class="content m-4">
       <IonButton expand="full" @click="onCreateBackup()">Create Backup</IonButton>
-      <IonButton expand="full" @click="onLoadBackup()">Load Backup</IonButton>
+      <IonButton expand="full" @click="onLoadBackup()">Import Backup</IonButton>
       <IonButton expand="full" @click="onClearAllCards()">Clear All Cards</IonButton>
       <IonButton v-if="ENV.DEV" expand="full" router-link="/test">test</IonButton>
     </div>

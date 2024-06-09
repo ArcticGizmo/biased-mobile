@@ -4,7 +4,7 @@ export type OptionalFields<T> = {
 
 export type ArtistType = 'group' | 'solo';
 export type WhereFrom = 'album' | 'event';
-export type OwnershipType = 'have' | 'want' | 'none';
+export type OwnershipType = 'have' | 'want' | 'in-transit' | 'none';
 
 export interface KPopData {
   artist: string;

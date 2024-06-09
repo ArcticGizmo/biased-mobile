@@ -5,11 +5,12 @@
     mode="ios"
     @ionChange="(e: any) => onChange(e.target.value as T)"
     :aria-readonly="readonly"
+    :swipe-gesture="false"
     :disabled="disabled"
   >
     <IonSegmentButton v-for="(option, index) of options" :key="index" class="pt-1" :value="option.value" layout="icon-top">
       <IonLabel>{{ option.text }}</IonLabel>
-      <IonIcon :icon="option.icon" :color="option.iconColor" />
+      <IonIcon v-if="option.icon" :icon="option.icon" :color="option.iconColor" />
     </IonSegmentButton>
   </IonSegment>
 </template>
@@ -25,7 +26,7 @@ export interface SegmentControlProps {
 interface SegementOption<T> {
   value: T;
   text: string;
-  icon: string;
+  icon?: string;
   iconColor?: string;
 }
 

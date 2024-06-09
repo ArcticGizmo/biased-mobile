@@ -1,17 +1,15 @@
 <template>
-  <BasePage title="Creator" default-back-href="/home">
+  <BasePage title="Creator" default-back-href="/home" max-width="500px">
     <div class="content p-8">
       <div class="upload-pic">
-        <KImg height="50vh" :src="imageSrc" background>
+        <KImg :src="imageSrc" background height="50vh">
           <template #fallback>
-            <template v-if="imageSrc">
-              <IonIcon class="bad-image-icon" :icon="sadOutline" />
-              <p>That image did not appear to work!</p>
-              <p>Maybe try a different one?</p>
-            </template>
-            <template v-else>
-              <p>Upload your PC!</p>
-            </template>
+            <p>Upload your PC!</p>
+          </template>
+          <template #error>
+            <IonIcon class="bad-image-icon" :icon="imageBroken" />
+            <p>That image did not appear to work!</p>
+            <p>Maybe try a different one?</p>
           </template>
         </KImg>
         <div class="pic-actions">
@@ -22,10 +20,10 @@
             <IonIcon slot="icon-only" :icon="imagesOutline" />
           </IonButton>
           <IonButton @click="onGetFromUrl()">
-            <IonIcon slot="icon-only" :icon="globeOutline" />
+            <IonIcon slot="icon-only" :icon="web" />
           </IonButton>
           <IonButton :disabled="!imageSrc" @click="onEditImage()">
-            <IonIcon slot="icon-only" :icon="pencilOutline" />
+            <IonIcon slot="icon-only" :icon="pencil" />
           </IonButton>
         </div>
       </div>
@@ -71,7 +69,7 @@
 </template>
 
 <script setup lang="ts">
-import { IonButton, IonIcon, IonInput, alertController, modalController } from '@ionic/vue';
+import { IonButton, IonIcon, IonInput, alertController, modalController, onIonViewDidEnter } from '@ionic/vue';
 import { useSimpleRouter } from '@/composables/router';
 import BasePage from './BasePage.vue';
 import KImg from '@/components/KImg.vue';
@@ -79,21 +77,23 @@ import OwnershipInput from '@/components/OwnershipInput.vue';
 import ArtistTypeInput from '@/components/ArtistTypeInput.vue';
 import WhereFromInput from '@/components/WhereFromInput.vue';
 import { KPhotoResponse, useImageImport } from '@/composables/imageImport';
-import { ref, watch, computed } from 'vue';
-import { sadOutline, cameraOutline, imagesOutline, globeOutline, pencilOutline } from 'ionicons/icons';
+import { ref, watch, computed, onMounted } from 'vue';
+import { cameraOutline, imagesOutline } from 'ionicons/icons';
 import VTransition from '@/components/VTransition.vue';
 import PickerInput from '@/components/PickerInput.vue';
 import ImageEditorModal from '@/components/ImageEditorModal.vue';
 import type { ArtistType, WhereFrom, OwnershipType, KPopCard } from '@/types';
 import { useKPopCards } from '@/composables/kPopCards';
+import { FileStore } from '@/composables/fileStore';
+import { Base64Uri } from '@/composables/base64';
+import { imageBroken, pencil, web } from '@/icons';
 
-import { newBase64Image } from '@/composables/localFileSystem';
-
-const { takePhoto, photoFromGallery, photoFromUrl, resizeMaxDimension } = useImageImport();
+const { takePhoto, photoFromGallery, photoFromUrl } = useImageImport();
 const { addCard, generateId } = useKPopCards();
 const router = useSimpleRouter();
 
 const thisYear = new Date().getFullYear();
+
 const dateOptions = Array.from({ length: 50 }, (_, i) => {
   const value = `${thisYear - i}`;
   return { text: value, value };
@@ -101,12 +101,12 @@ const dateOptions = Array.from({ length: 50 }, (_, i) => {
 
 const imageSrc = ref('');
 const originalImgSrc = ref('');
-const artist = ref('J');
+const artist = ref('');
 const artistType = ref<ArtistType>('group');
 const groupName = ref('');
 
 const whereFrom = ref<WhereFrom>('album');
-const whereFromName = ref('J');
+const whereFromName = ref('');
 const albumVersion = ref('');
 
 const year = ref(`${thisYear}`);
@@ -125,6 +125,14 @@ const resetForm = () => {
   ownershipType.value = 'none';
 };
 
+onIonViewDidEnter(() => {
+  resetForm();
+});
+
+onMounted(() => {
+  resetForm();
+});
+
 const whereFromNameLabel = computed(() => {
   return whereFrom.value === 'album' ? 'Album*' : 'Event*';
 });
@@ -141,8 +149,8 @@ watch(artistType, type => {
 
 const setImage = async (resp: KPhotoResponse) => {
   if (resp.ok) {
-    imageSrc.value = resp.photo.base64Uri;
-    originalImgSrc.value = resp.photo.base64Uri;
+    imageSrc.value = resp.base64Uri.toString();
+    originalImgSrc.value = resp.base64Uri.toString();
   }
 };
 
@@ -164,7 +172,8 @@ const onGetFromUrl = async () => {
 const onEditImage = async () => {
   const modal = await modalController.create({
     component: ImageEditorModal,
-    componentProps: { src: originalImgSrc.value }
+    componentProps: { src: originalImgSrc.value },
+    cssClass: 'modal-fullscreen'
   });
 
   modal.present();
@@ -176,12 +185,18 @@ const onEditImage = async () => {
 };
 
 const onSubmit = async () => {
-  const scaledImage = await resizeMaxDimension(imageSrc.value, 500);
-  const imageFile = await newBase64Image(scaledImage);
+  const scaledImage = await Base64Uri.fromUri(imageSrc.value).compress({ quality: 0.75, maxHeight: 1024, maxWidth: 1024 });
+
+  const fileResult = await FileStore.saveImage(`photo-cards/${generateId()}.${scaledImage.type()}`, scaledImage.toString());
+
+  if (!fileResult.ok) {
+    console.error('[creator] could not save file to disk', fileResult.error);
+    return;
+  }
 
   const data: KPopCard = {
     id: generateId(),
-    imageFile,
+    imageFilePath: fileResult.path,
     artist: artist.value,
     artistType: artistType.value,
     groupName: groupName.value,

@@ -22,6 +22,9 @@ import '@ionic/vue/css/text-transformation.css';
 import '@ionic/vue/css/flex-utils.css';
 import '@ionic/vue/css/display.css';
 
+/* Virtual scroll theming */
+import 'vue-virtual-scroller/dist/vue-virtual-scroller.css';
+
 /* Theme variables */
 import './theme/variables.css';
 

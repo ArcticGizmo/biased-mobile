@@ -2,15 +2,19 @@
   <IonPage :class="{ 'has-toolbar': hasToolbar }">
     <IonHeader v-if="title">
       <IonToolbar>
-        <IonButtons slot="start">
-          <IonBackButton v-if="!hideBackRef" :defaultHref="defaultBackHref || '/home'"></IonBackButton>
-        </IonButtons>
-        <IonTitle>{{ title }}</IonTitle>
+        <slot name="header">
+          <IonButtons slot="start">
+            <IonBackButton v-if="!hideBackRef" :defaultHref="defaultBackHref || '/home'"></IonBackButton>
+          </IonButtons>
+          <IonTitle>{{ title }}</IonTitle>
+        </slot>
       </IonToolbar>
     </IonHeader>
     <IonLoading :is-open="loading" class="transparent-loading" />
     <IonContent>
-      <slot></slot>
+      <div class="content" :class="{ 'h-full': fixedContentHeight }" :style="{ maxWidth }">
+        <slot></slot>
+      </div>
     </IonContent>
     <IonFooter>
       <slot name="footer"></slot>
@@ -27,8 +31,9 @@ const props = defineProps<{
   centered?: boolean;
   defaultBackHref?: string;
   hideBackRef?: boolean;
-  pad?: boolean;
   loading?: boolean;
+  maxWidth?: string;
+  fixedContentHeight?: boolean;
 }>();
 
 const hasToolbar = computed(() => !!props.title);
@@ -37,6 +42,10 @@ const hasToolbar = computed(() => !!props.title);
 <style scoped>
 .ion-page {
   justify-content: unset;
+}
+
+.content {
+  margin: 0 auto;
 }
 
 .ion-page.fill-height.has-toolbar {

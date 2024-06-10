@@ -6,7 +6,7 @@
       <IonButton expand="full" @click="onClearAllCards()">Clear All Cards</IonButton>
       <IonButton expand="full" @click="onCreateImage()">Create Image</IonButton>
       <IonButton v-if="ENV.DEV" expand="full" router-link="/test">test</IonButton>
-      <img :src="templateSrc" style="width: 90vw" height="500px" />
+      <img :src="templateSrc" style="width: 90vw; border: 1px solid orange" height="500px" />
     </div>
   </BasePage>
 </template>
@@ -20,7 +20,7 @@ import { createBackup, loadBackup } from '@/composables/backup';
 import { useToast } from '@/composables/toast';
 import { alertOutline, happyOutline, sadOutline } from 'ionicons/icons';
 import { ENV } from '@/env';
-import { createImage } from '@/composables/imageShare';
+import { createImage } from '@/composables/imageShare2';
 import { ref } from 'vue';
 
 const { cards, importBackup, clearCards } = useKPopCards();

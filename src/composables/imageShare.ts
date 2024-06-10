@@ -10,6 +10,7 @@ import { checkmarkCircle, heart, paperPlane } from 'ionicons/icons';
 
 interface LayoutRow {
   album: string;
+  year?: string;
   cards: KPopCard[];
 }
 
@@ -78,7 +79,8 @@ class ImageBuilder {
   async addRow(row: LayoutRow) {
     // add a title
     const pos: Pos = { ...this.pos };
-    this.drawText(row.album, 24, pos);
+    const title = row.year ? `${row.album} (${row.year})` : row.album;
+    this.drawText(title, 24, pos);
     pos.y += 24 + GAP;
 
     // add an image
@@ -182,8 +184,10 @@ const buildLayout = (cards: KPopCard[]): LayoutRow[] => {
   const groups = groupBy(sortedCards, card => card.whereFromName);
 
   return albums.map(album => {
+    const year = groups[album][0].year;
     return {
       album,
+      year,
       cards: groups[album]
     };
   });

@@ -3,8 +3,9 @@ import { groupBy } from '@/util/groupBy';
 import { firstBy } from 'thenby';
 import { FileStore } from './fileStore';
 import { Base64Uri } from './base64';
-import { Collage } from './collage';
+import { CanvasDrawer } from '../util/canvasDrawer';
 import { Position } from '@/util/position';
+import { Collage } from '@/util/collage';
 
 /*
 Worse case is 16 albumns in one row
@@ -14,11 +15,6 @@ Worse case is 16 albumns in one row
 interface Pos {
   x: number;
   y: number;
-}
-
-interface Size {
-  width: number;
-  height: number;
 }
 
 interface CardGroup {
@@ -61,7 +57,7 @@ const CARD_HEIGHT = CARD_WIDTH / CONFIG.aspectRatio;
 
 export const createImage = async (cards: KPopCard[]) => {
   // // create groups from cards
-  // const groups = createCardGroups(cards);
+  const groups = createCardGroups(cards);
 
   // console.log(groups);
 
@@ -73,21 +69,48 @@ export const createImage = async (cards: KPopCard[]) => {
 
   // return data;
 
-  const c = new Collage({
-    pageSize: CONFIG.pageSize,
-    pagePadding: CONFIG.padding
-  });
+  // =========== new
 
-  // c.drawText({
-  //   text: 'This is some text',
-  //   pos: new Position(),
+  const img = cards[0].imageFilePath;
+
+  // const c = new CanvasDrawer({ width: 1000, height: 2000 });
+
+  // // c.drawText({
+  // //   text: 'This is some text',
+  // //   pos: new Position(),
+  // //   fontSize: 22,
+  // //   color: 'orange',
+  // //   backgroundColor: 'green',
+  // //   size: { width: 200, height: 50 }
+  // // });
+
+  // // await c.drawImage({ filePath: cards[0].imageFilePath, pos: new Position(), size: { width: 1500, height: 1000 } });
+
+  // const pos = new Position();
+
+  // // draw full width of page
+  // let o = c.drawText({
+  //   text: 'This is the title text',
+  //   pos,
   //   fontSize: 22,
-  //   color: 'orange',
-  //   backgroundColor: 'green',
-  //   size: { width: 200, height: 50 }
+  //   size: { width: c.width, height: 50 },
+  //   backgroundColor: 'orange'
   // });
 
-  await c.drawImage({ filePath: cards[0].imageFilePath, pos: new Position(), size: { width: 1500, height: 1000 } });
+  // pos.addY(o.height);
+
+  // // draw an image
+  // for (let i = 0; i < 4; i++) {
+  //   o = await c.drawImage({ filePath: img, pos, size: { width: 200, height: 300 } });
+  //   pos.addX(o.width + 10);
+  // }
+
+  const c = new Collage({ pageSize: { width: 500, height: 1500 }, padding: 10, cardHeight: 100 });
+
+  c.addPageTitle('Jung Kook');
+  await c.addSection('Apples', groups[0].cards);
+  await c.addSection('Bacon', groups[1].cards);
+  await c.addSection('Cheese', groups[2].cards);
 
   return c.toDataUrl();
 };

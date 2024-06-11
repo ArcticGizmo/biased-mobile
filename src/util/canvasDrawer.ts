@@ -1,11 +1,6 @@
-import { Pos } from '@/util/position';
-import { FileStore } from './fileStore';
-import { Base64Uri } from './base64';
-
-export interface CollageOptions {
-  pageSize: Size;
-  pagePadding: number;
-}
+import type { Pos, Size } from '@/util/position';
+import { FileStore } from '../composables/fileStore';
+import { Base64Uri } from '../composables/base64';
 
 export interface DrawTextOptions {
   text: string;
@@ -22,19 +17,7 @@ export interface DrawImageOptions {
   size: Size;
 }
 
-export interface Size {
-  width: number;
-  height: number;
-}
-
 type Area = Pos & Size;
-
-interface Boundary {
-  minX: number;
-  minY: number;
-  maxX: number;
-  maxY: number;
-}
 
 const createArea = (pos: Pos, size: Size): Area => {
   return { x: pos.x, y: pos.y, width: size.width, height: size.height };
@@ -61,22 +44,19 @@ const createImageElement = async (filePath: string, maxWidth: number, maxHeight:
   });
 };
 
-export class Collage {
+export class CanvasDrawer {
   private _pageSize: Size;
   private _pagePadding = 0;
-  private _workingArea: Boundary = { minX: 0, minY: 0, maxX: 0, maxY: 0 };
-
   private _fontFamily = 'Arial';
 
   // pos is always relative to working boundary
   private _canvas = document.createElement('canvas');
   private _ctx: CanvasRenderingContext2D;
 
-  constructor(opts: CollageOptions) {
-    this._pageSize = opts.pageSize;
-    this._pagePadding = opts.pagePadding;
-    this._canvas.width = opts.pageSize.width;
-    this._canvas.height = opts.pageSize.height;
+  constructor(pageSize: Size) {
+    this._pageSize = pageSize;
+    this._canvas.width = pageSize.width;
+    this._canvas.height = pageSize.height;
 
     const ctx = this._canvas.getContext('2d');
 
@@ -85,25 +65,14 @@ export class Collage {
     }
 
     this._ctx = ctx;
-
-    this._recalculateWorkingBoundary();
   }
 
-  get workingArea() {
-    return { ...this._workingArea };
+  get width() {
+    return this._pageSize.width;
   }
 
-  private _recalculateWorkingBoundary() {
-    this._workingArea.minX = this._pagePadding;
-    this._workingArea.minY = this._pagePadding;
-
-    this._workingArea.maxX = this._pageSize.width - this._pagePadding;
-    this._workingArea.maxY = this._pageSize.height - this._pagePadding;
-  }
-
-  private _willFit(area: Area) {
-    const { minX, minY, maxX, maxY } = this._workingArea;
-    return area.x >= minX && area.x <= maxX && area.y >= minY && area.y <= maxY;
+  get height() {
+    return this._pageSize.height;
   }
 
   drawText(opts: DrawTextOptions) {
@@ -145,10 +114,10 @@ export class Collage {
     const offsets = { x: Math.floor((opts.size.width - img.width) / 2), y: Math.floor((opts.size.height - img.height) / 2) };
 
     this.useContext(c => {
-      c.drawImage(img, opts.pos.x + offsets.x, opts.pos.y + offsets.y);
+      c.drawImage(img, this._pagePadding + opts.pos.x + offsets.x, this._pagePadding + opts.pos.y + offsets.y);
 
       c.strokeStyle = 'blue';
-      c.lineWidth = 4;
+      c.lineWidth = 1;
 
       c.strokeRect(opts.pos.x, opts.pos.y, opts.size.width, opts.size.height);
     });

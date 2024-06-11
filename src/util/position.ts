@@ -8,6 +8,11 @@ export interface PartialPos {
   y?: number;
 }
 
+export interface Size {
+  width: number;
+  height: number;
+}
+
 export class Position implements Pos {
   private _x = 0;
   private _y = 0;
@@ -38,7 +43,13 @@ export class Position implements Pos {
     return new Position({ x: this._x, y: this._y });
   }
 
-  set(pos: PartialPos) {
+  set(pos: PartialPos | Pos | number) {
+    if (typeof pos === 'number') {
+      this._x = pos;
+      this._y = pos;
+      return this;
+    }
+
     if (pos.x != null) this._x = pos.x;
     if (pos.y != null) this._y = pos.y;
 
@@ -55,7 +66,19 @@ export class Position implements Pos {
     return this;
   }
 
-  add(pos: PartialPos) {
+  setBoth(value: number) {
+    this._x = value;
+    this._y = value;
+    return this;
+  }
+
+  add(pos: PartialPos | Pos | number) {
+    if (typeof pos === 'number') {
+      this._x += pos;
+      this._y += pos;
+      return this;
+    }
+
     if (pos.x != null) this._x += pos.x;
     if (pos.y != null) this._y += pos.y;
 

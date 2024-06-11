@@ -78,14 +78,16 @@ export const createImage = async (cards: KPopCard[]) => {
     pagePadding: CONFIG.padding
   });
 
-  c.drawText({
-    text: 'This is some text',
-    pos: new Position(),
-    fontSize: 22,
-    color: 'orange',
-    backgroundColor: 'green',
-    size: { width: 200, height: 50 }
-  });
+  // c.drawText({
+  //   text: 'This is some text',
+  //   pos: new Position(),
+  //   fontSize: 22,
+  //   color: 'orange',
+  //   backgroundColor: 'green',
+  //   size: { width: 200, height: 50 }
+  // });
+
+  await c.drawImage({ filePath: cards[0].imageFilePath, pos: new Position(), size: { width: 1500, height: 1000 } });
 
   return c.toDataUrl();
 };

@@ -1,4 +1,6 @@
 import { Pos } from '@/util/position';
+import { FileStore } from './fileStore';
+import { Base64Uri } from './base64';
 
 export interface CollageOptions {
   pageSize: Size;
@@ -12,6 +14,12 @@ export interface DrawTextOptions {
   size: Size;
   color?: string;
   backgroundColor?: string;
+}
+
+export interface DrawImageOptions {
+  filePath: string;
+  pos: Pos;
+  size: Size;
 }
 
 export interface Size {
@@ -36,6 +44,23 @@ const getCenter = (area: Area) => {
   return { x: area.x + area.width / 2, y: area.y + area.height / 2 };
 };
 
+const createImageElement = async (filePath: string, maxWidth: number, maxHeight: number): Promise<HTMLImageElement> => {
+  const file = await FileStore.loadImage(filePath);
+
+  if (!file.ok) {
+    throw 'unable to load image';
+  }
+
+  const scaledData = await Base64Uri.fromUri(file.data!).compress({ maxHeight, maxWidth });
+
+  const img = new Image();
+  return new Promise((resolve, reject) => {
+    img.onload = () => resolve(img);
+    img.onerror = (error: any) => reject(error);
+    img.src = scaledData.toString();
+  });
+};
+
 export class Collage {
   private _pageSize: Size;
   private _pagePadding = 0;
@@ -50,6 +75,8 @@ export class Collage {
   constructor(opts: CollageOptions) {
     this._pageSize = opts.pageSize;
     this._pagePadding = opts.pagePadding;
+    this._canvas.width = opts.pageSize.width;
+    this._canvas.height = opts.pageSize.height;
 
     const ctx = this._canvas.getContext('2d');
 
@@ -105,7 +132,29 @@ export class Collage {
     return container;
   }
 
-  
+  async drawImage(opts: DrawImageOptions) {
+    const imageResult = await FileStore.loadImage(opts.filePath);
+
+    if (!imageResult.ok) {
+      throw 'failed to load image';
+    }
+
+    const img = await createImageElement(opts.filePath, opts.size.width, opts.size.height);
+
+    // calculate diff between desired size and the fit size to offset the rendering
+    const offsets = { x: Math.floor((opts.size.width - img.width) / 2), y: Math.floor((opts.size.height - img.height) / 2) };
+
+    this.useContext(c => {
+      c.drawImage(img, opts.pos.x + offsets.x, opts.pos.y + offsets.y);
+
+      c.strokeStyle = 'blue';
+      c.lineWidth = 4;
+
+      c.strokeRect(opts.pos.x, opts.pos.y, opts.size.width, opts.size.height);
+    });
+
+    return createArea(opts.pos, opts.size);
+  }
 
   private getTextSizeForContainer(text: string, fontFamily: string, maxFontSize: number, area: Size, ratio = 1) {
     let curSize = maxFontSize;

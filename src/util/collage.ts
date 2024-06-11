@@ -112,7 +112,8 @@ export class Collage {
       const spaceRemaining = this._maxWidth - localPos.x;
 
       if (spaceRemaining < this.spaceRequiredForCard().width) {
-        this.moveToNewLine();
+        localPos.x = this._padding;
+        localPos.addY(this.spaceRequiredForCard().height + CARD_GAP);
       }
 
       const bounds = await this._canvasDrawer.drawImage({
@@ -132,7 +133,7 @@ export class Collage {
     }
 
     // move across for next section
-    this._pos.set(localPos).addX(SECTION_GAP);
+    this._pos.setX(localPos.x).addX(SECTION_GAP);
   }
 
   private addSectionTitle(text: string, width: number) {

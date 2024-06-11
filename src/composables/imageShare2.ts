@@ -3,6 +3,8 @@ import { groupBy } from '@/util/groupBy';
 import { firstBy } from 'thenby';
 import { FileStore } from './fileStore';
 import { Base64Uri } from './base64';
+import { Collage } from './collage';
+import { Position } from '@/util/position';
 
 /*
 Worse case is 16 albumns in one row
@@ -58,18 +60,34 @@ const CARD_WIDTH =
 const CARD_HEIGHT = CARD_WIDTH / CONFIG.aspectRatio;
 
 export const createImage = async (cards: KPopCard[]) => {
-  // create groups from cards
-  const groups = createCardGroups(cards);
+  // // create groups from cards
+  // const groups = createCardGroups(cards);
 
-  console.log(groups);
+  // console.log(groups);
 
-  // create pages
-  const pages = createPages(groups);
+  // // create pages
+  // const pages = createPages(groups);
 
-  // render pages
-  const data = await renderPage(pages[0]);
+  // // render pages
+  // const data = await renderPage(pages[0]);
 
-  return data;
+  // return data;
+
+  const c = new Collage({
+    pageSize: CONFIG.pageSize,
+    pagePadding: CONFIG.padding
+  });
+
+  c.drawText({
+    text: 'This is some text',
+    pos: new Position(),
+    fontSize: 22,
+    color: 'orange',
+    backgroundColor: 'green',
+    size: { width: 200, height: 50 }
+  });
+
+  return c.toDataUrl();
 };
 
 const createCardGroups = (cards: KPopCard[]): CardGroup[] => {

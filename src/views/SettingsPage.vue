@@ -117,7 +117,7 @@ const onCreateImage = async () => {
   const loading = await showLoading('Creating Backup');
 
   const artist = 'Dino';
-  const filename = `kpop-template-${Date.UTC}`;
+  const filename = `kpop-template-${Date.now()}`;
 
   try {
     const toExport = cards.value.filter(c => c.artist === artist);

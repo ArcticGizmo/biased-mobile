@@ -3,9 +3,9 @@ import { CanvasDrawer } from './canvasDrawer';
 import { Pos, Position, Size } from './position';
 import { checkmarkCircle, heart, paperPlane } from 'ionicons/icons';
 
-const PAGE_TITLE_SIZE = 50;
+const PAGE_TITLE_SIZE = 150;
 const SECTION_TITLE_SIZE = 25;
-const VERSION_SIZE = 12;
+const VERSION_SIZE = 16;
 const CARD_ASPECT_RATIO = 0.7;
 const CARD_GAP = 5;
 const SECTION_GAP = CARD_GAP * 3;
@@ -72,9 +72,11 @@ export class Collage {
 
   private _cardRegion: CardRegion;
   private _showOwnership = false;
+  private _isFull = false;
 
   private _pos = new Position();
   private _canvasDrawer: CanvasDrawer;
+  private _hasPreviousSection = false;
 
   constructor(opts: CollageOptions) {
     this._pageSize = { ...opts.pageSize };
@@ -88,34 +90,39 @@ export class Collage {
 
     this._pos.add(this._pagePadding);
 
-    this._canvasDrawer = new CanvasDrawer(this._pageSize);
+    this._canvasDrawer = new CanvasDrawer(this._pageSize, 'white');
   }
 
-  addPageTitle(text: string) {
-    const titleBounds = this._canvasDrawer.drawText({
-      text,
-      pos: this._pos,
-      fontSize: PAGE_TITLE_SIZE,
-      size: { width: this._maxWidth, height: PAGE_TITLE_SIZE },
-      backgroundColor: 'grey'
-    });
+  get isFull() {
+    return this._isFull;
+  }
 
-    this._pos.addY(titleBounds.height);
+  private markAsFull() {
+    return (this._isFull = true);
+  }
+
+  reset() {
+    this._pos = new Position().add(this._pagePadding);
+    this._canvasDrawer.reset();
+    this._hasPreviousSection = true;
   }
 
   // returns true if there is no more room left for the cards
   async addSection(title: string, cards: KPopCard[]) {
     // if there is not enough room in the row, move to the next row
-    if (cards.length > this.cardsRemainingInRow(this._pos.x)) {
+    if (this._hasPreviousSection && cards.length > this.cardsRemainingInRow(this._pos.x)) {
       this.moveToNewLine();
     }
+
+    this._hasPreviousSection = true;
 
     // check if there is enough height left
     const maxRowsLeft = this.maxRowsLeft(this._pos.y);
     const rowsRequired = Math.ceil(cards.length / this.maxCardsInRow());
 
     if (rowsRequired > maxRowsLeft) {
-      return true;
+      this.markAsFull();
+      return;
     }
 
     // draw the section title
@@ -136,18 +143,21 @@ export class Collage {
         localPos.y += this._cardRegion.totalSize.height + CARD_GAP;
       }
 
+      // draw the card itself
       const bounds = await this._canvasDrawer.drawImage({
         filePath: card.imageFilePath,
         pos: localPos,
         size: this._cardRegion.cardSize
       });
 
+      // draw the version (if required)
       if (card.albumVersion) {
         this._canvasDrawer.drawText({
           text: card.albumVersion,
           pos: localPos.clone().addY(this._cardRegion.cardSize.height),
-          fontSize: VERSION_SIZE,
-          size: { width: this._cardRegion.versionSize.width, height: VERSION_SIZE }
+          fontSize: (VERSION_SIZE / 3) * 2,
+          size: { width: this._cardRegion.versionSize.width, height: VERSION_SIZE },
+          factor: 1
         });
       }
 
@@ -180,8 +190,6 @@ export class Collage {
     } else {
       this._pos.x = localPos.x + SECTION_GAP;
     }
-
-    return false;
   }
 
   private canFitCardWidth(pos: Pos) {
@@ -207,13 +215,29 @@ export class Collage {
     this._pos.y += SECTION_TITLE_SIZE + SECTION_GAP + this._cardRegion.totalSize.height;
   }
 
+  addPageTitle(text: string) {
+    const titleBounds = this._canvasDrawer.drawText({
+      text,
+      pos: this._pos,
+      fontSize: PAGE_TITLE_SIZE,
+      size: { width: this._maxWidth, height: PAGE_TITLE_SIZE },
+      fontFamily: "'Brush Script MT', cursive",
+      backgroundColor: '#F1F1F1',
+      factor: 2
+    });
+
+    this._pos.addY(titleBounds.height + 5);
+  }
+
   private addSectionTitle(text: string, width: number) {
     return this._canvasDrawer.drawText({
       text,
       pos: this._pos,
       fontSize: SECTION_TITLE_SIZE,
       size: { width, height: SECTION_TITLE_SIZE },
-      backgroundColor: 'orange'
+      color: 'white',
+      backgroundColor: '#B6B6B6',
+      factor: 1.5
     });
   }
 

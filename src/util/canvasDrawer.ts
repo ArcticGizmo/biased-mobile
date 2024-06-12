@@ -5,10 +5,12 @@ import { Base64Uri } from '../composables/base64';
 export interface DrawTextOptions {
   text: string;
   pos: Pos;
+  fontFamily?: string;
   fontSize: number;
   size: Size;
   color?: string;
   backgroundColor?: string;
+  factor?: number;
 }
 
 export interface DrawImageOptions {
@@ -65,13 +67,12 @@ const toImageElement = async (src: string): Promise<HTMLImageElement> => {
 export class CanvasDrawer {
   private _pageSize: Size;
   private _pagePadding = 0;
-  private _fontFamily = 'Arial';
 
   // pos is always relative to working boundary
   private _canvas = document.createElement('canvas');
   private _ctx: CanvasRenderingContext2D;
 
-  constructor(pageSize: Size) {
+  constructor(pageSize: Size, backgroundColor?: string) {
     this._pageSize = pageSize;
     this._canvas.width = pageSize.width;
     this._canvas.height = pageSize.height;
@@ -83,6 +84,13 @@ export class CanvasDrawer {
     }
 
     this._ctx = ctx;
+
+    if (backgroundColor) {
+      this.useContext(c => {
+        c.fillStyle = backgroundColor;
+        c.fillRect(0, 0, pageSize.width, pageSize.height);
+      });
+    }
   }
 
   get width() {
@@ -93,7 +101,12 @@ export class CanvasDrawer {
     return this._pageSize.height;
   }
 
+  reset() {
+    this._ctx.reset();
+  }
+
   drawText(opts: DrawTextOptions) {
+    const fontFamily = opts.fontFamily || 'Arial';
     const container = createArea(opts.pos, opts.size);
 
     // draw the background
@@ -109,9 +122,9 @@ export class CanvasDrawer {
       c.textAlign = 'center';
       c.textBaseline = 'middle';
 
-      const textSize = this.getTextSizeForContainer(opts.text, this._fontFamily, opts.fontSize, container, 2);
+      const textSize = this.getTextSizeForContainer(opts.text, fontFamily, opts.fontSize, container, opts.factor || 1);
 
-      c.font = `${textSize}px Arial`;
+      c.font = `${textSize}px ${fontFamily}`;
       const containerCenter = getCenter(container);
       c.fillText(opts.text, containerCenter.x, containerCenter.y);
     });

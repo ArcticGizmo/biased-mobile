@@ -6,7 +6,7 @@
       <IonButton expand="full" @click="onClearAllCards()">Clear All Cards</IonButton>
       <IonButton expand="full" @click="onCreateImage()">Create Image</IonButton>
       <IonButton v-if="ENV.DEV" expand="full" router-link="/test">test</IonButton>
-      <img :src="templateSrc" style="width: 90vw; border: 1px solid orange" height="500px" />
+      <img v-for="(src, index) of templateSrcs" :key="index" :src="src" style="width: 90vw; border: 1px solid orange" height="500px" />
     </div>
   </BasePage>
 </template>
@@ -20,13 +20,14 @@ import { createBackup, loadBackup } from '@/composables/backup';
 import { useToast } from '@/composables/toast';
 import { alertOutline, happyOutline, sadOutline } from 'ionicons/icons';
 import { ENV } from '@/env';
-import { createImage } from '@/composables/imageShare2';
+import { createImages } from '@/composables/imageShare';
 import { ref } from 'vue';
+import { FileStore } from '@/composables/fileStore';
 
 const { cards, importBackup, clearCards } = useKPopCards();
 const { showToast } = useToast();
 
-const templateSrc = ref('');
+const templateSrcs = ref<string[]>([]);
 
 const delay = (duration: number) => new Promise(r => setTimeout(r, duration));
 
@@ -113,8 +114,32 @@ const onClearAllCards = async () => {
 };
 
 const onCreateImage = async () => {
-  const toExport = cards.value.filter(c => c.artist === 'Dino');
-  templateSrc.value = await createImage(toExport);
+  const loading = await showLoading('Creating Backup');
+
+  const artist = 'Dino';
+  const filename = `kpop-template-${Date.UTC}`;
+
+  try {
+    const toExport = cards.value.filter(c => c.artist === artist);
+
+    if (!toExport.length) {
+      await showToast({ message: 'There is nothing to export. Try a different filter', color: 'danger' });
+      return;
+    }
+
+    const dataUrls = await createImages(toExport);
+    templateSrcs.value = dataUrls;
+
+    for (const [index, data] of dataUrls.entries()) {
+      await FileStore.saveToGallery(`${filename}-${index}.jpg`, data);
+    }
+
+    await showToast({ message: 'Templates saved to gallery!', color: 'success' });
+  } catch (error) {
+    console.error(error);
+  } finally {
+    loading.dismiss();
+  }
 };
 </script>
 

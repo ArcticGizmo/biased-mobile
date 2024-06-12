@@ -1,6 +1,6 @@
 import { KPopCard } from '@/types';
 import { CanvasDrawer } from './canvasDrawer';
-import { Position, Size } from './position';
+import { Pos, Position, Size } from './position';
 
 const PAGE_TITLE_SIZE = 50;
 const SECTION_TITLE_SIZE = 25;
@@ -11,33 +11,48 @@ const SECTION_GAP = CARD_GAP * 3;
 
 export interface CollageOptions {
   pageSize: Size;
-  padding: number;
+  pagePadding: number;
   cardHeight: number;
 }
 
+interface CardRegion {
+  totalSize: Size;
+  gapRight: number;
+  cardSize: Size;
+  versionSize: Size;
+}
+
+const createCardRegion = (cardHeight: number): CardRegion => {
+  const cardWidth = cardHeight * CARD_ASPECT_RATIO;
+
+  return {
+    totalSize: { width: cardWidth + CARD_GAP, height: cardHeight + VERSION_SIZE },
+    gapRight: CARD_GAP,
+    cardSize: { width: cardWidth, height: cardHeight },
+    versionSize: { width: cardWidth, height: VERSION_SIZE }
+  };
+};
+
 export class Collage {
   private _pageSize: Size;
-  private _padding = 0;
+  private _pagePadding = 0;
   private _maxWidth = 0;
   private _maxHeight = 0;
 
-  private _cardHeight = 0;
-  private _cardWidth = 0;
-
+  private _cardRegion: CardRegion;
   private _pos = new Position();
   private _canvasDrawer: CanvasDrawer;
 
   constructor(opts: CollageOptions) {
     this._pageSize = { ...opts.pageSize };
-    this._padding = opts.padding;
+    this._pagePadding = opts.pagePadding;
 
-    this._maxWidth = opts.pageSize.width - this._padding * 2;
-    this._maxHeight = opts.pageSize.height - this._padding * 2;
+    this._maxWidth = opts.pageSize.width - this._pagePadding * 2;
+    this._maxHeight = opts.pageSize.height - this._pagePadding * 2;
 
-    this._cardHeight = opts.cardHeight;
-    this._cardWidth = opts.cardHeight * CARD_ASPECT_RATIO;
+    this._cardRegion = createCardRegion(opts.cardHeight);
 
-    this._pos.add(this._padding);
+    this._pos.add(this._pagePadding);
 
     this._canvasDrawer = new CanvasDrawer(this._pageSize);
   }
@@ -54,86 +69,86 @@ export class Collage {
     this._pos.addY(titleBounds.height);
   }
 
+  // returns true if there is no more room left for the cards
   async addSection(title: string, cards: KPopCard[]) {
-    const remainingXSpace = this._maxWidth - this._pos.x;
-    const canFitXCards = Math.floor(remainingXSpace / this.spaceRequiredForCard().width);
-
-    if (canFitXCards >= cards.length) {
-      return await this.addSingleRowSection(title, cards);
+    // if there is not enough room in the row, move to the next row
+    if (cards.length > this.cardsRemainingInRow(this._pos.x)) {
+      this.moveToNewLine();
     }
 
-    this.moveToNewLine();
+    // check if there is enough height left
+    const maxRowsLeft = this.maxRowsLeft(this._pos.y);
+    const rowsRequired = Math.ceil(cards.length / this.maxCardsInRow());
 
-    return await this.addMultiRowSection(title, cards);
-  }
-
-  private spaceRequiredForCard() {
-    return { width: this._cardWidth + this._padding, height: this._cardHeight + VERSION_SIZE };
-  }
-
-  private moveToNewLine() {
-    this._pos.x = this._padding;
-    this._pos.y += SECTION_TITLE_SIZE + SECTION_GAP + this.spaceRequiredForCard().height;
-  }
-
-  private async addSingleRowSection(title: string, cards: KPopCard[]) {
-    const titleBounds = this.addSectionTitle(title, this.spaceRequiredForCard().width * cards.length - this._padding);
-
-    const localPos = this._pos.clone().addY(titleBounds.height);
-
-    for (const card of cards) {
-      const bounds = await this._canvasDrawer.drawImage({
-        filePath: card.imageFilePath,
-        pos: localPos,
-        size: { width: this._cardWidth, height: this._cardHeight }
-      });
-
-      this._canvasDrawer.drawText({
-        text: 'version',
-        pos: localPos.clone().addY(this._cardHeight),
-        fontSize: VERSION_SIZE,
-        size: { width: this._cardWidth, height: VERSION_SIZE }
-      });
-
-      localPos.addX(bounds.width + this._padding);
+    if (rowsRequired > maxRowsLeft) {
+      return true;
     }
 
-    // move across for next section
-    this._pos.setX(localPos.x).addX(SECTION_GAP);
-  }
+    // draw the section title
+    const cardsInRow = Math.min(cards.length, this.cardsRemainingInRow(this._pos.x));
+    const titleWidth = this._cardRegion.totalSize.width * cardsInRow - this._cardRegion.gapRight;
+    const titleBounds = this.addSectionTitle(title, titleWidth);
 
-  private async addMultiRowSection(title: string, cards: KPopCard[]) {
-    const titleWidth = Math.min(this.spaceRequiredForCard().width * cards.length, this._maxWidth);
-    const titleBounds = this.addSectionTitle(title, titleWidth - this._padding);
-
+    // bump down from the title to start adding cards
     const localPos = this._pos.clone().addY(titleBounds.height);
 
-    for (const card of cards) {
-      const spaceRemaining = this._maxWidth - localPos.x;
+    let usedMultipleLines = false;
 
-      if (spaceRemaining < this.spaceRequiredForCard().width) {
-        localPos.x = this._padding;
-        localPos.addY(this.spaceRequiredForCard().height + CARD_GAP);
+    for (const card of cards) {
+      // if we cannot fit the width, go to the next line
+      if (!this.canFitCardWidth(localPos)) {
+        usedMultipleLines = true;
+        localPos.x = this._pagePadding;
+        localPos.y += this._cardRegion.totalSize.height + CARD_GAP;
       }
 
       const bounds = await this._canvasDrawer.drawImage({
         filePath: card.imageFilePath,
         pos: localPos,
-        size: { width: this._cardWidth, height: this._cardHeight }
+        size: this._cardRegion.cardSize
       });
 
       this._canvasDrawer.drawText({
         text: 'version',
-        pos: localPos.clone().addY(this._cardHeight),
+        pos: localPos.clone().addY(this._cardRegion.cardSize.height),
         fontSize: VERSION_SIZE,
-        size: { width: this._cardWidth, height: VERSION_SIZE }
+        size: { width: this._cardRegion.versionSize.width, height: VERSION_SIZE }
       });
 
-      localPos.addX(bounds.width + this._padding);
+      localPos.addX(bounds.width + this._cardRegion.gapRight);
     }
 
-    // move across for next section
-    this._pos.setX(localPos.x).addX(SECTION_GAP);
+    if (usedMultipleLines) {
+      this._pos.y = localPos.y - SECTION_TITLE_SIZE;
+      this.moveToNewLine();
+    } else {
+      this._pos.x = localPos.x + SECTION_GAP;
+    }
+
+    return false;
+  }
+
+  private canFitCardWidth(pos: Pos) {
+    return pos.x + this._cardRegion.cardSize.width < this._maxWidth;
+  }
+
+  private maxRowsLeft(yPos: number) {
+    const heightRemaining = this._maxHeight + this._pagePadding - SECTION_TITLE_SIZE - yPos;
+    const height = this._cardRegion.totalSize.height + SECTION_GAP;
+    return Math.floor(heightRemaining / height);
+  }
+
+  private maxCardsInRow() {
+    return Math.floor((this._maxWidth + this._cardRegion.gapRight) / this._cardRegion.totalSize.width);
+  }
+
+  private cardsRemainingInRow(xPos: number) {
+    return Math.floor((this._maxWidth + this._cardRegion.gapRight - xPos) / this._cardRegion.totalSize.width);
+  }
+
+  private moveToNewLine() {
+    this._pos.x = this._pagePadding;
+    this._pos.y += SECTION_TITLE_SIZE + SECTION_GAP + this._cardRegion.totalSize.height;
   }
 
   private addSectionTitle(text: string, width: number) {

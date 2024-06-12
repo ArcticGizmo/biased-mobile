@@ -91,7 +91,7 @@ export class CanvasDrawer {
       c.textAlign = 'center';
       c.textBaseline = 'middle';
 
-      const textSize = this.getTextSizeForContainer(opts.text, this._fontFamily, opts.fontSize, container, 1.1);
+      const textSize = this.getTextSizeForContainer(opts.text, this._fontFamily, opts.fontSize, container, 2);
 
       c.font = `${textSize}px Arial`;
       const containerCenter = getCenter(container);

@@ -12,10 +12,10 @@ export const createImage = async (cards: KPopCard[]) => {
   // create groups from cards
   const groups = createCardGroups(cards);
 
-  const c = new Collage({ pageSize: { width: 500, height: 1500 }, padding: 10, cardHeight: 100 });
+  const c = new Collage({ pageSize: { width: 500, height: 6000 }, pagePadding: 10, cardHeight: 100 });
 
   c.addPageTitle(cards[0].artist);
-  for (const group of groups.slice(5, 8)) {
+  for (const group of groups.slice(0, 9)) {
     await c.addSection(group.title, group.cards);
   }
 

@@ -1,6 +1,7 @@
-import { KPopCard } from '@/types';
+import { KPopCard, OwnershipType } from '@/types';
 import { CanvasDrawer } from './canvasDrawer';
 import { Pos, Position, Size } from './position';
+import { checkmarkCircle, heart, paperPlane } from 'ionicons/icons';
 
 const PAGE_TITLE_SIZE = 50;
 const SECTION_TITLE_SIZE = 25;
@@ -8,11 +9,13 @@ const VERSION_SIZE = 12;
 const CARD_ASPECT_RATIO = 0.7;
 const CARD_GAP = 5;
 const SECTION_GAP = CARD_GAP * 3;
+const OWNERSHIP_BORDER_WIDTH = 2;
 
 export interface CollageOptions {
   pageSize: Size;
   pagePadding: number;
   cardHeight: number;
+  showOwnership?: boolean;
 }
 
 interface CardRegion {
@@ -33,6 +36,34 @@ const createCardRegion = (cardHeight: number): CardRegion => {
   };
 };
 
+const getSvg = (ownershipType: OwnershipType) => {
+  switch (ownershipType) {
+    case 'have':
+      return svgWithFill(checkmarkCircle, getFillColor(ownershipType));
+    case 'in-transit':
+      return svgWithFill(paperPlane, getFillColor(ownershipType));
+    case 'want':
+      return svgWithFill(heart, getFillColor(ownershipType));
+    default:
+      return;
+  }
+};
+
+const getFillColor = (ownershipType: OwnershipType) => {
+  switch (ownershipType) {
+    case 'have':
+      return 'green';
+    case 'in-transit':
+      return 'orange';
+    case 'want':
+      return 'red';
+    default:
+      return 'transparent';
+  }
+};
+
+const svgWithFill = (dataUrl: string, color: string) => dataUrl.replace('<svg', `<svg fill='${color}'`);
+
 export class Collage {
   private _pageSize: Size;
   private _pagePadding = 0;
@@ -40,12 +71,15 @@ export class Collage {
   private _maxHeight = 0;
 
   private _cardRegion: CardRegion;
+  private _showOwnership = false;
+
   private _pos = new Position();
   private _canvasDrawer: CanvasDrawer;
 
   constructor(opts: CollageOptions) {
     this._pageSize = { ...opts.pageSize };
     this._pagePadding = opts.pagePadding;
+    this._showOwnership = opts.showOwnership || false;
 
     this._maxWidth = opts.pageSize.width - this._pagePadding * 2;
     this._maxHeight = opts.pageSize.height - this._pagePadding * 2;
@@ -108,12 +142,34 @@ export class Collage {
         size: this._cardRegion.cardSize
       });
 
-      this._canvasDrawer.drawText({
-        text: 'version',
-        pos: localPos.clone().addY(this._cardRegion.cardSize.height),
-        fontSize: VERSION_SIZE,
-        size: { width: this._cardRegion.versionSize.width, height: VERSION_SIZE }
-      });
+      if (card.albumVersion) {
+        this._canvasDrawer.drawText({
+          text: card.albumVersion,
+          pos: localPos.clone().addY(this._cardRegion.cardSize.height),
+          fontSize: VERSION_SIZE,
+          size: { width: this._cardRegion.versionSize.width, height: VERSION_SIZE }
+        });
+      }
+
+      // if render ownership
+      if (this._showOwnership) {
+        const svg = getSvg(card.ownershipType);
+        if (svg) {
+          const svgSize = this._cardRegion.cardSize.width * 0.25;
+          await this._canvasDrawer.drawSvg({ svg, pos: localPos, size: { width: svgSize, height: svgSize } });
+
+          // draw the border
+          this._canvasDrawer.drawRect({
+            pos: localPos,
+            size: {
+              width: this._cardRegion.cardSize.width,
+              height: this._cardRegion.totalSize.height
+            },
+            borderWidth: OWNERSHIP_BORDER_WIDTH,
+            borderColor: getFillColor(card.ownershipType)
+          });
+        }
+      }
 
       localPos.addX(bounds.width + this._cardRegion.gapRight);
     }

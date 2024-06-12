@@ -17,6 +17,19 @@ export interface DrawImageOptions {
   size: Size;
 }
 
+export interface DrawRectOptions {
+  pos: Pos;
+  size: Size;
+  borderWidth: number;
+  borderColor: string;
+}
+
+export interface DrawSvgOptions {
+  svg: string;
+  pos: Pos;
+  size: Size;
+}
+
 type Area = Pos & Size;
 
 const createArea = (pos: Pos, size: Size): Area => {
@@ -36,11 +49,16 @@ const createImageElement = async (filePath: string, maxWidth: number, maxHeight:
 
   const scaledData = await Base64Uri.fromUri(file.data!).compress({ maxHeight, maxWidth });
 
+  return await toImageElement(scaledData.toString());
+};
+
+const toImageElement = async (src: string): Promise<HTMLImageElement> => {
   const img = new Image();
   return new Promise((resolve, reject) => {
     img.onload = () => resolve(img);
     img.onerror = (error: any) => reject(error);
-    img.src = scaledData.toString();
+
+    img.src = src;
   });
 };
 
@@ -115,14 +133,24 @@ export class CanvasDrawer {
 
     this.useContext(c => {
       c.drawImage(img, this._pagePadding + opts.pos.x + offsets.x, this._pagePadding + opts.pos.y + offsets.y);
-
-      c.strokeStyle = 'blue';
-      c.lineWidth = 1;
-
-      c.strokeRect(opts.pos.x, opts.pos.y, opts.size.width, opts.size.height);
     });
 
     return createArea(opts.pos, opts.size);
+  }
+
+  drawRect(opts: DrawRectOptions) {
+    this.useContext(c => {
+      c.lineWidth = opts.borderWidth;
+      c.strokeStyle = opts.borderColor;
+      c.strokeRect(opts.pos.x, opts.pos.y, opts.size.width, opts.size.height);
+    });
+  }
+
+  async drawSvg(opts: DrawSvgOptions) {
+    const img = await toImageElement(opts.svg);
+    this.useContext(c => {
+      c.drawImage(img, opts.pos.x, opts.pos.y, opts.size.width, opts.size.height);
+    });
   }
 
   private getTextSizeForContainer(text: string, fontFamily: string, maxFontSize: number, area: Size, ratio = 1) {
@@ -156,13 +184,11 @@ export class CanvasDrawer {
     return curSize;
   }
 
-  private useContext(action: (ctx: CanvasRenderingContext2D) => void) {
+  useContext(action: (ctx: CanvasRenderingContext2D) => void) {
     this._ctx.save();
     action(this._ctx);
     this._ctx.restore();
   }
-
-  drawCard() {}
 
   toDataUrl() {
     return this._canvas.toDataURL();

@@ -27,7 +27,7 @@
     <div v-else class="grouping-list">
       <IonCard v-for="(item, index) of items" :key="index" @click="onItemGroupSelect(item)">
         <IonCardHeader>
-          <IonCardTitle>{{ item.title }}</IonCardTitle>
+          <IonCardTitle>{{ item.title || 'unknown' }}</IonCardTitle>
         </IonCardHeader>
         <IonCardContent>
           <div class="summary flex flex-cols gap-4">

@@ -1,6 +1,7 @@
 import { createApp } from 'vue';
 import App from './App.vue';
 import router from './router';
+import Vue3TouchEvents, { type Vue3TouchEventsOptions } from 'vue3-touch-events';
 
 import { IonicVue } from '@ionic/vue';
 
@@ -31,7 +32,9 @@ import './theme/variables.css';
 import { defineCustomElements } from '@ionic/pwa-elements/loader';
 defineCustomElements(window);
 
-const app = createApp(App).use(IonicVue).use(router);
+const app = createApp(App).use(IonicVue).use(router).use<Vue3TouchEventsOptions>(Vue3TouchEvents, {
+  disableClick: false
+});
 
 router.isReady().then(() => {
   app.mount('#app');

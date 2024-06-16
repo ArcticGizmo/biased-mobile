@@ -1,6 +1,6 @@
 <template>
-  <BaseDialog justify-content="flex-end" @backdrop="onBackdrop()">
-    <div class="sheet">
+  <BaseDialog class="aaaa" justify-content="flex-end" @backdrop="onBackdrop()">
+    <div class="sheet slide-up">
       <div><slot name="header"></slot></div>
       <div><slot>Content</slot></div>
     </div>
@@ -20,5 +20,19 @@ const onBackdrop = () => emits('backdrop');
 <style scoped>
 .sheet {
   background-color: white;
+}
+
+.slide-up {
+  animation: slideInUp ease-in-out 0.3s;
+}
+
+@keyframes slideInUp {
+  from {
+    transform: translate3d(0, 100%, 0);
+  }
+
+  to {
+    transform: translate3d(0, 0, 0);
+  }
 }
 </style>

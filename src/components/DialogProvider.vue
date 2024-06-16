@@ -27,10 +27,10 @@ import { DIALOGS } from '@/composables/dialogController';
 }
 
 @keyframes backgroundFadeIn {
-  0% {
+  from {
     opacity: 0;
   }
-  100% {
+  to {
     opacity: 0.5;
   }
 }

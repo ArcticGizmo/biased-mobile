@@ -1,6 +1,6 @@
 <template>
-  <BaseDialog class="aaaa" justify-content="flex-end" @backdrop="onBackdrop()">
-    <div class="sheet slide-up">
+  <BaseDialog justify-content="flex-end">
+    <div class="sheet">
       <div><slot name="header"></slot></div>
       <div><slot>Content</slot></div>
     </div>
@@ -10,20 +10,20 @@
 <script setup lang="ts">
 import BaseDialog from './BaseDialog.vue';
 
-const emits = defineEmits<{
-  (e: 'backdrop'): void;
+defineProps<{
+  persistent?: boolean;
 }>();
-
-const onBackdrop = () => emits('backdrop');
 </script>
+
+<style scoped></style>
 
 <style scoped>
 .sheet {
   background-color: white;
 }
 
-.slide-up {
-  animation: slideInUp ease-in-out 0.3s;
+.open .sheet {
+  animation: slideInUp ease 0.3s 1 forwards;
 }
 
 @keyframes slideInUp {
@@ -33,6 +33,20 @@ const onBackdrop = () => emits('backdrop');
 
   to {
     transform: translate3d(0, 0, 0);
+  }
+}
+
+.closing .sheet {
+  animation: slideOutDown ease 0.3s 1 forwards;
+}
+
+@keyframes slideOutDown {
+  from {
+    transform: translate3d(0, 0, 0);
+  }
+
+  to {
+    transform: translate3d(0, 100%, 0);
   }
 }
 </style>

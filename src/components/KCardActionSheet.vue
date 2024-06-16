@@ -1,5 +1,5 @@
 <template>
-  <BaseActionDialog @backdrop="dialogController.backdropDismiss">
+  <BaseActionDialog>
     <div class="pt-4 mx-2">
       <OwnershipInput model-value="none" />
     </div>

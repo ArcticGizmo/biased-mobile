@@ -31,6 +31,7 @@
           :src="FileStore.toHref(card.imageFilePath)"
           :status="card.ownershipType"
           @click="emits('select', card)"
+          v-touch:longtap="() => emits('long-select', card)"
         />
       </template>
     </RecycleScroller>
@@ -51,6 +52,7 @@ defineProps<{ items: KPopCard[]; loading?: boolean }>();
 
 const emits = defineEmits<{
   (e: 'select', card: KPopCard): void;
+  (e: 'long-select', card: KPopCard): void;
 }>();
 
 const { width } = useWindowSize();

@@ -1,7 +1,7 @@
 <template>
   <BaseActionDialog>
     <div class="pt-4 mx-2">
-      <OwnershipInput model-value="none" />
+      <OwnershipInput :model-value="card?.ownershipType || 'none'" :disabled="!card" @change="onOwnershipChange" />
     </div>
     <ion-list>
       <ion-item>
@@ -19,6 +19,15 @@ import BaseActionDialog from '@/views/BaseActionDialog.vue';
 import { dialogController } from '@/composables/dialogController';
 import { IonList, IonItem, IonLabel } from '@ionic/vue';
 import OwnershipInput from './OwnershipInput.vue';
+import { useKPopCards } from '@/composables/kPopCards';
+import { computed } from 'vue';
+import { OwnershipType } from '@/types';
+
+const props = defineProps<{ id: string }>();
+
+const { cards, update } = useKPopCards();
+
+const card = computed(() => cards.value.find(c => c.id === props.id));
 
 const onView = () => {
   dialogController.dismiss({ role: 'view' });
@@ -26,5 +35,9 @@ const onView = () => {
 
 const onDelete = () => {
   dialogController.dismiss({ role: 'delete' });
+};
+
+const onOwnershipChange = (ownershipType: OwnershipType) => {
+  update(props.id, { ownershipType });
 };
 </script>

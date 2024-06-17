@@ -30,7 +30,7 @@
       </div>
     </div>
 
-    <KCardList v-else :items="filteredCards" :loading="isLoading" @select="onOpenCard">
+    <KCardList v-else :items="filteredCards" :loading="isLoading" @select="onSelectCard" @long-select="onLongSelectCard">
       <template #empty>
         <div class="text-center p-3">No matches</div>
       </template>
@@ -52,10 +52,15 @@ import { checkmarkCircle, heart, paperPlane } from 'ionicons/icons';
 import { multiSort, sortBy } from '@/util/sort';
 import FilterModal, { type Filter } from '@/components/FilterModal.vue';
 import { useQueryParam } from '@/composables/useQueryParam';
+import { dialogController } from '@/composables/dialogController';
+import KCardActionSheet from '@/components/KCardActionSheet.vue';
+import { showSimpleAlert } from '@/composables/modals';
+import { useToast } from '@/composables/toast';
 
 const group = useQueryParam('group');
 const artist = useQueryParam('artist');
 
+const { showToast } = useToast();
 const router = useSimpleRouter();
 
 const search = ref('');
@@ -66,10 +71,39 @@ const filterHave = ref(false);
 
 const activeFilters = ref<Filter[]>([]);
 
-const { cards, isLoading } = useKPopCards();
+const { cards, deleteCard, isLoading } = useKPopCards();
 
-const onOpenCard = (card: KPopCard) => {
-  router.push(`/cards/${card.id}`);
+const onSelectCard = async (card: KPopCard) => {
+  const actionResp = await dialogController.create({
+    component: KCardActionSheet,
+    componentProps: { id: card.id }
+  });
+
+  if (actionResp.role === 'view') {
+    router.push(`/cards/${card.id}`);
+    return;
+  }
+
+  if (actionResp.role !== 'delete') {
+    return;
+  }
+
+  const alertResp = await showSimpleAlert({ header: 'Remove Card', message: 'Once the card is gone, its gone', okName: 'delete' });
+
+  if (alertResp !== 'delete') {
+    return;
+  }
+
+  try {
+    await deleteCard(card.id);
+  } catch (error) {
+    console.error('unable to remove card', error);
+    await showToast({ color: 'danger', message: "Sorry, that didn't work" });
+  }
+};
+
+const onLongSelectCard = (card: KPopCard) => {
+  console.log('--- long select');
 };
 
 const initialCardFilter = computed(() => {

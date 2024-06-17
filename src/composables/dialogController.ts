@@ -1,13 +1,13 @@
 import { type DefferablePromise, DeferredPromise } from '@/util/deferredPromise';
-import { Ref, markRaw, ref } from 'vue';
+import { Component, Ref, markRaw, ref } from 'vue';
 
-export interface DialogOptions {
-  component: any;
+export interface DialogOptions<> {
+  component: Component;
   componentProps?: any;
 }
 
 interface DialogInstance<T> {
-  component: any;
+  component: Component;
   componentProps?: any;
   prom: DefferablePromise<DialogDismissResp<T>>;
   closing: Ref<boolean>;
@@ -52,8 +52,8 @@ const dismiss = <T>(options: DialogDismissReq<T>) => {
 
   const resp: DialogDismissResp<T> = { role: options.role, data: options.data };
   dialog.closing = true;
+  dialog.prom.resolve(resp);
   setTimeout(() => {
-    dialog.prom.resolve(resp);
     DIALOGS.value.pop();
   }, 300);
 };

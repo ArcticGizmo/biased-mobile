@@ -30,7 +30,14 @@
       </div>
     </div>
 
-    <KCardList v-else :items="filteredCards" :loading="isLoading" @select="onSelectCard" @long-select="onLongSelectCard">
+    <KCardList
+      v-else
+      :items="filteredCards"
+      :selected="selectedCardIds"
+      :loading="isLoading"
+      @select="onSelectCard"
+      @long-hold="onHoldCard"
+    >
       <template #empty>
         <div class="text-center p-3">No matches</div>
       </template>
@@ -73,14 +80,34 @@ const activeFilters = ref<Filter[]>([]);
 
 const { cards, deleteCard, isLoading } = useKPopCards();
 
+const selectedCardIds = ref<string[]>(['15247ec0-1dc9-11ef-befd-355a1fa51b69', 'd27b85f0-1dc8-11ef-befd-355a1fa51b69']);
+const activeMultiSelect = computed(() => selectedCardIds.value.length > 0);
+
 const onSelectCard = async (card: KPopCard) => {
+  if (activeMultiSelect.value) {
+    handleMultiSelectTap(card.id);
+  } else {
+    await handleNormalSelectTap(card.id);
+  }
+};
+
+const handleMultiSelectTap = (cardId: string) => {
+  if (selectedCardIds.value.includes(cardId)) {
+    selectedCardIds.value = selectedCardIds.value.filter(c => c !== cardId);
+  } else {
+    // TODO: this might not work
+    selectedCardIds.value.push(cardId);
+  }
+};
+
+const handleNormalSelectTap = async (cardId: string) => {
   const actionResp = await dialogController.create({
     component: KCardActionSheet,
-    componentProps: { id: card.id }
+    componentProps: { id: cardId }
   });
 
   if (actionResp.role === 'view') {
-    router.push(`/cards/${card.id}`);
+    router.push(`/cards/${cardId}`);
     return;
   }
 
@@ -95,15 +122,26 @@ const onSelectCard = async (card: KPopCard) => {
   }
 
   try {
-    await deleteCard(card.id);
+    await deleteCard(cardId);
   } catch (error) {
     console.error('unable to remove card', error);
     await showToast({ color: 'danger', message: "Sorry, that didn't work" });
   }
 };
 
-const onLongSelectCard = (card: KPopCard) => {
-  console.log('--- long select');
+const onHoldCard = (card: KPopCard) => {
+  const id = card.id;
+
+  if (!activeMultiSelect.value) {
+    selectedCardIds.value = [id];
+    return;
+  }
+
+  if (selectedCardIds.value.includes(id)) {
+    selectedCardIds.value = [];
+  } else {
+    selectedCardIds.value = [id];
+  }
 };
 
 const initialCardFilter = computed(() => {

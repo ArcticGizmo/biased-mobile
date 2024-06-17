@@ -25,13 +25,14 @@
     >
       <template #default="{ item: card, index }">
         <KCard
+          :class="{ selected: selected?.includes(card.id) }"
           :key="index"
           :title="card.artist"
           :subtitle="cardSubtitle(card)"
           :src="FileStore.toHref(card.imageFilePath)"
           :status="card.ownershipType"
           @click="emits('select', card)"
-          v-touch:longtap="() => emits('long-select', card)"
+          v-touch:hold="() => emits('long-hold', card)"
         />
       </template>
     </RecycleScroller>
@@ -48,11 +49,11 @@ import { computed } from 'vue';
 import { RecycleScroller } from 'vue-virtual-scroller';
 import KCard from './KCard.vue';
 
-defineProps<{ items: KPopCard[]; loading?: boolean }>();
+defineProps<{ items: KPopCard[]; selected?: string[]; loading?: boolean }>();
 
 const emits = defineEmits<{
   (e: 'select', card: KPopCard): void;
-  (e: 'long-select', card: KPopCard): void;
+  (e: 'long-hold', card: KPopCard): void;
 }>();
 
 const { width } = useWindowSize();
@@ -97,5 +98,15 @@ const cardSubtitle = (card: KPopCard) => {
 :deep(.cols-6 .icon-want),
 :deep(.cols-6 .icon-have) {
   font-size: 3rem;
+}
+
+.k-card {
+  transition: padding 0.1s ease-out;
+}
+
+.selected {
+  background-color: orange;
+  border-color: transparent;
+  padding: 0.5rem;
 }
 </style>

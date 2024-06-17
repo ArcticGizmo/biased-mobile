@@ -8,20 +8,37 @@ interface CardGroup {
   cards: KPopCard[];
 }
 
-const createCollage = () => {
-  return new Collage({ pageSize: { width: 2000, height: 2830 }, pagePadding: 40, cardHeight: 165, showOwnership: true });
+export interface CreateImageOptions {
+  title?: string;
+  style?: 'plain' | 'border';
+}
+
+const getCardHeight = (count: number) => {
+  if (count < 10) return 500;
+  if (count < 20) return 400;
+  if (count < 30) return 300;
+  if (count < 60) return 200;
+  return 165;
 };
 
-export const createImages = async (cards: KPopCard[]) => {
-  const title = cards[0].artist;
+export const createImages = async (cards: KPopCard[], opts?: CreateImageOptions) => {
+  const showOwnership = opts?.style === 'border';
+  const cardHeight = getCardHeight(cards.length);
+  const title = opts?.title || cards[0].artist;
 
   // create groups from cards
   const groups = createCardGroups(cards);
 
   const collages: Collage[] = [];
 
+  const createCollage = () => {
+    return new Collage({ pageSize: { width: 2000, height: 2830 }, pagePadding: 40, cardHeight, showOwnership });
+  };
+
   let c = createCollage();
-  c.addPageTitle(title);
+  if (title) {
+    c.addPageTitle(title);
+  }
   collages.push(c);
 
   for (const group of groups) {
@@ -32,7 +49,9 @@ export const createImages = async (cards: KPopCard[]) => {
     }
 
     c = createCollage();
-    c.addPageTitle(title);
+    if (title) {
+      c.addPageTitle(title);
+    }
     collages.push(c);
 
     await c.addSection(group.title, group.cards);
@@ -50,7 +69,7 @@ export const createImages = async (cards: KPopCard[]) => {
 const createCardGroups = (cards: KPopCard[]): CardGroup[] => {
   // sort by year
   const sortedCards = [...cards];
-  sortedCards.sort(firstBy('year').thenBy('whereFromName'));
+  sortedCards.sort(firstBy('year').thenBy('whereFromName').thenBy('albumVersion').thenBy('artist'));
 
   // get albums
   const albums = [...new Set(sortedCards.map(c => c.whereFromName))];

@@ -1,14 +1,15 @@
 <template>
   <BaseActionDialog>
     <div class="pt-4 mx-2">
-      <OwnershipInput :model-value="card?.ownershipType || 'none'" :disabled="!card" @change="onOwnershipChange" />
+      <OwnershipInput
+        :model-value="matchedCards[0]?.ownershipType || 'none'"
+        :disabled="!matchedCards.length"
+        @change="onOwnershipChange"
+      />
     </div>
     <ion-list>
-      <ion-item>
-        <ion-label @click="onView()">View</ion-label>
-      </ion-item>
-      <ion-item>
-        <ion-label color="danger" @click="onDelete()">Delete</ion-label>
+      <ion-item v-for="(button, index) of buttons" :key="index">
+        <ion-label :color="button.color" @click="onButtonSelect(button)">{{ button.text }}</ion-label>
       </ion-item>
     </ion-list>
   </BaseActionDialog>
@@ -23,21 +24,26 @@ import { useKPopCards } from '@/composables/kPopCards';
 import { computed } from 'vue';
 import { OwnershipType } from '@/types';
 
-const props = defineProps<{ id: string }>();
+export interface ActionSheetButton {
+  text: string;
+  role?: string;
+  data?: any;
+  color?: string;
+}
+
+const props = defineProps<{ ids: string[]; buttons: ActionSheetButton[] }>();
 
 const { cards, update } = useKPopCards();
 
-const card = computed(() => cards.value.find(c => c.id === props.id));
+const matchedCards = computed(() => cards.value.filter(c => props.ids.includes(c.id)));
 
-const onView = () => {
-  dialogController.dismiss({ role: 'view' });
-};
-
-const onDelete = () => {
-  dialogController.dismiss({ role: 'delete' });
+const onButtonSelect = (button: ActionSheetButton) => {
+  dialogController.dismiss({ role: button.role, data: button.data });
 };
 
 const onOwnershipChange = (ownershipType: OwnershipType) => {
-  update(props.id, { ownershipType });
+  for (const card of matchedCards.value) {
+    update(card.id, { ownershipType });
+  }
 };
 </script>

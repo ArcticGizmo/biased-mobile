@@ -135,5 +135,3 @@ const onSelectEverything = () => {
   router.push('/cards');
 };
 </script>
-
-<style scoped></style>

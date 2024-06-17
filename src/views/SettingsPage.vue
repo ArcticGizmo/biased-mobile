@@ -4,7 +4,6 @@
       <IonButton expand="full" @click="onCreateBackup()">Create Backup</IonButton>
       <IonButton expand="full" @click="onLoadBackup()">Import Backup</IonButton>
       <IonButton expand="full" @click="onClearAllCards()">Clear All Cards</IonButton>
-      <IonButton expand="full" @click="onCreateImage()">Create Image</IonButton>
       <IonButton v-if="ENV.DEV" expand="full" router-link="/test">test</IonButton>
       <img v-for="(src, index) of templateSrcs" :key="index" :src="src" style="width: 90vw; border: 1px solid orange" height="500px" />
     </div>
@@ -20,21 +19,13 @@ import { createBackup, loadBackup } from '@/composables/backup';
 import { useToast } from '@/composables/toast';
 import { alertOutline, happyOutline, sadOutline } from 'ionicons/icons';
 import { ENV } from '@/env';
-import { createImages } from '@/composables/imageShare';
 import { ref } from 'vue';
-import { FileStore } from '@/composables/fileStore';
+import { withDelay } from '@/util/delay';
 
 const { cards, importBackup, clearCards } = useKPopCards();
 const { showToast } = useToast();
 
 const templateSrcs = ref<string[]>([]);
-
-const delay = (duration: number) => new Promise(r => setTimeout(r, duration));
-
-async function withDelay<T>(task: Promise<T>, minDuration: number) {
-  const [resp] = await Promise.all([task, delay(minDuration)]);
-  return resp;
-}
 
 const onCreateBackup = async () => {
   const loading = await showLoading('Creating Backup');
@@ -108,35 +99,6 @@ const onClearAllCards = async () => {
   } catch (error) {
     console.error('failed to delete cards', error);
     await showToast({ color: 'danger', message: "Unable to remove your cards :'(", icon: alertOutline });
-  } finally {
-    loading.dismiss();
-  }
-};
-
-const onCreateImage = async () => {
-  const loading = await showLoading('Creating Backup');
-
-  const artist = 'Dino';
-  const filename = `kpop-template-${Date.now()}`;
-
-  try {
-    const toExport = cards.value.filter(c => c.artist === artist);
-
-    if (!toExport.length) {
-      await showToast({ message: 'There is nothing to export. Try a different filter', color: 'danger' });
-      return;
-    }
-
-    const dataUrls = await createImages(toExport);
-    templateSrcs.value = dataUrls;
-
-    for (const [index, data] of dataUrls.entries()) {
-      await FileStore.saveToGallery(`${filename}-${index}.jpg`, data);
-    }
-
-    await showToast({ message: 'Templates saved to gallery!', color: 'success' });
-  } catch (error) {
-    console.error(error);
   } finally {
     loading.dismiss();
   }

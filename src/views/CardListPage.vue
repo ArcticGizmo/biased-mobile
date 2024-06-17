@@ -42,11 +42,38 @@
         <div class="text-center p-3">No matches</div>
       </template>
     </KCardList>
+
+    <template v-if="activeMultiSelect">
+      <ion-fab slot="fixed" vertical="bottom" horizontal="center">
+        <ion-fab-button color="primary" @click="onMultiSelectAction()">
+          <ion-icon :icon="chevronUpCircle" color="dark" />
+        </ion-fab-button>
+      </ion-fab>
+
+      <ion-fab class="ml-10" slot="fixed" vertical="bottom" horizontal="start">
+        <ion-fab-button color="medium" @click="selectedCardIds = []"> Clear </ion-fab-button>
+      </ion-fab>
+
+      <ion-fab class="mr-10" slot="fixed" vertical="bottom" horizontal="end">
+        <ion-fab-button color="medium" @click="selectedCardIds = initialCardFilter.map(c => c.id)"> All </ion-fab-button>
+      </ion-fab>
+    </template>
   </BasePage>
 </template>
 
 <script setup lang="ts">
-import { IonSearchbar, IonButtons, IonBackButton, IonButton, IonText, IonIcon, modalController } from '@ionic/vue';
+import {
+  IonSearchbar,
+  IonButtons,
+  IonBackButton,
+  IonButton,
+  IonText,
+  IonIcon,
+  modalController,
+  IonFab,
+  IonFabButton,
+  alertController
+} from '@ionic/vue';
 import { useKPopCards } from '@/composables/kPopCards';
 import BasePage from './BasePage.vue';
 import { computed, ref } from 'vue';
@@ -55,14 +82,18 @@ import { KPopCard } from '@/types';
 import FilterItem from '@/components/FilterItem.vue';
 import { useSimpleRouter } from '@/composables/router';
 import { filter, noCard } from '@/icons';
-import { checkmarkCircle, heart, paperPlane } from 'ionicons/icons';
+import { checkmarkCircle, heart, paperPlane, chevronUpCircle } from 'ionicons/icons';
 import { multiSort, sortBy } from '@/util/sort';
 import FilterModal, { type Filter } from '@/components/FilterModal.vue';
 import { useQueryParam } from '@/composables/useQueryParam';
 import { dialogController } from '@/composables/dialogController';
 import KCardActionSheet from '@/components/KCardActionSheet.vue';
-import { showSimpleAlert } from '@/composables/modals';
+import { showLoading, showSimpleAlert } from '@/composables/modals';
 import { useToast } from '@/composables/toast';
+import { delay, withDelay } from '@/util/delay';
+import { createBackup } from '@/composables/backup';
+import { createImages } from '@/composables/imageShare';
+import { FileStore } from '@/composables/fileStore';
 
 const group = useQueryParam('group');
 const artist = useQueryParam('artist');
@@ -78,9 +109,9 @@ const filterHave = ref(false);
 
 const activeFilters = ref<Filter[]>([]);
 
-const { cards, deleteCard, isLoading } = useKPopCards();
+const { cards, deleteCard, deleteCards, isLoading } = useKPopCards();
 
-const selectedCardIds = ref<string[]>(['15247ec0-1dc9-11ef-befd-355a1fa51b69', 'd27b85f0-1dc8-11ef-befd-355a1fa51b69']);
+const selectedCardIds = ref<string[]>([]);
 const activeMultiSelect = computed(() => selectedCardIds.value.length > 0);
 
 const onSelectCard = async (card: KPopCard) => {
@@ -95,7 +126,6 @@ const handleMultiSelectTap = (cardId: string) => {
   if (selectedCardIds.value.includes(cardId)) {
     selectedCardIds.value = selectedCardIds.value.filter(c => c !== cardId);
   } else {
-    // TODO: this might not work
     selectedCardIds.value.push(cardId);
   }
 };
@@ -103,7 +133,20 @@ const handleMultiSelectTap = (cardId: string) => {
 const handleNormalSelectTap = async (cardId: string) => {
   const actionResp = await dialogController.create({
     component: KCardActionSheet,
-    componentProps: { id: cardId }
+    componentProps: {
+      ids: [cardId],
+      buttons: [
+        {
+          text: 'View',
+          role: 'view'
+        },
+        {
+          text: 'Delete',
+          role: 'delete',
+          color: 'danger'
+        }
+      ]
+    }
   });
 
   if (actionResp.role === 'view') {
@@ -141,6 +184,179 @@ const onHoldCard = (card: KPopCard) => {
     selectedCardIds.value = [];
   } else {
     selectedCardIds.value = [id];
+  }
+};
+
+const onMultiSelectAction = async () => {
+  const actionResp = await dialogController.create({
+    component: KCardActionSheet,
+    componentProps: {
+      ids: selectedCardIds.value,
+      buttons: [
+        {
+          text: 'Create Collage',
+          role: 'create-collage'
+        },
+        {
+          text: 'Create Backup',
+          role: 'create-backup'
+        },
+        {
+          text: 'Delete All',
+          role: 'delete-all',
+          color: 'danger'
+        }
+      ]
+    }
+  });
+
+  if (actionResp.role === 'backdrop') {
+    return;
+  }
+
+  const ids = selectedCardIds.value;
+
+  switch (actionResp.role) {
+    case 'create-collage':
+      await createCollageFromSelected(ids);
+      break;
+
+    case 'create-backup':
+      await createBackupFromSelected(ids);
+      break;
+
+    case 'delete-all':
+      await deleteSelectedCards(ids);
+      break;
+  }
+
+  selectedCardIds.value = [];
+};
+
+const getBestCollageName = (ids: string[]) => {
+  const matchingCards = cards.value.filter(c => ids.includes(c.id));
+
+  const artistNames = [...new Set(matchingCards.map(c => c.artist))];
+  if (artistNames.length === 1) {
+    return artistNames[0];
+  }
+
+  return '';
+};
+
+const createCollageFromSelected = async (ids: string[]) => {
+  // get a placeholder name for the collage
+
+  const nameAlert = await alertController.create({
+    header: 'Name your collage',
+    buttons: [
+      { text: 'cancel', role: 'cancel' },
+      { text: 'ok', role: 'ok' }
+    ],
+    inputs: [
+      {
+        type: 'text',
+        name: 'name',
+        value: getBestCollageName(ids),
+        placeholder: 'Title'
+      }
+    ]
+  });
+
+  nameAlert.present();
+
+  const nameResp = await nameAlert.onDidDismiss();
+
+  if (nameResp.role === 'cancel') {
+    return;
+  }
+
+  const highlightAlert = await alertController.create({
+    header: 'Pick a style',
+    buttons: [
+      { text: 'cancel', role: 'cancel' },
+      { text: 'ok', role: 'ok' }
+    ],
+    inputs: [
+      {
+        name: 'style',
+        type: 'radio',
+        label: 'Plain',
+        value: 'plain'
+      },
+      {
+        name: 'style',
+        type: 'radio',
+        label: 'With Borders',
+        value: 'border'
+      }
+    ]
+  });
+
+  highlightAlert.present();
+
+  const higlightResp = await highlightAlert.onDidDismiss();
+
+  if (higlightResp.role === 'cancel') {
+    return;
+  }
+
+  const name = nameResp.data.values.name as string;
+  const style = higlightResp.data.values as 'plain' | 'border';
+
+  const loading = await showLoading('Creating Collage');
+
+  const selectedCards = cards.value.filter(c => ids.includes(c.id));
+
+  const filename = `kpop-collage-${Date.now()}`;
+
+  const minDuration = delay(2500);
+
+  try {
+    const dataUrls = await createImages(selectedCards, { title: name, style });
+
+    const promises = dataUrls.map((data, index) => {
+      FileStore.saveToGallery(`${filename}-${index}.jpg`, data);
+    });
+
+    await Promise.all(promises);
+
+    await minDuration;
+
+    await showToast({ message: 'Collage saved to gallery!', color: 'success' });
+  } catch (error) {
+    console.error(error);
+  } finally {
+    loading.dismiss();
+  }
+};
+
+const createBackupFromSelected = async (ids: string[]) => {
+  const loading = await showLoading('Creating Backup');
+
+  const selectedCards = cards.value.filter(c => ids.includes(c.id));
+
+  try {
+    const resp = await withDelay(createBackup(selectedCards), 2_000);
+    if (resp.ok) {
+      await showToast({ message: 'Backup created!', color: 'success' });
+    }
+  } catch (error) {
+    console.error(error);
+  } finally {
+    loading.dismiss();
+  }
+};
+
+const deleteSelectedCards = async (ids: string[]) => {
+  const loading = await showLoading('Deleting Cards');
+
+  try {
+    await deleteCards(ids);
+  } catch (error) {
+    console.error(error);
+  } finally {
+    loading.dismiss();
   }
 };
 
@@ -203,3 +419,9 @@ const onOpenFilter = async () => {
   activeFilters.value = resp.data!;
 };
 </script>
+
+<style scoped>
+ion-fab-button::part(native) {
+  box-shadow: 0 0 1.5rem 0.5rem var(--ion-color-medium);
+}
+</style>

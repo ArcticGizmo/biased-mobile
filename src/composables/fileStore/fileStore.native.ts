@@ -11,12 +11,46 @@ import type {
 } from './types';
 import { Capacitor } from '@capacitor/core';
 import { getMimeTypeFromPath } from '../mime';
+import { Media } from '@capacitor-community/media';
+
+const ALBUM_NAME = 'KPopCards';
 
 const getEncoding = (encoding: FileEncoding) => {
   if (encoding === 'base64') {
     return undefined;
   }
   return encoding as Encoding;
+};
+
+const getAlbumnId = async () => {
+  let album = await getAlbum();
+
+  if (album) {
+    return album.identifier;
+  }
+
+  await Media.createAlbum({ name: ALBUM_NAME });
+
+  album = await getAlbum();
+
+  if (album) {
+    return album.identifier;
+  }
+
+  throw new Error(`${ALBUM_NAME} album does not exist`);
+};
+
+const getAlbum = async () => {
+  const { albums } = await Media.getAlbums();
+  let album = undefined;
+  if (Capacitor.getPlatform() === 'android') {
+    const albumsPath = (await Media.getAlbumsPath()).path;
+    album = albums.find(a => a.name === ALBUM_NAME && a.identifier.startsWith(albumsPath));
+  } else {
+    album = albums.find(a => a.name === ALBUM_NAME);
+  }
+
+  return album;
 };
 
 export class FileStoreNative implements IFileStore {
@@ -43,6 +77,10 @@ export class FileStoreNative implements IFileStore {
 
   async saveImage(path: string, base64Data: string, opts?: ImageSaveOptions | undefined): Promise<FileSaveResult> {
     return await this.save(path, base64Data, { directory: opts?.directory, encoding: 'base64' });
+  }
+
+  async saveToGallery(fileName: string, base64Data: string): Promise<void> {
+    await Media.savePhoto({ path: base64Data, albumIdentifier: await getAlbumnId(), fileName });
   }
 
   async load(path: string, opts?: FileLoadOptions): Promise<FileLoadResult> {

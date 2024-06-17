@@ -4,9 +4,8 @@
       <IonButton expand="full" @click="onCreateBackup()">Create Backup</IonButton>
       <IonButton expand="full" @click="onLoadBackup()">Import Backup</IonButton>
       <IonButton expand="full" @click="onClearAllCards()">Clear All Cards</IonButton>
-      <IonButton expand="full" @click="onCreateImage()">Create Image</IonButton>
       <IonButton v-if="ENV.DEV" expand="full" router-link="/test">test</IonButton>
-      <img :src="templateSrc" style="width: 90vw" height="500px" />
+      <img v-for="(src, index) of templateSrcs" :key="index" :src="src" style="width: 90vw; border: 1px solid orange" height="500px" />
     </div>
   </BasePage>
 </template>
@@ -20,20 +19,13 @@ import { createBackup, loadBackup } from '@/composables/backup';
 import { useToast } from '@/composables/toast';
 import { alertOutline, happyOutline, sadOutline } from 'ionicons/icons';
 import { ENV } from '@/env';
-import { createImage } from '@/composables/imageShare';
 import { ref } from 'vue';
+import { withDelay } from '@/util/delay';
 
 const { cards, importBackup, clearCards } = useKPopCards();
 const { showToast } = useToast();
 
-const templateSrc = ref('');
-
-const delay = (duration: number) => new Promise(r => setTimeout(r, duration));
-
-async function withDelay<T>(task: Promise<T>, minDuration: number) {
-  const [resp] = await Promise.all([task, delay(minDuration)]);
-  return resp;
-}
+const templateSrcs = ref<string[]>([]);
 
 const onCreateBackup = async () => {
   const loading = await showLoading('Creating Backup');
@@ -110,11 +102,6 @@ const onClearAllCards = async () => {
   } finally {
     loading.dismiss();
   }
-};
-
-const onCreateImage = async () => {
-  const toExport = cards.value.filter(c => c.artist === 'Dino');
-  templateSrc.value = await createImage(toExport);
 };
 </script>
 

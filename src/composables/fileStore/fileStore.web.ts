@@ -50,6 +50,10 @@ export class FileStoreWeb implements IFileStore {
     return await this.save(path, base64Data, { directory: opts?.directory, encoding: 'base64' });
   }
 
+  async saveToGallery(fileName: string, base64Data: string): Promise<void> {
+    await this.saveImage(`gallery/${fileName}`, base64Data, { directory: Directory.Data });
+  }
+
   async load(path: string, opts?: FileLoadOptions): Promise<FileLoadResult> {
     path = trimPrefix(path);
     const encoding = opts?.encoding || 'utf8';

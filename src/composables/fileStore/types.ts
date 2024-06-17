@@ -32,6 +32,7 @@ export interface IFileStore {
 
   save(path: string, data: string, opts?: FileSaveOptions): Promise<FileSaveResult>;
   saveImage(path: string, base64Data: string, opts?: ImageSaveOptions): Promise<FileSaveResult>;
+  saveToGallery(fileName: string, base64Data: string): Promise<void>;
   load(path: string, opts?: FileLoadOptions): Promise<FileLoadResult>;
   loadImage(path: string): Promise<FileLoadResult>;
   remove(path: string): Promise<FileRemoveResult>;

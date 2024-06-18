@@ -76,7 +76,6 @@ export class Collage {
 
   private _pos = new Position();
   private _canvasDrawer: CanvasDrawer;
-  private _hasPreviousSection = false;
 
   constructor(opts: CollageOptions) {
     this._pageSize = { ...opts.pageSize };
@@ -104,17 +103,16 @@ export class Collage {
   reset() {
     this._pos = new Position().add(this._pagePadding);
     this._canvasDrawer.reset();
-    this._hasPreviousSection = true;
   }
 
   // returns true if there is no more room left for the cards
   async addSection(title: string, cards: KPopCard[]) {
+    const cardsRemainingInRow = this.cardsRemainingInRow(this._pos.x);
+
     // if there is not enough room in the row, move to the next row
-    if (this._hasPreviousSection && cards.length > this.cardsRemainingInRow(this._pos.x)) {
+    if (cardsRemainingInRow !== this.maxCardsInRow() && cards.length > cardsRemainingInRow) {
       this.moveToNewLine();
     }
-
-    this._hasPreviousSection = true;
 
     // check if there is enough height left
     const maxRowsLeft = this.maxRowsLeft(this._pos.y);

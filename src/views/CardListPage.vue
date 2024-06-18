@@ -48,6 +48,7 @@
         <ion-fab-button color="primary" @click="onMultiSelectAction()">
           <ion-icon :icon="chevronUpCircle" color="dark" />
         </ion-fab-button>
+        <IonChip class="select-count">{{ selectedCardIds.length }}</IonChip>
       </ion-fab>
 
       <ion-fab class="ml-10" slot="fixed" vertical="bottom" horizontal="start">
@@ -72,7 +73,8 @@ import {
   modalController,
   IonFab,
   IonFabButton,
-  alertController
+  alertController,
+  IonChip
 } from '@ionic/vue';
 import { useKPopCards } from '@/composables/kPopCards';
 import BasePage from './BasePage.vue';
@@ -425,5 +427,16 @@ const onOpenFilter = async () => {
 <style scoped>
 ion-fab-button::part(native) {
   box-shadow: 0 0 1.5rem 0.5rem var(--ion-color-medium);
+}
+
+.select-count {
+  position: absolute;
+  top: -1rem;
+  left: 2rem;
+}
+
+ion-chip {
+  --background: var(--ion-color-medium);
+  --color: var(--ion-color-light);
 }
 </style>

@@ -36,7 +36,7 @@
       <ArtistTypeInput class="mt-4" v-model="artistType" />
 
       <VTransition :show="artistType === 'group'">
-        <IonInput class="mt-4" v-model="groupName" label="Group Name" label-placement="stacked" fill="outline" inputmode="text" />
+        <IonInput class="mt-4" v-model="groupName" label="Group Name*" label-placement="stacked" fill="outline" inputmode="text" />
       </VTransition>
 
       <!-- ======= where from ======== -->
@@ -138,6 +138,9 @@ const whereFromNameLabel = computed(() => {
 });
 
 const canSubmit = computed(() => {
+  if (artistType.value === 'group' && !groupName.value) {
+    return false;
+  }
   return imageSrc.value && artist.value && whereFromName.value;
 });
 

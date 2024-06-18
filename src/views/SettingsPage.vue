@@ -33,7 +33,6 @@ const onCreateBackup = async () => {
   try {
     const resp = await withDelay(createBackup([...cards.value]), 2_000);
     if (resp.ok) {
-      console.log('backup created at', resp.path);
       await showToast({ message: 'Backup created!', color: 'success' });
     }
   } catch (error) {

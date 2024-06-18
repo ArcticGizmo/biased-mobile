@@ -55,7 +55,7 @@
       </ion-fab>
 
       <ion-fab class="mr-10" slot="fixed" vertical="bottom" horizontal="end">
-        <ion-fab-button color="medium" @click="selectedCardIds = initialCardFilter.map(c => c.id)"> All </ion-fab-button>
+        <ion-fab-button color="medium" @click="selectedCardIds = filteredCards.map(c => c.id)"> All </ion-fab-button>
       </ion-fab>
     </template>
   </BasePage>
@@ -94,6 +94,7 @@ import { delay, withDelay } from '@/util/delay';
 import { createBackup } from '@/composables/backup';
 import { createImages } from '@/composables/imageShare';
 import { FileStore } from '@/composables/fileStore';
+import { getDateTimeFileName } from '@/util/datetime';
 
 const group = useQueryParam('group');
 const artist = useQueryParam('artist');
@@ -112,6 +113,7 @@ const activeFilters = ref<Filter[]>([]);
 const { cards, deleteCard, deleteCards, isLoading } = useKPopCards();
 
 const selectedCardIds = ref<string[]>([]);
+
 const activeMultiSelect = computed(() => selectedCardIds.value.length > 0);
 
 const onSelectCard = async (card: KPopCard) => {
@@ -308,7 +310,7 @@ const createCollageFromSelected = async (ids: string[]) => {
 
   const selectedCards = cards.value.filter(c => ids.includes(c.id));
 
-  const filename = `kpop-collage-${Date.now()}`;
+  const filename = `kpop-collage-${getDateTimeFileName(new Date())}`;
 
   const minDuration = delay(2500);
 

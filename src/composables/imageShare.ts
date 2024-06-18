@@ -24,7 +24,7 @@ const getCardHeight = (count: number) => {
 export const createImages = async (cards: KPopCard[], opts?: CreateImageOptions) => {
   const showOwnership = opts?.style === 'border';
   const cardHeight = getCardHeight(cards.length);
-  const title = opts?.title || cards[0].artist;
+  const title = opts?.title;
 
   // create groups from cards
   const groups = createCardGroups(cards);

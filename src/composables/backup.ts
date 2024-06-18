@@ -2,6 +2,7 @@ import { KPopCard, KPopCardPackable } from '@/types';
 import { FilePicker } from '@capawesome/capacitor-file-picker';
 import { FileStore } from './fileStore';
 import { Directory } from '@capacitor/filesystem';
+import { getDateTimeFileName } from '@/util/datetime';
 
 export interface BackupV1 {
   version: 1;
@@ -14,7 +15,7 @@ export type LoadBackupResponse = { ok: true; backup: Backup } | { ok: false; err
 
 export const createBackup = async (cards: KPopCard[]) => {
   const backup = await buildBackup(cards);
-  const filename = `kpop-cards-backup-${getBackupName()}.txt`;
+  const filename = `kpop-cards-backup-${getDateTimeFileName(new Date())}.txt`;
   return await FileStore.save(filename, JSON.stringify(backup), { directory: Directory.Documents });
 };
 
@@ -43,19 +44,6 @@ const buildBackup = async (cards: KPopCard[]): Promise<BackupV1> => {
   }
 
   return { version: 1, cards: packedCards };
-};
-
-const padNumber = (num: number) => `${num}`.padStart(2, '0');
-
-const getBackupName = () => {
-  const now = new Date();
-  const year = now.getFullYear();
-  const month = padNumber(now.getMonth() + 1);
-  const date = padNumber(now.getDate());
-  const hour = padNumber(now.getHours());
-  const minutes = padNumber(now.getMinutes());
-  const seconds = padNumber(now.getSeconds());
-  return `${year}-${month}-${date}-${hour}-${minutes}-${seconds}`;
 };
 
 export const loadBackup = async (): Promise<LoadBackupResponse> => {

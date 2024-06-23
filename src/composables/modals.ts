@@ -1,6 +1,9 @@
 import { AlertButton, alertController, loadingController } from '@ionic/vue';
 
 type StringLiteral<T> = T extends string ? (string extends T ? never : T) : never;
+type LiteralUnion<T extends U, U = string> = T | (U & Record<never, never>);
+
+type ButtonClass = LiteralUnion<'danger', string>;
 
 export interface SimpleAlertOptions<Ok, Cancel> {
   header?: string;
@@ -8,6 +11,8 @@ export interface SimpleAlertOptions<Ok, Cancel> {
   message?: string;
   okName?: StringLiteral<Ok>;
   cancelName?: StringLiteral<Cancel>;
+  okClass?: ButtonClass;
+  cancelClass?: ButtonClass;
 }
 
 export const showLoading = async (message?: string) => {
@@ -26,11 +31,13 @@ export const showSimpleAlert = async <Ok = 'ok', Cancel = 'cancel'>(options: Sim
   const buttons: AlertButton[] = [
     {
       text: cancelName,
-      role: cancelName
+      role: cancelName,
+      cssClass: options.cancelClass
     },
     {
       text: okName,
-      role: okName
+      role: okName,
+      cssClass: options.okClass
     }
   ];
 

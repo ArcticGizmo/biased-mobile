@@ -78,7 +78,12 @@ const onOwnershipChange = (ownershipType: OwnershipType) => {
 };
 
 const onDelete = async () => {
-  const resp = await showSimpleAlert({ header: 'Remove Card', message: 'Once the card is gone, its gone', okName: 'delete' });
+  const resp = await showSimpleAlert({
+    header: 'Remove Card',
+    message: 'Once the card is gone, its gone',
+    okName: 'delete',
+    okClass: 'danger'
+  });
 
   if (resp !== 'delete') {
     return;

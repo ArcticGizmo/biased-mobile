@@ -1,9 +1,9 @@
 <template>
   <BasePage title="Settings" max-width="500px">
     <div class="content m-4">
-      <IonButton expand="full" @click="onCreateBackup()">Create Backup</IonButton>
-      <IonButton expand="full" @click="onLoadBackup()">Import Backup</IonButton>
-      <IonButton expand="full" @click="onClearAllCards()">Clear All Cards</IonButton>
+      <IonButton expand="full" fill="outline" @click="onCreateBackup()">Create Backup</IonButton>
+      <IonButton expand="full" fill="outline" @click="onLoadBackup()">Import Backup</IonButton>
+      <IonButton expand="full" fill="outline" @click="onClearAllCards()">Clear All Cards</IonButton>
       <IonButton v-if="ENV.DEV" expand="full" router-link="/test">test</IonButton>
       <img v-for="(src, index) of templateSrcs" :key="index" :src="src" style="width: 90vw; border: 1px solid orange" height="500px" />
     </div>
@@ -83,7 +83,8 @@ const onClearAllCards = async () => {
   const resp = await showSimpleAlert({
     header: 'Remove all cards?',
     message: 'This will remove everything and cannot be undone',
-    okName: 'delete'
+    okName: 'delete',
+    okClass: 'danger'
   });
 
   if (resp !== 'delete') {

@@ -353,6 +353,17 @@ const createBackupFromSelected = async (ids: string[]) => {
 };
 
 const deleteSelectedCards = async (ids: string[]) => {
+  const resp = await showSimpleAlert({
+    header: 'Remove Cards',
+    message: 'Once cards are gone, they are gone',
+    okName: 'delete',
+    okClass: 'danger'
+  });
+
+  if (resp !== 'delete') {
+    return;
+  }
+
   const loading = await showLoading('Deleting Cards');
 
   try {

@@ -14,7 +14,8 @@
         "test:e2e": "cypress run",
         "test:unit": "vitest",
         "lint": "eslint .",
-        "emulator": "emulator -avd Pixel5_34"
+        "assets:build": "npx @capacitor/assets generate --iconBackgroundColor #daebf8 --iconBackgroundColorDark #222222 --splashBackgroundColor #daebf8 --splashBackgroundColorDark #111111",
+        "emulator": "start cmd.exe /c emulator -avd Pixel5_34"
     },
     "dependencies": {
         "@capacitor-community/media": "^6.0.0",
@@ -49,6 +50,7 @@
         "vue3-touch-events": "^4.1.8"
     },
     "devDependencies": {
+        "@capacitor/assets": "^3.0.5",
         "@capacitor/cli": "^6.0.0",
         "@types/uuid": "^9.0.8",
         "@vitejs/plugin-vue": "^4.0.0",

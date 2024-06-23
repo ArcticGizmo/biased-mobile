@@ -33,6 +33,15 @@ const onBackgroundDismiss = () => {
 };
 </script>
 
+<style>
+.ios .dialog-base .sheet {
+  border-radius: 1rem;
+  padding: 0.5rem;
+  padding-bottom: 1.5rem;
+  margin-bottom: 1rem;
+}
+</style>
+
 <style scoped>
 .dialog-base {
   height: 100%;
@@ -73,5 +82,4 @@ ion-backdrop {
 .closing ion-backdrop {
   animation: backgroundFadeOut ease 0.3s 1 forwards;
 }
-
 </style>

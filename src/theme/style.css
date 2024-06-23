@@ -1,0 +1,12 @@
+.segment-button-checked::part(indicator-background) {
+  border-bottom: 4px solid var(--ion-color-primary-shade);
+}
+
+.toast-bottom {
+  transform: translateY(-50px);
+}
+
+.modal-fullscreen::part(content) {
+  width: 100vw;
+  height: 100vh;
+}

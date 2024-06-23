@@ -17,25 +17,25 @@ const OPTIONS = [
     value: 'none',
     text: 'Missing',
     icon: noCard,
-    iconColor: 'dark'
+    iconColor: 'medium'
   },
   {
     value: 'want',
     text: 'Want',
     icon: heart,
-    iconColor: 'danger'
+    iconColor: 'love'
   },
   {
     value: 'in-transit',
     text: 'Coming',
     icon: paperPlane,
-    iconColor: 'warning'
+    iconColor: 'pending'
   },
   {
     value: 'have',
     text: 'Have',
     icon: checkmarkCircle,
-    iconColor: 'secondary'
+    iconColor: 'owned'
   }
 ];
 </script>

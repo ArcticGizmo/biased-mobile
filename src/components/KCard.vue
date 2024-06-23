@@ -13,9 +13,9 @@
         <IonCardTitle class="text-sm text-ellipsis overflow-hidden whitespace-nowrap">{{ title }}</IonCardTitle>
         <IonCardSubtitle v-if="subtitle" class="text-xs text-ellipsis overflow-hidden whitespace-nowrap">{{ subtitle }}</IonCardSubtitle>
       </IonCardContent>
-      <IonIcon v-if="status === 'want'" class="icon-want text-xl absolute top-2 right-2" color="danger" :icon="heartCircle" />
-      <IonIcon v-if="status === 'in-transit'" class="icon-have text-xl absolute top-2 right-2" color="warning" :icon="paperPlane" />
-      <IonIcon v-if="status === 'have'" class="icon-have text-xl absolute top-2 right-2" color="secondary" :icon="checkmarkCircle" />
+      <IonIcon v-if="status === 'want'" class="icon-want text-xl absolute top-2 right-2" color="love" :icon="heartCircle" />
+      <IonIcon v-if="status === 'in-transit'" class="icon-have text-xl absolute top-2 right-2" color="pending" :icon="paperPlane" />
+      <IonIcon v-if="status === 'have'" class="icon-have text-xl absolute top-2 right-2" color="owned" :icon="checkmarkCircle" />
     </template>
   </IonCard>
 </template>
@@ -46,14 +46,14 @@ withDefaults(defineProps<KCardProps>(), { status: 'none' });
 }
 
 .want {
-  border-color: var(--ion-color-danger);
+  border-color: var(--ion-color-love);
 }
 
 .in-transit {
-  border-color: var(--ion-color-warning);
+  border-color: var(--ion-color-pending);
 }
 
 .have {
-  border-color: var(--ion-color-secondary);
+  border-color: var(--ion-color-owned);
 }
 </style>

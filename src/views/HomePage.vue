@@ -32,15 +32,19 @@
         <IonCardContent>
           <div class="summary flex flex-cols gap-4">
             <div>
-              <IonIcon class="mr-1" :style="{ marginBottom: '-2px' }" :icon="starBox" color="warning" />
+              <IonIcon class="mr-1" :style="{ marginBottom: '-2px' }" :icon="checkmarkCircle" color="owned" />
               <IonText>{{ item.summary.have }}</IonText>
             </div>
             <div>
-              <IonIcon class="mr-1" :style="{ marginBottom: '-2px' }" :icon="heart" color="danger" />
+              <IonIcon class="mr-1" :style="{ marginBottom: '-2px' }" :icon="paperPlane" color="pending" />
+              <IonText>{{ item.summary.inTransit }}</IonText>
+            </div>
+            <div>
+              <IonIcon class="mr-1" :style="{ marginBottom: '-2px' }" :icon="heart" color="love" />
               <IonText>{{ item.summary.want }}</IonText>
             </div>
             <div>
-              <IonIcon class="mr-1" :style="{ marginBottom: '-2px' }" :icon="noCard" color="medium" />
+              <IonIcon class="mr-1" :style="{ marginBottom: '-2px' }" :icon="noCard" />
               <IonText>{{ item.summary.missing }}</IonText>
             </div>
           </div>
@@ -57,10 +61,10 @@ import { useKPopCards } from '@/composables/kPopCards';
 import { computed, ref } from 'vue';
 import { IonButton, IonSearchbar, IonText, IonCard, IonCardTitle, IonCardHeader, IonCardContent, IonSpinner, IonIcon } from '@ionic/vue';
 import FilterItem from '@/components/FilterItem.vue';
-import { heart, people, person } from 'ionicons/icons';
+import { heart, paperPlane, people, person, checkmarkCircle } from 'ionicons/icons';
 import { sort } from '@/util/sort';
 import { KPopCard, OwnershipType } from '@/types';
-import { noCard, starBox } from '@/icons';
+import { noCard } from '@/icons';
 import { groupBy } from '@/util/groupBy';
 
 type Grouping = 'group' | 'artist';
@@ -75,6 +79,7 @@ interface ItemGroup {
 interface CardSummary {
   have: number;
   want: number;
+  inTransit: number;
   missing: number;
 }
 
@@ -90,6 +95,7 @@ const getCardSummary = (cards: KPopCard[]): CardSummary => {
   return {
     have: ownershipCount(cards, 'have'),
     want: ownershipCount(cards, 'want'),
+    inTransit: ownershipCount(cards, 'in-transit'),
     missing: ownershipCount(cards, 'none')
   };
 };

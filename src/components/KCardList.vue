@@ -105,8 +105,8 @@ const cardSubtitle = (card: KPopCard) => {
 }
 
 .selected {
-  background: var(--ion-color-primary);
-  border-color: var(--ion-color-primary);
-  padding: 0.5rem;
+  background: rgb(var(--ion-color-secondary-rgb), 0.5);
+  border-color: rgb(var(--ion-color-secondary-rgb), 0.5);
+  padding: 0.25rem;
 }
 </style>

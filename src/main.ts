@@ -28,6 +28,7 @@ import 'vue-virtual-scroller/dist/vue-virtual-scroller.css';
 
 /* Theme variables */
 import './theme/variables.css';
+import './theme/style.css';
 
 import { defineCustomElements } from '@ionic/pwa-elements/loader';
 defineCustomElements(window);

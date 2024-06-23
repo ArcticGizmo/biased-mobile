@@ -14,7 +14,7 @@
     <div class="p-4">
       <template v-for="section of filterSections" :key="section.name">
         <div v-if="section.options.length > 1" class="mb-5">
-          <IonTitle class="p-0 pl-1 mb-1">{{ section.name }}</IonTitle>
+          <span class="p-0 pl-1 mb-1 text-xl">{{ section.name }}</span>
           <div class="divider"></div>
           <div class="options">
             <FilterItem

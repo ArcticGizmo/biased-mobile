@@ -52,17 +52,17 @@ const getSvg = (ownershipType: OwnershipType) => {
 const getFillColor = (ownershipType: OwnershipType) => {
   switch (ownershipType) {
     case 'have':
-      return 'green';
+      return '#38c776';
     case 'in-transit':
-      return 'orange';
+      return '#2ec2db';
     case 'want':
-      return 'red';
+      return '#ff4252';
     default:
       return 'transparent';
   }
 };
 
-const svgWithFill = (dataUrl: string, color: string) => dataUrl.replace('<svg', `<svg fill='${color}'`);
+const svgWithFill = (dataUrl: string, color: string) => dataUrl.replace('<svg', `<svg fill='${color.replace('#', '%23')}'`);
 
 export class Collage {
   private _pageSize: Size;

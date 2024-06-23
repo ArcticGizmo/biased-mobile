@@ -1,5 +1,5 @@
 <template>
-  <BasePage title="Creator" default-back-href="/home" max-width="500px">
+  <BasePage title="Create" default-back-href="/home" max-width="500px">
     <div class="content p-8">
       <div class="upload-pic">
         <KImg :src="imageSrc" background height="50vh">
@@ -30,13 +30,13 @@
 
       <!-- ======= who ======== -->
       <!-- artist -->
-      <IonInput class="mt-4" v-model="artist" label="Artist*" label-placement="stacked" fill="outline" inputmode="text" />
+      <IonInput class="mt-4" v-model="artist" mode="md" label="Artist*" label-placement="stacked" fill="outline" inputmode="text" />
 
       <!-- is soloist selection -->
       <ArtistTypeInput class="mt-4" v-model="artistType" />
 
       <VTransition :show="artistType === 'group'">
-        <IonInput class="mt-4" v-model="groupName" label="Group Name*" label-placement="stacked" fill="outline" inputmode="text" />
+        <IonInput class="mt-4" v-model="groupName" mode="md" label="Group Name*" label-placement="stacked" fill="outline" inputmode="text" />
       </VTransition>
 
       <!-- ======= where from ======== -->
@@ -46,6 +46,7 @@
       <IonInput
         class="mt-4"
         v-model="whereFromName"
+        mode="md"
         :label="whereFromNameLabel"
         label-placement="stacked"
         fill="outline"
@@ -54,7 +55,7 @@
 
       <!-- album version (optional) -->
       <VTransition :show="whereFrom === 'album'">
-        <IonInput class="mt-4" v-model="albumVersion" label="Album Version" label-placement="stacked" fill="outline" inputmode="text" />
+        <IonInput class="mt-4" v-model="albumVersion" mode="md" label="Album Version" label-placement="stacked" fill="outline" inputmode="text" />
       </VTransition>
 
       <!-- year -->
@@ -193,7 +194,7 @@ const onSubmit = async () => {
   const fileResult = await FileStore.saveImage(`photo-cards/${generateId()}.${scaledImage.type()}`, scaledImage.toString());
 
   if (!fileResult.ok) {
-    console.error('[creator] could not save file to disk', fileResult.error);
+    console.error('[create] could not save file to disk', fileResult.error);
     return;
   }
 

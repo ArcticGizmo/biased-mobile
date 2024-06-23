@@ -29,7 +29,7 @@
       </template>
     </div>
     <template #footer>
-      <IonButton class="mx-3" expand="full" @click="onApply()">Apply</IonButton>
+      <IonButton class="mx-3" expand="block" @click="onApply()">Apply</IonButton>
     </template>
   </BaseModal>
 </template>

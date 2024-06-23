@@ -27,7 +27,7 @@ interface NavItem {
 const items: NavItem[] = [
   {
     tab: 'create',
-    href: '/creator',
+    href: '/create',
     icon: addCircle,
     text: 'Create'
   },

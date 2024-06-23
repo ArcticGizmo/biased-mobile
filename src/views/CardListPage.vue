@@ -26,7 +26,7 @@
         <IonText>Looks like you are about to start your journey!</IonText>
       </div>
       <div>
-        <IonButton class="mt-4" router-link="/creator">Add your first card!</IonButton>
+        <IonButton class="mt-4" router-link="/create">Add your first card!</IonButton>
       </div>
     </div>
 

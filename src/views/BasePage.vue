@@ -16,7 +16,7 @@
         <slot></slot>
       </div>
     </IonContent>
-    <IonFooter>
+    <IonFooter :style="{ maxWidth, margin: 'auto' }">
       <slot name="footer"></slot>
     </IonFooter>
   </IonPage>

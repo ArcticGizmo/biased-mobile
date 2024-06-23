@@ -1,10 +1,10 @@
 <template>
   <BasePage title="Settings" max-width="500px">
     <div class="content m-4">
-      <IonButton expand="full" fill="outline" @click="onCreateBackup()">Create Backup</IonButton>
-      <IonButton expand="full" fill="outline" @click="onLoadBackup()">Import Backup</IonButton>
-      <IonButton expand="full" fill="outline" @click="onClearAllCards()">Clear All Cards</IonButton>
-      <IonButton v-if="ENV.DEV" expand="full" router-link="/test">test</IonButton>
+      <IonButton expand="block" fill="outline" @click="onCreateBackup()">Create Backup</IonButton>
+      <IonButton expand="block" fill="outline" @click="onLoadBackup()">Import Backup</IonButton>
+      <IonButton expand="block" fill="outline" @click="onClearAllCards()">Clear All Cards</IonButton>
+      <IonButton v-if="ENV.DEV" expand="block" router-link="/test">test</IonButton>
       <img v-for="(src, index) of templateSrcs" :key="index" :src="src" style="width: 90vw; border: 1px solid orange" height="500px" />
     </div>
   </BasePage>

@@ -17,7 +17,7 @@ const routes: Array<RouteRecordRaw> = [
         component: HomePage
       },
       {
-        path: '/creator',
+        path: '/create',
         component: () => import('@/views/CreatePage.vue')
       },
       {

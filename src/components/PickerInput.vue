@@ -3,6 +3,7 @@
     v-bind="attrs"
     :model-value="model"
     :label="label"
+    :mode="fill ? 'md' : undefined"
     :fill="fill"
     :label-placement="labelPlacement"
     :disabled="isOpen"

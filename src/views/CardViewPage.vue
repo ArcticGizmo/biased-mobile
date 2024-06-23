@@ -9,6 +9,7 @@
         v-if="card.artistType === 'group'"
         class="mt-4"
         :model-value="card.groupName"
+        mode="md"
         label="Group"
         label-placement="stacked"
         fill="outline"
@@ -20,6 +21,7 @@
       <IonInput
         class="mt-4"
         :model-value="card.whereFromName"
+        mode="md"
         :label="whereFromNameLabel"
         label-placement="stacked"
         fill="outline"
@@ -32,6 +34,7 @@
         v-if="card.albumVersion"
         class="mt-4"
         :model-value="card.albumVersion"
+        mode="md"
         label="Album Version"
         label-placement="stacked"
         fill="outline"
@@ -40,7 +43,16 @@
       />
 
       <!-- year -->
-      <IonInput class="mt-4" :model-value="card.year" label="Released" label-placement="stacked" fill="outline" inputmode="text" readonly />
+      <IonInput
+        class="mt-4"
+        :model-value="card.year"
+        mode="md"
+        label="Released"
+        label-placement="stacked"
+        fill="outline"
+        inputmode="text"
+        readonly
+      />
     </div>
   </BasePage>
 </template>

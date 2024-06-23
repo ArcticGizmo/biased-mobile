@@ -2,7 +2,7 @@
   <BasePage title="My Cards" hide-back-ref>
     <template #header>
       <IonSearchbar class="px-2" :style="{ paddingTop: 0, paddingBottom: 0 }" v-model="search" mode="ios" />
-      <div class="filter-items mx-2">
+      <div class="mx-2 mb-1">
         <FilterItem :icon="people" text="Group" :model-value="grouping === 'group'" @click="grouping = 'group'" />
         <FilterItem :icon="person" text="Artist" :model-value="grouping === 'artist'" @click="grouping = 'artist'" />
         <FilterItem text="All" @click="onSelectEverything()" />

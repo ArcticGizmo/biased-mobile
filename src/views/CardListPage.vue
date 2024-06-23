@@ -13,7 +13,7 @@
         </IonButtons>
       </div>
 
-      <div class="filter-items mx-2">
+      <div class="mx-2 mb-1">
         <FilterItem v-model="filterMissing" :icon="noCard" text="Missing" />
         <FilterItem v-model="filterWant" :icon="heart" text="Want" />
         <FilterItem v-model="filterInTransit" :icon="paperPlane" text="Coming" />

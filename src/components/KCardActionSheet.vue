@@ -1,6 +1,6 @@
 <template>
   <BaseActionDialog>
-    <div class="pt-4 mx-2">
+    <div class="pt-4 pb-2 mx-2">
       <OwnershipInput
         :model-value="matchedCards[0]?.ownershipType || 'none'"
         :disabled="!matchedCards.length"

@@ -2,6 +2,7 @@ import { createRouter, createWebHistory } from '@ionic/vue-router';
 import { RouteRecordRaw } from 'vue-router';
 import HomePage from '../views/HomePage.vue';
 import TabsPage from '@/views/TabsPage.vue';
+import { ENV } from '@/env';
 
 const routes: Array<RouteRecordRaw> = [
   {
@@ -42,7 +43,7 @@ const routes: Array<RouteRecordRaw> = [
   }
 ];
 
-if (import.meta.env.DEV) {
+if (ENV.IS_DEV) {
   routes.push({
     path: '/test',
     component: () => import('@/views/TestPage.vue')

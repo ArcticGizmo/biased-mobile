@@ -1,3 +1,5 @@
+import { ENV } from "@/env";
+
 type ViteMessageResponse<T> = { id: number; ok: true; data: T } | { id: number; ok: false; error: any };
 
 type Resolve = (payload: any) => void;
@@ -11,7 +13,7 @@ class ViteMessagingClient {
   private _proms: Record<string, { resolve: Resolve; reject: Reject }> = {};
 
   private get hot() {
-    if (!import.meta.env.DEV) {
+    if (!ENV.IS_DEV) {
       throw 'Vite hot reloading not available outside of DEV';
     }
 

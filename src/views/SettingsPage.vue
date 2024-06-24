@@ -4,8 +4,6 @@
       <IonButton expand="block" fill="outline" @click="onCreateBackup()">Create Backup</IonButton>
       <IonButton expand="block" fill="outline" @click="onLoadBackup()">Import Backup</IonButton>
       <IonButton expand="block" fill="outline" @click="onClearAllCards()">Clear All Cards</IonButton>
-      <IonButton v-if="ENV.DEV" expand="block" router-link="/test">test</IonButton>
-      <img v-for="(src, index) of templateSrcs" :key="index" :src="src" style="width: 90vw; border: 1px solid orange" height="500px" />
     </div>
   </BasePage>
 </template>
@@ -18,14 +16,10 @@ import { showLoading, showSimpleAlert } from '@/composables/modals';
 import { createBackup, loadBackup } from '@/composables/backup';
 import { useToast } from '@/composables/toast';
 import { alertOutline, happyOutline, sadOutline } from 'ionicons/icons';
-import { ENV } from '@/env';
-import { ref } from 'vue';
 import { withDelay } from '@/util/delay';
 
 const { cards, importBackup, clearCards } = useKPopCards();
 const { showToast } = useToast();
-
-const templateSrcs = ref<string[]>([]);
 
 const onCreateBackup = async () => {
   const loading = await showLoading('Creating Backup');

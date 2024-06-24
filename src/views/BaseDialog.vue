@@ -38,7 +38,7 @@ const onBackgroundDismiss = () => {
   border-radius: 1rem;
   padding: 0.5rem;
   padding-bottom: 1.5rem;
-  margin-bottom: 1rem;
+  margin: 0 1rem 1rem 1rem;
 }
 </style>
 

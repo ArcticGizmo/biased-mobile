@@ -27,7 +27,7 @@
     <div v-else class="grouping-list">
       <IonCard v-for="(item, index) of items" :key="index" @click="onItemGroupSelect(item)">
         <IonCardHeader>
-          <IonCardTitle>{{ item.title || 'unknown' }}</IonCardTitle>
+          <ion-label class="text-2xl" color="medium">{{ item.title || 'unknown' }}</ion-label>
         </IonCardHeader>
         <IonCardContent>
           <div class="summary flex flex-cols gap-4">
@@ -59,7 +59,7 @@ import BasePage from './BasePage.vue';
 import { useSimpleRouter } from '@/composables/router';
 import { useKPopCards } from '@/composables/kPopCards';
 import { computed, ref } from 'vue';
-import { IonButton, IonSearchbar, IonText, IonCard, IonCardTitle, IonCardHeader, IonCardContent, IonSpinner, IonIcon } from '@ionic/vue';
+import { IonButton, IonSearchbar, IonText, IonCard, IonLabel, IonCardHeader, IonCardContent, IonSpinner, IonIcon } from '@ionic/vue';
 import FilterItem from '@/components/FilterItem.vue';
 import { heart, paperPlane, people, person, checkmarkCircle } from 'ionicons/icons';
 import { sort } from '@/util/sort';

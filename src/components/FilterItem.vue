@@ -1,5 +1,5 @@
 <template>
-  <IonButton class="filter-item" fill="outline" color="dark" size="small" :class="{ selected: modelValue }" @click="onToggle()">
+  <IonButton class="filter-item" fill="outline" color="dark" mode="md" size="small" :class="{ selected: modelValue }" @click="onToggle()">
     <IonIcon v-if="icon" slot="start" :icon="icon" />
     {{ text }}
   </IonButton>

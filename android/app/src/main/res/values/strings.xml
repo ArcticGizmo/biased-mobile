@@ -1,7 +1,7 @@
 <?xml version='1.0' encoding='utf-8'?>
 <resources>
-    <string name="app_name">K-Pop Cards</string>
-    <string name="title_activity_main">K-Pop Cards</string>
-    <string name="package_name">io.arcticgizmo.kpop.cards</string>
-    <string name="custom_url_scheme">io.arcticgizmo.kpop.cards</string>
+    <string name="app_name">Biased</string>
+    <string name="title_activity_main">Biased</string>
+    <string name="package_name">io.arcticgizmo.biased</string>
+    <string name="custom_url_scheme">io.arcticgizmo.biased</string>
 </resources>

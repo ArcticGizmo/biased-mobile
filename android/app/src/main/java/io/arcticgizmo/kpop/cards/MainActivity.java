@@ -1,4 +1,4 @@
-package io.arcticgizmo.kpop.cards;
+package io.arcticgizmo.biased;
 
 import com.getcapacitor.BridgeActivity;
 

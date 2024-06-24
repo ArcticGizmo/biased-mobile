@@ -1,10 +1,10 @@
 apply plugin: 'com.android.application'
 
 android {
-    namespace "io.arcticgizmo.kpop.cards"
+    namespace "io.arcticgizmo.biased"
     compileSdk rootProject.ext.compileSdkVersion
     defaultConfig {
-        applicationId "io.arcticgizmo.kpop.cards"
+        applicationId "io.arcticgizmo.biased"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1

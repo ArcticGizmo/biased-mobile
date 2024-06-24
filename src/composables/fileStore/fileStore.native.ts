@@ -13,7 +13,7 @@ import { Capacitor } from '@capacitor/core';
 import { getMimeTypeFromPath } from '../mime';
 import { Media } from '@capacitor-community/media';
 
-const ALBUM_NAME = 'KPopCards';
+const ALBUM_NAME = 'Biased Collages';
 
 const getEncoding = (encoding: FileEncoding) => {
   if (encoding === 'base64') {

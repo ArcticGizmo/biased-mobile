@@ -27,7 +27,7 @@
     <div v-else class="grouping-list">
       <IonCard v-for="(item, index) of items" :key="index" @click="onItemGroupSelect(item)">
         <IonCardHeader>
-          <ion-label class="text-2xl" color="medium">{{ item.title || 'unknown' }}</ion-label>
+          <ion-label class="text-2xl" color="medium">{{ item.title || 'Unknown' }}</ion-label>
         </IonCardHeader>
         <IonCardContent>
           <div class="summary flex flex-cols gap-4">
@@ -114,7 +114,10 @@ const artistItems = computed<ItemGroup[]>(() => {
 });
 
 const groupItems = computed<ItemGroup[]>(() => {
-  const groups = groupBy(cards.value, c => c.groupName);
+  const groups = groupBy(
+    cards.value.filter(c => !!c.groupName),
+    c => c.groupName
+  );
 
   return Object.entries(groups).map(([group, cards]) => {
     return {

@@ -3,6 +3,7 @@ import { RouteRecordRaw } from 'vue-router';
 import HomePage from '../views/HomePage.vue';
 import TabsPage from '@/views/TabsPage.vue';
 import { ENV } from '@/env';
+import { modeGuard } from '@/composables/customIonicVue';
 
 const routes: Array<RouteRecordRaw> = [
   {
@@ -54,5 +55,9 @@ const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes
 });
+
+if (ENV.IS_DEV) {
+  router.beforeEach(modeGuard);
+}
 
 export default router;

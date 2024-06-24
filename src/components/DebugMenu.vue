@@ -8,8 +8,8 @@
       <ion-card class="flex flex-col p-3">
         <div class="inline-flex">
           <span class="mt-3 mr-4">Change Style</span>
-          <ion-button>Android</ion-button>
-          <ion-button>iOS</ion-button>
+          <ion-button @click="setMode('md')">Android</ion-button>
+          <ion-button @click="setMode('ios')">iOS</ion-button>
         </div>
         <ion-button router-link="/test">Test Page</ion-button>
       </ion-card>
@@ -18,6 +18,7 @@
 </template>
 
 <script setup lang="ts">
+import { setMode } from '@/composables/customIonicVue';
 import { IonFab, IonFabList, IonFabButton, IonIcon, IonCard, IonButton } from '@ionic/vue';
 import { chevronDownCircle } from 'ionicons/icons';
 </script>

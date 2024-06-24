@@ -1,3 +1,5 @@
+export type IonicMode = 'md' | 'ios';
+
 export type OptionalFields<T> = {
   [P in keyof T]?: T[P];
 };

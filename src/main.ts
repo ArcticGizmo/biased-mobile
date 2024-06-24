@@ -4,6 +4,7 @@ import router from './router';
 import Vue3TouchEvents, { type Vue3TouchEventsOptions } from 'vue3-touch-events';
 
 import { IonicVue } from '@ionic/vue';
+import { getMode } from './composables/customIonicVue';
 
 import './index.css';
 
@@ -33,7 +34,7 @@ import './theme/style.css';
 import { defineCustomElements } from '@ionic/pwa-elements/loader';
 defineCustomElements(window);
 
-const app = createApp(App).use(IonicVue).use(router).use<Vue3TouchEventsOptions>(Vue3TouchEvents, {
+const app = createApp(App).use(IonicVue, { mode: getMode() }).use(router).use<Vue3TouchEventsOptions>(Vue3TouchEvents, {
   disableClick: false
 });
 

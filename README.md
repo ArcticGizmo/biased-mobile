@@ -1,4 +1,4 @@
-# kpop-cards-ionic
+# baised
 keep track of our kpop addiction
 
 # Installation

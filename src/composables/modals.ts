@@ -24,6 +24,27 @@ export const showLoading = async (message?: string) => {
   return loading;
 };
 
+type ExecuteResult<T, E> = { ok: true; result: T } | { ok: false; error: E };
+
+export const execute = async <T, E = unknown>(action: () => Promise<T>): Promise<ExecuteResult<T, E>> => {
+  try {
+    return { ok: true, result: await action() };
+  } catch (error) {
+    return { ok: false, error: error as E };
+  }
+};
+
+export const executeWithLoading = async <T, E = unknown>(action: () => Promise<T>, message?: string): Promise<ExecuteResult<T, E>> => {
+  const loading = await showLoading(message);
+  try {
+    return { ok: true, result: await action() };
+  } catch (error) {
+    return { ok: false, error: error as E };
+  } finally {
+    loading.dismiss();
+  }
+};
+
 export const showSimpleAlert = async <Ok = 'ok', Cancel = 'cancel'>(options: SimpleAlertOptions<Ok, Cancel>) => {
   const okName = (options.okName as string) || 'ok';
   const cancelName = (options.cancelName as string) || 'cancel';

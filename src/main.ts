@@ -6,6 +6,9 @@ import Vue3TouchEvents, { type Vue3TouchEventsOptions } from 'vue3-touch-events'
 import { IonicVue } from '@ionic/vue';
 import { getMode } from './composables/customIonicVue';
 
+/* Vue Query */
+import { VueQueryPlugin } from '@tanstack/vue-query';
+
 import './index.css';
 
 /* Core CSS required for Ionic components to work properly */
@@ -34,9 +37,13 @@ import './theme/style.css';
 import { defineCustomElements } from '@ionic/pwa-elements/loader';
 defineCustomElements(window);
 
-const app = createApp(App).use(IonicVue, { mode: getMode() }).use(router).use<Vue3TouchEventsOptions>(Vue3TouchEvents, {
-  disableClick: false
-});
+const app = createApp(App)
+  .use(IonicVue, { mode: getMode() })
+  .use(router)
+  .use<Vue3TouchEventsOptions>(Vue3TouchEvents, {
+    disableClick: false
+  })
+  .use(VueQueryPlugin);
 
 router.isReady().then(() => {
   app.mount('#app');

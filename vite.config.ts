@@ -3,6 +3,9 @@ import path from 'path';
 import { defineConfig } from 'vite';
 import checker from 'vite-plugin-checker';
 import { viteStoragePlugin } from './vitePlugins/viteStorage';
+import { CorsProxy } from './vitePlugins/corsProxy';
+
+const apiProxy = new CorsProxy('/proxy');
 
 // https://vitejs.dev/config/
 export default defineConfig({
@@ -30,6 +33,8 @@ export default defineConfig({
     include: ['tests/**/*.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx}']
   },
   server: {
-    port: 8100
+    proxy: {
+      ...apiProxy.entry()
+    }
   }
 });

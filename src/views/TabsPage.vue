@@ -13,7 +13,7 @@
 </template>
 
 <script setup lang="ts">
-import { imageAlbum } from '@/icons';
+import { cards, imageAlbum } from '@/icons';
 import { IonTabBar, IonTabButton, IonTabs, IonLabel, IonIcon, IonPage, IonRouterOutlet } from '@ionic/vue';
 import { settings, addCircle } from 'ionicons/icons';
 
@@ -30,6 +30,12 @@ const items: NavItem[] = [
     href: '/create',
     icon: addCircle,
     text: 'Create'
+  },
+  {
+    tab: 'packs',
+    href: '/packs',
+    icon: cards,
+    text: 'Packs'
   },
   {
     tab: 'home',

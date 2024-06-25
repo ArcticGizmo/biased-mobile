@@ -1,7 +1,7 @@
 import { toastController } from '@ionic/vue';
 import type { Color } from '@ionic/core';
 
-const DEFAULT_TOAST_DURATION = 5_000;
+const DEFAULT_TOAST_DURATION = 2_500;
 
 export interface ToastOps {
   id?: string;

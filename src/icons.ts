@@ -10,5 +10,6 @@ import web from '@mdi/svg/svg/web.svg';
 import trash from '@mdi/svg/svg/delete.svg';
 import filter from '@mdi/svg/svg/tune-variant.svg';
 import cards from '@mdi/svg/svg/cards.svg';
+import updateIcon from '@mdi/svg/svg/update.svg';
 
-export { imageAlbum, imageBroken, imageFrame, calendar, musicBox, starBox, noCard, pencil, web, trash, filter, cards };
+export { imageAlbum, imageBroken, imageFrame, calendar, musicBox, starBox, noCard, pencil, web, trash, filter, cards, updateIcon };

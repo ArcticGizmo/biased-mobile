@@ -45,5 +45,6 @@ const onOwnershipChange = (ownershipType: OwnershipType) => {
   for (const card of matchedCards.value) {
     update(card.id, { ownershipType });
   }
+  dialogController.dismiss({ role: 'cancel' });
 };
 </script>

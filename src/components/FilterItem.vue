@@ -1,14 +1,14 @@
 <template>
   <IonButton class="filter-item" fill="outline" color="dark" mode="md" size="small" :class="{ selected: modelValue }" @click="onToggle()">
-    <IonIcon v-if="icon" slot="start" :icon="icon" />
-    {{ text }}
+    <IonIcon v-if="icon" :slot="text ? 'start' : 'icon-only'" :icon="icon" />
+    <span v-if="text">{{ text }}</span>
   </IonButton>
 </template>
 
 <script setup lang="ts">
 import { IonIcon, IonButton } from '@ionic/vue';
 
-const props = defineProps<{ modelValue?: boolean; text: string; icon?: string; selected?: boolean }>();
+const props = defineProps<{ modelValue?: boolean; text?: string; icon?: string; selected?: boolean }>();
 
 const emits = defineEmits<{
   (e: 'update:modelValue', v: boolean): void;
@@ -23,6 +23,10 @@ const onToggle = () => {
 </script>
 
 <style scoped>
+.filter-item {
+  min-width: 4rem;
+}
+
 .filter-item::part(native) {
   border-width: 1px;
   border-color: rgba(var(--ion-color-dark-rgb), 0.2);

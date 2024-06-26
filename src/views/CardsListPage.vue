@@ -13,11 +13,17 @@
         </IonButtons>
       </div>
 
-      <div class="mx-2 mb-1">
+      <div class="filter-list mx-2 mb-1">
         <FilterItem v-model="filterMissing" :icon="noCard" text="Missing" />
         <FilterItem v-model="filterWant" :icon="heart" text="Want" />
         <FilterItem v-model="filterInTransit" :icon="paperPlane" text="Coming" />
         <FilterItem v-model="filterHave" :icon="checkmarkCircle" text="Have" />
+      </div>
+      <div class="filter-list mx-2 mb-1">
+        <FilterItem :model-value="activeSorter === 'new-to-old'" :icon="newToOld"  @changed="activeSorter = 'new-to-old'" />
+        <FilterItem :model-value="activeSorter === 'old-to-new'" :icon="oldToNew"  @changed="activeSorter = 'old-to-new'" />
+        <FilterItem :model-value="activeSorter === 'a-to-z'" :icon="aToZ"  @changed="activeSorter = 'a-to-z'" />
+        <FilterItem :model-value="activeSorter === 'z-to-a'" :icon="zToA"  @changed="activeSorter = 'z-to-a'" />
       </div>
     </template>
 
@@ -83,7 +89,7 @@ import KCardList from '@/components/KCardList.vue';
 import { KPopCard } from '@/types';
 import FilterItem from '@/components/FilterItem.vue';
 import { useSimpleRouter } from '@/composables/router';
-import { filter, noCard } from '@/icons';
+import { filter, noCard, newToOld, oldToNew, aToZ, zToA } from '@/icons';
 import { checkmarkCircle, heart, paperPlane, chevronUpCircle } from 'ionicons/icons';
 import { multiSort, sortBy } from '@/util/sort';
 import FilterModal, { type Filter } from '@/components/FilterModal.vue';
@@ -97,6 +103,9 @@ import { createBackup } from '@/composables/backup';
 import { createImages } from '@/composables/imageShare';
 import { FileStore } from '@/composables/fileStore';
 import { getDateTimeFileName } from '@/util/datetime';
+import { firstBy } from 'thenby';
+
+type Sorter = 'a-to-z' | 'z-to-a' | 'new-to-old' | 'old-to-new';
 
 const group = useQueryParam('group');
 const artist = useQueryParam('artist');
@@ -111,6 +120,7 @@ const filterInTransit = ref(false);
 const filterHave = ref(false);
 
 const activeFilters = ref<Filter[]>([]);
+const activeSorter = ref<Sorter>('new-to-old');
 
 const { cards, deleteCard, deleteCards, isLoading } = useKPopCards();
 
@@ -410,9 +420,30 @@ const applyAdvancedFilter = (cards: KPopCard[], filters: Filter[]) => {
   });
 };
 
+const applyBasicSort = (cards: KPopCard[], sorter: Sorter) => {
+  switch (sorter) {
+    case 'a-to-z':
+      cards.sort((a, b) => a.artist.localeCompare(b.artist));
+      break;
+
+    case 'z-to-a':
+      cards.sort((a, b) => b.artist.localeCompare(a.artist));
+      break;
+
+    case 'old-to-new':
+      cards.sort(firstBy('year'));
+      break;
+
+    case 'new-to-old':
+      cards.sort(firstBy('year', -1));
+      break;
+  }
+};
+
 const filteredCards = computed(() => {
   let cards = applyBasicFilter(initialCardFilter.value);
   cards = applyAdvancedFilter(cards, activeFilters.value);
+  applyBasicSort(cards, activeSorter.value);
   return multiSort(cards, ['artist', 'whereFromName', 'albumVersion', 'year'], search.value);
 });
 
@@ -445,5 +476,11 @@ const onOpenFilter = async () => {
 ion-chip {
   --background: var(--ion-color-medium);
   --color: var(--ion-color-light);
+}
+
+@media screen and (max-width: 400px) {
+  .filter-list > ion-button {
+    font-size: 0.6rem;
+  }
 }
 </style>

@@ -226,7 +226,7 @@ const section = computed(() => {
   background-size: contain;
   background-repeat: no-repeat;
   background-position: center;
-  opacity: 0.05 !important;
+  opacity: 0.025 !important;
 }
 
 ion-icon {

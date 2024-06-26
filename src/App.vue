@@ -1,5 +1,5 @@
 <template>
-  <DebugMenu v-if="ENV.IS_DEV" />
+  <DebugMenu v-if="ENV.IS_DEV || true" />
   <IonApp>
     <DialogProvider />
     <IonRouterOutlet id="main"></IonRouterOutlet>

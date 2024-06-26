@@ -51,8 +51,8 @@
 
     <template v-if="activeMultiSelect">
       <ion-fab slot="fixed" vertical="bottom" horizontal="center">
-        <ion-fab-button color="dark" @click="onMultiSelectAction()">
-          <ion-icon :icon="chevronUpCircle" color="primary" />
+        <ion-fab-button color="primary" @click="onMultiSelectAction()">
+          <ion-icon :icon="chevronUpCircle" color="dark" />
         </ion-fab-button>
         <IonChip class="select-count">{{ selectedCardIds.length }}</IonChip>
       </ion-fab>

@@ -54,7 +54,7 @@
         <ion-fab-button color="primary" @click="onMultiSelectAction()">
           <ion-icon :icon="chevronUpCircle" color="dark" />
         </ion-fab-button>
-        <IonChip class="select-count">{{ selectedCardIds.length }}</IonChip>
+        <IonChip class="select-count" @click="onMultiSelectAction()">{{ selectedCardIds.length }}</IonChip>
       </ion-fab>
 
       <ion-fab class="mr-10" slot="fixed" vertical="bottom" horizontal="start">
@@ -62,7 +62,7 @@
       </ion-fab>
 
       <ion-fab class="ml-10" slot="fixed" vertical="bottom" horizontal="end">
-        <ion-fab-button color="dark" @click="selectedCardIds = []"> None </ion-fab-button>
+        <ion-fab-button color="dark" @click="selectedCardIds = []"> Done </ion-fab-button>
       </ion-fab>
     </template>
   </BasePage>

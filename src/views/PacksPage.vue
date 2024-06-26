@@ -1,22 +1,10 @@
 <template>
-  <BasePage title="Packs" max-width="500px">
+  <BasePage max-width="500px" :class="{ 'show-background': section !== 'list' }" :fixed-content-height="section !== 'list'">
     <template #header>
-      <IonSearchbar class="px-2" :style="{ paddingTop: 0, paddingBottom: 0 }" v-model="search" mode="ios" />
+      <IonSearchbar class="px-2 my-0.5" v-model="search" mode="ios" />
     </template>
 
-    <div v-if="packsQuery.isLoading.value" class="flex items-center justify-center h-full">
-      <IonSpinner name="dots" />
-    </div>
-
-    <div v-else-if="!packs.length" class="text-center p-3">
-      <div>
-        <IonText>Looks like there are no packs available right now. <br />Try again later!</IonText>
-      </div>
-    </div>
-
-    <div v-else-if="!filteredPacks.length" class="text-center p-3">No matches</div>
-
-    <div v-else class="grouping-list">
+    <div v-if="section === 'list'" class="grouping-list">
       <IonCard v-for="(pack, index) of filteredPacks" :key="index" @click="onPackSelect(pack)">
         <IonCardHeader>
           <IonLabel class="text-2xl" color="medium">
@@ -29,6 +17,17 @@
           <IonLabel class="text-sm">{{ pack.group }}</IonLabel>
         </IonCardContent>
       </IonCard>
+    </div>
+
+    <div v-else class="flex flex-col items-center justify-center h-full">
+      <template v-if="section === 'loading'">
+        <IonSpinner name="dots" />
+      </template>
+      <template v-else-if="section === 'no-packs'">
+        <IonText class="text-center">No packs available at the moment!</IonText>
+        <IonButton class="mt-4" expand="block" fill="outline" router-link="/create">Try create your own</IonButton>
+      </template>
+      <template v-else-if="section === 'no-match'"> No Matches </template>
     </div>
   </BasePage>
 </template>
@@ -44,7 +43,8 @@ import {
   IonCardContent,
   actionSheetController,
   IonIcon,
-  ActionSheetButton
+  ActionSheetButton,
+  IonButton
 } from '@ionic/vue';
 import BasePage from './BasePage.vue';
 import { type AvailablePack, usePacksQuery, usePackHistory, fetchPack } from '@/composables/packs';
@@ -211,9 +211,24 @@ const onDeletePack = async (pack: AvailablePack) => {
 
   await showToast({ color: 'success', message: 'Cards deleted', icon: happyOutline });
 };
+
+const section = computed(() => {
+  if (packsQuery.isLoading.value) return 'loading';
+  if (!packs.value.length) return 'no-packs';
+  if (!filteredPacks.value.length) return 'no-match';
+  return 'list';
+});
 </script>
 
 <style scoped>
+.show-background :deep(ion-content::part(background)) {
+  background-image: url('@/assets/icon.png');
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+  opacity: 0.05 !important;
+}
+
 ion-icon {
   margin-bottom: -0.2rem;
 }

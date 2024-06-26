@@ -1,5 +1,5 @@
 <template>
-  <BasePage title="My Cards" fixed-content-height>
+  <BasePage fixed-content-height>
     <template #header>
       <div class="inline-flex w-full">
         <IonButtons slot="start">

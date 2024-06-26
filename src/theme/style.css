@@ -19,3 +19,12 @@
 .md .action-sheet-destructive {
   color: var(--ion-color-danger) !important;
 }
+
+ion-searchbar {
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
+}
+
+ion-searchbar {
+  height: 100%;
+}

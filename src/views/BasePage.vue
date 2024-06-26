@@ -1,10 +1,10 @@
 <template>
   <IonPage :class="{ 'has-toolbar': hasToolbar }">
-    <IonHeader v-if="title">
+    <IonHeader v-if="title || slots['header']">
       <IonToolbar>
         <slot name="header">
-          <IonButtons slot="start">
-            <IonBackButton v-if="!hideBackRef" :defaultHref="defaultBackHref || '/home'"></IonBackButton>
+          <IonButtons v-if="!defaultBackHref" slot="start">
+            <IonBackButton :defaultHref="defaultBackHref" />
           </IonButtons>
           <IonTitle>{{ title }}</IonTitle>
         </slot>
@@ -24,19 +24,19 @@
 
 <script setup lang="ts">
 import { IonPage, IonContent, IonHeader, IonToolbar, IonTitle, IonButtons, IonBackButton, IonFooter, IonLoading } from '@ionic/vue';
-import { computed } from 'vue';
+import { computed, useSlots } from 'vue';
 
 const props = defineProps<{
   title?: string;
-  centered?: boolean;
   defaultBackHref?: string;
-  hideBackRef?: boolean;
   loading?: boolean;
   maxWidth?: string;
   fixedContentHeight?: boolean;
 }>();
 
 const hasToolbar = computed(() => !!props.title);
+
+const slots = useSlots();
 </script>
 
 <style scoped>

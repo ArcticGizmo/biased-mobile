@@ -1,5 +1,5 @@
 <template>
-  <BasePage title="Create" default-back-href="/home" max-width="500px">
+  <BasePage max-width="500px">
     <div class="content p-8">
       <div class="upload-pic">
         <KImg :src="imageSrc" background height="50vh">
@@ -13,16 +13,16 @@
           </template>
         </KImg>
         <div class="pic-actions">
-          <IonButton @click="onTakePicture()">
+          <IonButton fill="outline" @click="onTakePicture()">
             <IonIcon slot="icon-only" :icon="cameraOutline" />
           </IonButton>
-          <IonButton @click="onGetFromGallery()">
+          <IonButton fill="outline" @click="onGetFromGallery()">
             <IonIcon slot="icon-only" :icon="imagesOutline" />
           </IonButton>
-          <IonButton @click="onGetFromUrl()">
+          <IonButton fill="outline" @click="onGetFromUrl()">
             <IonIcon slot="icon-only" :icon="web" />
           </IonButton>
-          <IonButton :disabled="!imageSrc" @click="onEditImage()">
+          <IonButton fill="outline" :disabled="!imageSrc" @click="onEditImage()">
             <IonIcon slot="icon-only" :icon="pencil" />
           </IonButton>
         </div>
@@ -36,7 +36,15 @@
       <ArtistTypeInput class="mt-4" v-model="artistType" />
 
       <VTransition :show="artistType === 'group'">
-        <IonInput class="mt-4" v-model="groupName" mode="md" label="Group Name*" label-placement="stacked" fill="outline" inputmode="text" />
+        <IonInput
+          class="mt-4"
+          v-model="groupName"
+          mode="md"
+          label="Group Name*"
+          label-placement="stacked"
+          fill="outline"
+          inputmode="text"
+        />
       </VTransition>
 
       <!-- ======= where from ======== -->
@@ -55,7 +63,15 @@
 
       <!-- album version (optional) -->
       <VTransition :show="whereFrom === 'album'">
-        <IonInput class="mt-4" v-model="albumVersion" mode="md" label="Album Version" label-placement="stacked" fill="outline" inputmode="text" />
+        <IonInput
+          class="mt-4"
+          v-model="albumVersion"
+          mode="md"
+          label="Album Version"
+          label-placement="stacked"
+          fill="outline"
+          inputmode="text"
+        />
       </VTransition>
 
       <!-- year -->

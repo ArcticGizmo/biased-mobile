@@ -34,7 +34,7 @@ const routes: Array<RouteRecordRaw> = [
   },
   {
     path: '/cards',
-    component: () => import('@/views/CardListPage.vue')
+    component: () => import('@/views/CardsListPage.vue')
   },
   {
     path: '/cards/:id',

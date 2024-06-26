@@ -1,30 +1,14 @@
 <template>
-  <BasePage title="My Cards" hide-back-ref>
+  <BasePage :class="{ 'show-background': section !== 'list' }" :fixed-content-height="section !== 'list'">
     <template #header>
-      <IonSearchbar class="px-2" :style="{ paddingTop: 0, paddingBottom: 0 }" v-model="search" mode="ios" />
+      <IonSearchbar class="px-2 my-0.5" v-model="search" mode="ios" />
       <div class="mx-2 mb-1">
         <FilterItem :icon="people" text="Group" :model-value="grouping === 'group'" @click="grouping = 'group'" />
         <FilterItem :icon="person" text="Artist" :model-value="grouping === 'artist'" @click="grouping = 'artist'" />
         <FilterItem text="All" @click="onSelectEverything()" />
       </div>
     </template>
-
-    <div v-if="isLoading" class="flex items-center justify-center h-full">
-      <IonSpinner name="dots" />
-    </div>
-
-    <div v-else-if="!cards.length" class="text-center p-3">
-      <div>
-        <IonText>Looks like you are about to start your journey!</IonText>
-      </div>
-      <div>
-        <IonButton class="mt-4" router-link="/creator">Add your first card!</IonButton>
-      </div>
-    </div>
-
-    <div v-else-if="!items.length" class="text-center p-3">No matches</div>
-
-    <div v-else class="grouping-list">
+    <div v-if="section === 'list'" class="grouping-list">
       <IonCard v-for="(item, index) of items" :key="index" @click="onItemGroupSelect(item)">
         <IonCardHeader>
           <ion-label class="text-2xl" color="medium">{{ item.title || 'Unknown' }}</ion-label>
@@ -51,6 +35,20 @@
         </IonCardContent>
       </IonCard>
     </div>
+
+    <div v-else class="flex flex-col items-center justify-center h-full">
+      <template v-if="section === 'loading'">
+        <IonSpinner name="dots" />
+      </template>
+      <template v-else-if="section === 'getting-started'">
+        <IonText>Looks like you are about to start your journey!</IonText>
+        <div>
+          <IonButton class="mt-4" expand="block" fill="outline" router-link="/packs">Open a pack!</IonButton>
+          <IonButton class="mt-4" expand="block" fill="outline" router-link="/create">Create your own!</IonButton>
+        </div>
+      </template>
+      <template v-else-if="section === 'no-match'"> No Matches </template>
+    </div>
   </BasePage>
 </template>
 
@@ -66,6 +64,7 @@ import { sort } from '@/util/sort';
 import { KPopCard, OwnershipType } from '@/types';
 import { noCard } from '@/icons';
 import { groupBy } from '@/util/groupBy';
+import { useInitialLoad } from '@/composables/initialLoad';
 
 type Grouping = 'group' | 'artist';
 
@@ -88,6 +87,7 @@ const grouping = ref<Grouping>('group');
 
 const router = useSimpleRouter();
 const { cards, isLoading } = useKPopCards();
+const { loading: initialLoading } = useInitialLoad(1000);
 
 const ownershipCount = (cards: KPopCard[], type: OwnershipType) => cards.filter(c => c.ownershipType === type).length;
 
@@ -135,6 +135,13 @@ const items = computed(() => {
   return sort(items, x => x.title, search.value);
 });
 
+const section = computed(() => {
+  if (initialLoading.value || isLoading.value) return 'loading';
+  if (!cards.value.length) return 'getting-started';
+  if (!items.value.length) return 'no-match';
+  return 'list';
+});
+
 const onItemGroupSelect = (item: ItemGroup) => {
   const query = item.type === 'group' ? { group: item.value } : { artist: item.value };
   router.push({ path: '/cards', query });
@@ -144,3 +151,13 @@ const onSelectEverything = () => {
   router.push('/cards');
 };
 </script>
+
+<style scoped>
+.show-background :deep(ion-content::part(background)) {
+  background-image: url('@/assets/icon.png');
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+  opacity: 0.05 !important;
+}
+</style>

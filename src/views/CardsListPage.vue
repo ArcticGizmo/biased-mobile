@@ -478,7 +478,7 @@ ion-chip {
   --color: var(--ion-color-light);
 }
 
-@media screen and (max-width: 400px) {
+@media screen and (max-width: 300px) {
   .filter-list > ion-button {
     font-size: 0.6rem;
   }

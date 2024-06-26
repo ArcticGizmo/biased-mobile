@@ -3,8 +3,8 @@
     <template #header>
       <IonSearchbar class="px-2 my-0.5" v-model="search" mode="ios" />
       <div class="mx-2 mb-1">
-        <FilterItem :icon="people" text="Group" :model-value="grouping === 'group'" @click="grouping = 'group'" />
-        <FilterItem :icon="person" text="Artist" :model-value="grouping === 'artist'" @click="grouping = 'artist'" />
+        <FilterItem :icon="people" text="By Group" :model-value="grouping === 'group'" @click="grouping = 'group'" />
+        <FilterItem :icon="person" text="By Artist" :model-value="grouping === 'artist'" @click="grouping = 'artist'" />
         <FilterItem text="All" @click="onSelectEverything()" />
       </div>
     </template>

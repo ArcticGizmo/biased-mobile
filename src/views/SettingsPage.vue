@@ -17,8 +17,10 @@ import { createBackup, loadBackup } from '@/composables/backup';
 import { useToast } from '@/composables/toast';
 import { alertOutline, happyOutline, sadOutline } from 'ionicons/icons';
 import { withDelay } from '@/util/delay';
+import { usePackHistory } from '@/composables/packs';
 
 const { cards, importBackup, clearCards } = useKPopCards();
+const { deleteAllPacks } = usePackHistory();
 const { showToast } = useToast();
 
 const onCreateBackup = async () => {
@@ -89,6 +91,7 @@ const onClearAllCards = async () => {
 
   try {
     await clearCards();
+    await deleteAllPacks();
     await showToast({ color: 'success', message: 'All cards removed!' });
   } catch (error) {
     console.error('failed to delete cards', error);

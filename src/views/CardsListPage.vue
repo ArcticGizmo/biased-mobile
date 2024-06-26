@@ -45,18 +45,18 @@
 
     <template v-if="activeMultiSelect">
       <ion-fab slot="fixed" vertical="bottom" horizontal="center">
-        <ion-fab-button color="primary" @click="onMultiSelectAction()">
-          <ion-icon :icon="chevronUpCircle" color="dark" />
+        <ion-fab-button color="dark" @click="onMultiSelectAction()">
+          <ion-icon :icon="chevronUpCircle" color="primary" />
         </ion-fab-button>
         <IonChip class="select-count">{{ selectedCardIds.length }}</IonChip>
       </ion-fab>
 
-      <ion-fab class="ml-10" slot="fixed" vertical="bottom" horizontal="start">
-        <ion-fab-button color="medium" @click="selectedCardIds = []"> Clear </ion-fab-button>
+      <ion-fab class="mr-10" slot="fixed" vertical="bottom" horizontal="start">
+        <ion-fab-button color="dark" @click="selectedCardIds = filteredCards.map(c => c.id)"> All </ion-fab-button>
       </ion-fab>
 
-      <ion-fab class="mr-10" slot="fixed" vertical="bottom" horizontal="end">
-        <ion-fab-button color="medium" @click="selectedCardIds = filteredCards.map(c => c.id)"> All </ion-fab-button>
+      <ion-fab class="ml-10" slot="fixed" vertical="bottom" horizontal="end">
+        <ion-fab-button color="dark" @click="selectedCardIds = []"> None </ion-fab-button>
       </ion-fab>
     </template>
   </BasePage>
@@ -436,10 +436,6 @@ const onOpenFilter = async () => {
 </script>
 
 <style scoped>
-ion-fab-button::part(native) {
-  box-shadow: 0 0 1.5rem 0.5rem var(--ion-color-medium);
-}
-
 .select-count {
   position: absolute;
   top: -1rem;

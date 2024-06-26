@@ -80,5 +80,10 @@ export const usePackHistory = () => {
     await cacheHistory();
   };
 
-  return { packHistory: readonly(packHistory) as ComputedRef<PackHistory>, addPack, deletePack };
+  const deleteAllPacks = async () => {
+    packHistory.value = {};
+    await cacheHistory();
+  };
+
+  return { packHistory: readonly(packHistory) as ComputedRef<PackHistory>, addPack, deletePack, deleteAllPacks };
 };

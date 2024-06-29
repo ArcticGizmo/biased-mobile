@@ -231,11 +231,7 @@ const onDeletePack = async (pack: AvailablePack) => {
     return;
   }
 
-  const artistName = pack.artist.toLowerCase();
-  const groupName = pack.group.toLowerCase();
-  const cardIdsToDelete = cards.value
-    .filter(c => c.artist.toLowerCase() === artistName && c.groupName?.toLowerCase() === groupName)
-    .map(c => c.id);
+  const cardIdsToDelete = cards.value.filter(c => c.packId === pack.packId).map(c => c.id);
 
   const deleteResp = await executeWithLoading(async () => {
     await deleteCards(cardIdsToDelete);

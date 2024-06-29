@@ -1,5 +1,5 @@
 <template>
-  <BasePage :class="{ 'show-background': section !== 'list' }" :fixed-content-height="section !== 'list'">
+  <BasePage :class="{ 'show-background': section !== 'list' }" :fixed-content-height="section !== 'list'" max-width="500px">
     <template #header>
       <IonSearchbar class="px-2 my-0.5" v-model="search" />
       <div class="mx-2 mb-1">

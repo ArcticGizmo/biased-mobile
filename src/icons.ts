@@ -13,8 +13,8 @@ import cards from '@mdi/svg/svg/cards.svg';
 import updateIcon from '@mdi/svg/svg/update.svg';
 import aToZ from '@mdi/svg/svg/sort-alphabetical-ascending.svg';
 import zToA from '@mdi/svg/svg/sort-alphabetical-descending.svg';
-import newToOld from '@mdi/svg/svg/sort-calendar-ascending.svg';
-import oldToNew from '@mdi/svg/svg/sort-calendar-descending.svg';
+import newToOld from '@mdi/svg/svg/sort-reverse-variant.svg';
+import oldToNew from '@mdi/svg/svg/sort-variant.svg';
 
 export {
   imageAlbum,
@@ -33,5 +33,5 @@ export {
   aToZ,
   zToA,
   newToOld,
-  oldToNew
+  oldToNew,
 };

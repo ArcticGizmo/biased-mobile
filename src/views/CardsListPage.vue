@@ -19,12 +19,6 @@
         <FilterItem v-model="filterInTransit" :icon="paperPlane" text="Coming" />
         <FilterItem v-model="filterHave" :icon="checkmarkCircle" text="Have" />
       </div>
-      <div class="filter-list mx-2 mb-1">
-        <FilterItem :model-value="activeSorter === 'new-to-old'" :icon="newToOld" @changed="activeSorter = 'new-to-old'" />
-        <FilterItem :model-value="activeSorter === 'old-to-new'" :icon="oldToNew" @changed="activeSorter = 'old-to-new'" />
-        <FilterItem :model-value="activeSorter === 'a-to-z'" :icon="aToZ" @changed="activeSorter = 'a-to-z'" />
-        <FilterItem :model-value="activeSorter === 'z-to-a'" :icon="zToA" @changed="activeSorter = 'z-to-a'" />
-      </div>
     </template>
 
     <div v-if="!initialCardFilter.length" class="text-center p-3">
@@ -92,10 +86,10 @@ import KCardList from '@/components/KCardList.vue';
 import { KPopCard } from '@/types';
 import FilterItem from '@/components/FilterItem.vue';
 import { useSimpleRouter } from '@/composables/router';
-import { filter, noCard, newToOld, oldToNew, aToZ, zToA } from '@/icons';
+import { filter, noCard } from '@/icons';
 import { checkmarkCircle, heart, paperPlane, chevronUpCircle } from 'ionicons/icons';
 import { multiSort, sortBy } from '@/util/sort';
-import FilterModal, { type Filter } from '@/components/FilterModal.vue';
+import FilterModal, { Sorter, type Filter } from '@/components/FilterModal.vue';
 import { useQueryParam } from '@/composables/useQueryParam';
 import { dialogController } from '@/composables/dialogController';
 import KCardActionSheet from '@/components/KCardActionSheet.vue';
@@ -107,8 +101,6 @@ import { createImages } from '@/composables/imageShare';
 import { FileStore } from '@/composables/fileStore';
 import { getDateTimeFileName } from '@/util/datetime';
 import { firstBy } from 'thenby';
-
-type Sorter = 'a-to-z' | 'z-to-a' | 'new-to-old' | 'old-to-new';
 
 const group = useQueryParam('group');
 const artist = useQueryParam('artist');
@@ -455,7 +447,7 @@ const enterAnimation = (baseEl: HTMLElement) => {
 
   const backdropAnimation = createAnimation()
     .addElement(root.querySelector('ion-backdrop') as any)
-    .fromTo('left', '0.01', 'var(--backdrop-opacity)');
+    .fromTo('opacity', '0.01', 'var(--backdrop-opacity)');
 
   const wrapperAnimation = createAnimation()
     .addElement(root.querySelector('.modal-wrapper') as any)
@@ -474,7 +466,11 @@ const leaveAnimation = (baseEl: HTMLElement) => {
 const onOpenFilter = async () => {
   const modal = await modalController.create({
     component: FilterModal,
-    componentProps: { cards: initialCardFilter.value, activeFilters: activeFilters.value },
+    componentProps: {
+      cards: initialCardFilter.value,
+      activeFilters: activeFilters.value,
+      activeSorter: activeSorter.value
+    },
     cssClass: 'modal-fullscreen',
     enterAnimation,
     leaveAnimation
@@ -482,13 +478,15 @@ const onOpenFilter = async () => {
 
   modal.present();
 
-  const resp = await modal.onWillDismiss<Filter[]>();
+  const resp = await modal.onWillDismiss<{ filters: Filter[]; sorter: Sorter }>();
 
+  console.log(resp);
   if (resp.role !== 'accept') {
     return;
   }
 
-  activeFilters.value = resp.data!;
+  activeFilters.value = resp.data!.filters;
+  activeSorter.value = resp.data!.sorter;
 };
 </script>
 

@@ -12,10 +12,22 @@
       <IonTitle class="text-center">Filters</IonTitle>
     </template>
     <div class="p-4">
+      <div class="mb-5">
+        <span class="p-0 pl-1 mb-1 text-xl">Sort</span>
+        <div class="options">
+          <FilterItem
+            v-for="(option, index) of SORT_OPTIONS"
+            :key="index"
+            :model-value="option.value === sorter"
+            :icon="option.icon"
+            :text="option.text"
+            @changed="sorter = option.value"
+          />
+        </div>
+      </div>
       <template v-for="section of filterSections" :key="section.name">
         <div v-if="section.options.length > 1" class="mb-5">
           <span class="p-0 pl-1 mb-1 text-xl">{{ section.name }}</span>
-          <div class="divider"></div>
           <div class="options">
             <FilterItem
               v-for="(option, index) of section.options"
@@ -41,6 +53,10 @@ import { IonTitle, IonButtons, IonButton, IonIcon, modalController, onIonViewWil
 import { arrowBack } from 'ionicons/icons';
 import FilterItem from './FilterItem.vue';
 import { onMounted, reactive, ref } from 'vue';
+import { newToOld } from '@/icons';
+import { oldToNew } from '@/icons';
+import { aToZ } from '@/icons';
+import { zToA } from '@/icons';
 
 interface FilterSection {
   name: string;
@@ -54,8 +70,40 @@ export interface Filter {
   values: string[];
 }
 
-const props = defineProps<{ cards: KPopCard[]; activeFilters?: Filter[] }>();
+export type Sorter = 'a-to-z' | 'z-to-a' | 'new-to-old' | 'old-to-new';
 
+interface SortOption {
+  value: Sorter;
+  icon: string;
+  text: string;
+}
+
+const SORT_OPTIONS: SortOption[] = [
+  {
+    value: 'new-to-old',
+    text: 'Newest First',
+    icon: newToOld
+  },
+  {
+    value: 'old-to-new',
+    text: 'Oldest First',
+    icon: oldToNew
+  },
+  {
+    value: 'a-to-z',
+    text: 'A to Z',
+    icon: aToZ
+  },
+  {
+    value: 'z-to-a',
+    text: 'Z to A',
+    icon: zToA
+  }
+];
+
+const props = defineProps<{ cards: KPopCard[]; activeFilters?: Filter[]; activeSorter?: Sorter }>();
+
+const sorter = ref<Sorter>('new-to-old');
 const filterSections = ref<FilterSection[]>([]);
 
 const createFilterSection = (name: string, key: string) => {
@@ -67,6 +115,8 @@ const createFilterSection = (name: string, key: string) => {
 };
 
 const onReset = (useInitial = false) => {
+  sorter.value = props.activeSorter || 'new-to-old';
+
   const oldFilters = props.activeFilters || [];
 
   const sections: FilterSection[] = [
@@ -109,7 +159,7 @@ const toggleValue = (section: FilterSection, option: string, add: boolean) => {
 };
 
 const onApply = () => {
-  const filterRequests: Filter[] = filterSections.value
+  const filters: Filter[] = filterSections.value
     .filter(f => f.options.length > 1 && f.values.length > 0)
     .map(f => {
       return {
@@ -118,6 +168,12 @@ const onApply = () => {
       };
     });
 
-  modalController.dismiss(filterRequests, 'accept');
+  modalController.dismiss(
+    {
+      filters,
+      sorter: sorter.value
+    },
+    'accept'
+  );
 };
 </script>

@@ -502,9 +502,14 @@ ion-chip {
   --color: var(--ion-color-light);
 }
 
-@media screen and (max-width: 300px) {
-  .filter-list > ion-button {
-    font-size: 0.6rem;
+.filter-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(6rem, 1fr));
+}
+
+@media screen and (max-width: 450px) {
+  .filter-list {
+    grid-template-columns: repeat(2, minmax(6rem, 1fr));
   }
 }
 

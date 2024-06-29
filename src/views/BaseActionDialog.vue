@@ -1,8 +1,12 @@
 <template>
-  <BaseDialog justify-content="flex-end">
+  <BaseDialog v-touch:swipe.bottom="onSwipe" v-touch-options="{ swipeTolerance: 50 }" justify-content="flex-end">
     <div class="sheet">
-      <div><slot name="header"></slot></div>
-      <div><slot>Content</slot></div>
+      <div>
+        <slot name="header"></slot>
+      </div>
+      <div>
+        <slot>Content</slot>
+      </div>
     </div>
   </BaseDialog>
 </template>
@@ -13,6 +17,12 @@ import BaseDialog from './BaseDialog.vue';
 defineProps<{
   persistent?: boolean;
 }>();
+
+const emits = defineEmits<{
+  (e: 'swipe-close'): void;
+}>();
+
+const onSwipe = () => emits('swipe-close');
 </script>
 
 <style scoped></style>

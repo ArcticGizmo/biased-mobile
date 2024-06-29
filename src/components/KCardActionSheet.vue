@@ -1,5 +1,5 @@
 <template>
-  <BaseActionDialog>
+  <BaseActionDialog @swipe-close="onClose()">
     <div class="pt-4 pb-2 mx-2">
       <OwnershipInput
         :model-value="matchedCards[0]?.ownershipType || 'none'"
@@ -46,5 +46,9 @@ const onOwnershipChange = (ownershipType: OwnershipType) => {
     update(card.id, { ownershipType });
   }
   dialogController.dismiss({ role: 'cancel' });
+};
+
+const onClose = () => {
+  dialogController.dismiss({ role: 'backdrop' });
 };
 </script>

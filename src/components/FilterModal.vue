@@ -1,5 +1,5 @@
 <template>
-  <BaseModal title="Filters" max-width="500px">
+  <BaseModal v-touch:swipe.right="onClose" title="Filters" max-width="500px">
     <template #header>
       <IonButtons slot="start">
         <IonButton @click="onClose()">

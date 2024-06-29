@@ -57,13 +57,15 @@
         <IonChip class="select-count" @click="onMultiSelectAction()">{{ selectedCardIds.length }}</IonChip>
       </ion-fab>
 
-      <ion-fab class="mr-10" slot="fixed" vertical="bottom" horizontal="start">
+      <ion-fab class="ml-10" slot="fixed" vertical="bottom" horizontal="start">
+        <ion-fab-button color="dark" @click="selectedCardIds = []"> Done </ion-fab-button>
+      </ion-fab>
+
+      <ion-fab class="mr-10" slot="fixed" vertical="bottom" horizontal="end">
         <ion-fab-button color="dark" @click="selectedCardIds = filteredCards.map(c => c.id)"> All </ion-fab-button>
       </ion-fab>
 
-      <ion-fab class="ml-10" slot="fixed" vertical="bottom" horizontal="end">
-        <ion-fab-button color="dark" @click="selectedCardIds = []"> Done </ion-fab-button>
-      </ion-fab>
+      <div class="action-region fixed bottom-0 w-full -z-1 pointer-events-none"></div>
     </template>
   </BasePage>
 </template>
@@ -80,7 +82,8 @@ import {
   IonFab,
   IonFabButton,
   alertController,
-  IonChip
+  IonChip,
+  createAnimation
 } from '@ionic/vue';
 import { useKPopCards } from '@/composables/kPopCards';
 import BasePage from './BasePage.vue';
@@ -447,11 +450,34 @@ const filteredCards = computed(() => {
   return multiSort(cards, ['artist', 'whereFromName', 'albumVersion', 'year'], search.value);
 });
 
+const enterAnimation = (baseEl: HTMLElement) => {
+  const root = baseEl.shadowRoot!;
+
+  const backdropAnimation = createAnimation()
+    .addElement(root.querySelector('ion-backdrop') as any)
+    .fromTo('left', '0.01', 'var(--backdrop-opacity)');
+
+  const wrapperAnimation = createAnimation()
+    .addElement(root.querySelector('.modal-wrapper') as any)
+    .keyframes([
+      { offset: 0, transform: 'translateX(100%)' },
+      { offset: 1, transform: 'translateX(0)' }
+    ]);
+
+  return createAnimation().addElement(baseEl).easing('ease-out').duration(250).addAnimation([backdropAnimation, wrapperAnimation]);
+};
+
+const leaveAnimation = (baseEl: HTMLElement) => {
+  return enterAnimation(baseEl).direction('reverse');
+};
+
 const onOpenFilter = async () => {
   const modal = await modalController.create({
     component: FilterModal,
     componentProps: { cards: initialCardFilter.value, activeFilters: activeFilters.value },
-    cssClass: 'modal-fullscreen'
+    cssClass: 'modal-fullscreen',
+    enterAnimation,
+    leaveAnimation
   });
 
   modal.present();
@@ -482,5 +508,11 @@ ion-chip {
   .filter-list > ion-button {
     font-size: 0.6rem;
   }
+}
+
+.action-region {
+  background: transparent;
+  background: linear-gradient(0, rgba(var(--ion-color-warning-rgb), 0.5) 0%, rgba(0, 0, 0, 0) 100%);
+  height: 8rem;
 }
 </style>

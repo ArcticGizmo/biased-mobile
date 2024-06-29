@@ -44,6 +44,10 @@ const onLoadBackup = async () => {
   try {
     const resp = await loadBackup();
 
+    if (!resp.ok && resp.error?.message === 'pickFiles canceled.') {
+      return;
+    }
+
     if (!resp.ok) {
       console.error('could not load backup', resp.error);
       await showToast({ color: 'danger', message: 'Could not import backup', icon: sadOutline });

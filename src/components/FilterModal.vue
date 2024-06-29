@@ -91,12 +91,12 @@ const SORT_OPTIONS: SortOption[] = [
   },
   {
     value: 'a-to-z',
-    text: 'A to Z',
+    text: 'A-Z',
     icon: aToZ
   },
   {
     value: 'z-to-a',
-    text: 'Z to A',
+    text: 'Z-A',
     icon: zToA
   }
 ];

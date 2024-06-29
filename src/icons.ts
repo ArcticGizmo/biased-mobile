@@ -15,6 +15,7 @@ import aToZ from '@mdi/svg/svg/sort-alphabetical-ascending.svg';
 import zToA from '@mdi/svg/svg/sort-alphabetical-descending.svg';
 import newToOld from '@mdi/svg/svg/sort-reverse-variant.svg';
 import oldToNew from '@mdi/svg/svg/sort-variant.svg';
+import progressTag from '@mdi/svg/svg/progress-tag.svg';
 
 export {
   imageAlbum,
@@ -34,4 +35,5 @@ export {
   zToA,
   newToOld,
   oldToNew,
+  progressTag
 };

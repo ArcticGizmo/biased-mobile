@@ -2,6 +2,11 @@
   <BasePage max-width="500px" :class="{ 'show-background': section !== 'list' }" :fixed-content-height="section !== 'list'">
     <template #header>
       <IonSearchbar class="px-2 my-0.5" v-model="search" />
+      <div class="mx-2 mb-1">
+        <FilterItem :icon="progressTag" text="Status" :model-value="sorter === 'status'" @click="sorter = 'status'" />
+        <FilterItem :icon="aToZ" text="A-Z" :model-value="sorter === 'a-to-z'" @click="sorter = 'a-to-z'" />
+        <FilterItem :icon="zToA" text="Z-A" :model-value="sorter === 'z-to-a'" @click="sorter = 'z-to-a'" />
+      </div>
     </template>
 
     <div v-if="section === 'list'" class="grouping-list">
@@ -58,10 +63,19 @@ import { useToast } from '@/composables/toast';
 import { alert, checkmarkCircle, chevronDown, happyOutline, sadOutline } from 'ionicons/icons';
 import { withDelay } from '@/util/delay';
 import { useKPopCards } from '@/composables/kPopCards';
-import { updateIcon } from '@/icons';
+import { aToZ, updateIcon, zToA, progressTag } from '@/icons';
 import { firstBy } from 'thenby';
+import FilterItem from '@/components/FilterItem.vue';
 
 type PackStatus = 'up-to-date' | 'outdated' | 'not-downloaded';
+
+type PackSorter = 'a-to-z' | 'z-to-a' | 'status';
+
+const PACK_SORT_ORDER: Record<PackStatus, number> = {
+  'not-downloaded': 2,
+  'up-to-date': 1,
+  outdated: 0
+};
 
 const { showToast } = useToast();
 
@@ -71,13 +85,34 @@ const { cards, deleteCards, importBackup } = useKPopCards();
 
 const packs = computed(() => packsQuery.data.value || []);
 
+const sortPacks = (packs: AvailablePack[], packSorter: PackSorter) => {
+  switch (packSorter) {
+    case 'a-to-z':
+      packs.sort(firstBy('artist', 1).thenBy('group'));
+      break;
+
+    case 'z-to-a':
+      packs.sort(firstBy('artist', -1).thenBy('group'));
+      break;
+
+    case 'status':
+      packs.sort(
+        firstBy<AvailablePack>(c => PACK_SORT_ORDER[getPackStatus(c)])
+          .thenBy('artist', 1)
+          .thenBy('group')
+      );
+      break;
+  }
+};
+
 const filteredPacks = computed(() => {
   const items = [...packs.value];
-  items.sort(firstBy('artist', 1).thenBy('group'));
+  sortPacks(items, sorter.value);
   return multiSort(items, ['artist', 'group'], search.value);
 });
 
 const search = ref('');
+const sorter = ref<PackSorter>('status');
 
 const getPackStatus = (pack: AvailablePack): PackStatus => {
   const timeOnDisk = packHistory.value[pack.packId];

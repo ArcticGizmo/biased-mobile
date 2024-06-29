@@ -1,7 +1,7 @@
 <template>
   <BasePage :class="{ 'show-background': section !== 'list' }" :fixed-content-height="section !== 'list'">
     <template #header>
-      <IonSearchbar class="px-2 my-0.5" v-model="search" mode="ios" />
+      <IonSearchbar class="px-2 my-0.5" v-model="search" />
       <div class="mx-2 mb-1">
         <FilterItem :icon="people" text="By Group" :model-value="grouping === 'group'" @click="grouping = 'group'" />
         <FilterItem :icon="person" text="By Artist" :model-value="grouping === 'artist'" @click="grouping = 'artist'" />
@@ -33,6 +33,9 @@
             </div>
           </div>
         </IonCardContent>
+        <div class="absolute top-0 right-0 h-full w-16 flex items-center justify-end pr-4">
+          <IonIcon :icon="chevronForward" size="large" color="secondary" />
+        </div>
       </IonCard>
     </div>
 
@@ -59,7 +62,7 @@ import { useKPopCards } from '@/composables/kPopCards';
 import { computed, ref } from 'vue';
 import { IonButton, IonSearchbar, IonText, IonCard, IonLabel, IonCardHeader, IonCardContent, IonSpinner, IonIcon } from '@ionic/vue';
 import FilterItem from '@/components/FilterItem.vue';
-import { heart, paperPlane, people, person, checkmarkCircle } from 'ionicons/icons';
+import { heart, paperPlane, people, person, checkmarkCircle, chevronForward } from 'ionicons/icons';
 import { sort } from '@/util/sort';
 import { KPopCard, OwnershipType } from '@/types';
 import { noCard } from '@/icons';

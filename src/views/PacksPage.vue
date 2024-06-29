@@ -1,7 +1,7 @@
 <template>
   <BasePage max-width="500px" :class="{ 'show-background': section !== 'list' }" :fixed-content-height="section !== 'list'">
     <template #header>
-      <IonSearchbar class="px-2 my-0.5" v-model="search" mode="ios" />
+      <IonSearchbar class="px-2 my-0.5" v-model="search" />
     </template>
 
     <div v-if="section === 'list'" class="grouping-list">
@@ -16,6 +16,9 @@
         <IonCardContent>
           <IonLabel class="text-sm">{{ pack.group }}</IonLabel>
         </IonCardContent>
+        <div class="absolute top-0 right-0 h-full w-16 flex items-center justify-end pr-4">
+          <IonIcon :icon="chevronDown" size="large" color="secondary" />
+        </div>
       </IonCard>
     </div>
 
@@ -52,7 +55,7 @@ import { computed, ref } from 'vue';
 import { multiSort } from '@/util/sort';
 import { executeWithLoading, showSimpleAlert } from '@/composables/modals';
 import { useToast } from '@/composables/toast';
-import { alert, checkmarkCircle, happyOutline, sadOutline } from 'ionicons/icons';
+import { alert, checkmarkCircle, chevronDown, happyOutline, sadOutline } from 'ionicons/icons';
 import { withDelay } from '@/util/delay';
 import { useKPopCards } from '@/composables/kPopCards';
 import { updateIcon } from '@/icons';

@@ -4,7 +4,6 @@ import router from './router';
 import Vue3TouchEvents, { type Vue3TouchEventsOptions } from 'vue3-touch-events';
 
 import { IonicVue } from '@ionic/vue';
-import { getMode } from './composables/customIonicVue';
 
 /* Vue Query */
 import { VueQueryPlugin } from '@tanstack/vue-query';
@@ -38,7 +37,7 @@ import { defineCustomElements } from '@ionic/pwa-elements/loader';
 defineCustomElements(window);
 
 const app = createApp(App)
-  .use(IonicVue, { mode: getMode() })
+  .use(IonicVue, { mode: 'ios' })
   .use(router)
   .use<Vue3TouchEventsOptions>(Vue3TouchEvents, {
     disableClick: false

@@ -5,7 +5,7 @@
         <IonButtons slot="start">
           <IonBackButton defaultHref="/home" />
         </IonButtons>
-        <IonSearchbar class="px-2" :style="{ paddingTop: 0, paddingBottom: 0 }" v-model="search" mode="ios" />
+        <IonSearchbar class="px-2" :style="{ paddingTop: 0, paddingBottom: 0 }" v-model="search" />
         <IonButtons slot="end">
           <IonButton fill="clear" color="dark" :disabled="!initialCardFilter.length" @click="onOpenFilter()">
             <IonIcon slot="icon-only" :icon="filter" />
@@ -20,10 +20,10 @@
         <FilterItem v-model="filterHave" :icon="checkmarkCircle" text="Have" />
       </div>
       <div class="filter-list mx-2 mb-1">
-        <FilterItem :model-value="activeSorter === 'new-to-old'" :icon="newToOld"  @changed="activeSorter = 'new-to-old'" />
-        <FilterItem :model-value="activeSorter === 'old-to-new'" :icon="oldToNew"  @changed="activeSorter = 'old-to-new'" />
-        <FilterItem :model-value="activeSorter === 'a-to-z'" :icon="aToZ"  @changed="activeSorter = 'a-to-z'" />
-        <FilterItem :model-value="activeSorter === 'z-to-a'" :icon="zToA"  @changed="activeSorter = 'z-to-a'" />
+        <FilterItem :model-value="activeSorter === 'new-to-old'" :icon="newToOld" @changed="activeSorter = 'new-to-old'" />
+        <FilterItem :model-value="activeSorter === 'old-to-new'" :icon="oldToNew" @changed="activeSorter = 'old-to-new'" />
+        <FilterItem :model-value="activeSorter === 'a-to-z'" :icon="aToZ" @changed="activeSorter = 'a-to-z'" />
+        <FilterItem :model-value="activeSorter === 'z-to-a'" :icon="zToA" @changed="activeSorter = 'z-to-a'" />
       </div>
     </template>
 

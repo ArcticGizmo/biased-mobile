@@ -2,7 +2,6 @@
   <IonSegment
     v-model="model"
     :class="{ readonly }"
-    mode="ios"
     @ionChange="(e: any) => onChange(e.target.value as T)"
     :aria-readonly="readonly"
     :swipe-gesture="false"

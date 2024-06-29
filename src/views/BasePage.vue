@@ -3,7 +3,7 @@
     <IonHeader v-if="title || slots['header']">
       <IonToolbar>
         <slot name="header">
-          <IonButtons v-if="!defaultBackHref" slot="start">
+          <IonButtons v-if="defaultBackHref" slot="start">
             <IonBackButton :defaultHref="defaultBackHref" />
           </IonButtons>
           <IonTitle>{{ title }}</IonTitle>

@@ -9,7 +9,12 @@
       </div>
     </template>
     <div v-if="section === 'list'" class="grouping-list">
-      <IonCard v-for="(item, index) of items" :key="index" @click="onItemGroupSelect(item)">
+      <IonCard
+        v-for="(item, index) of items"
+        :key="index"
+        v-touch:hold="onItemGroupLongSelectDelegate(index)"
+        @click="onItemGroupSelect(item)"
+      >
         <IonCardHeader>
           <ion-label class="text-2xl" color="medium">{{ item.title || 'Unknown' }}</ion-label>
         </IonCardHeader>
@@ -60,7 +65,18 @@ import BasePage from './BasePage.vue';
 import { useSimpleRouter } from '@/composables/router';
 import { useKPopCards } from '@/composables/kPopCards';
 import { computed, ref } from 'vue';
-import { IonButton, IonSearchbar, IonText, IonCard, IonLabel, IonCardHeader, IonCardContent, IonSpinner, IonIcon } from '@ionic/vue';
+import {
+  IonButton,
+  IonSearchbar,
+  IonText,
+  IonCard,
+  IonLabel,
+  IonCardHeader,
+  IonCardContent,
+  IonSpinner,
+  IonIcon,
+  actionSheetController
+} from '@ionic/vue';
 import FilterItem from '@/components/FilterItem.vue';
 import { heart, paperPlane, people, person, checkmarkCircle, chevronForward } from 'ionicons/icons';
 import { sort } from '@/util/sort';
@@ -68,6 +84,8 @@ import { KPopCard, OwnershipType } from '@/types';
 import { noCard } from '@/icons';
 import { groupBy } from '@/util/groupBy';
 import { useInitialLoad } from '@/composables/initialLoad';
+import { executeWithLoading, showSimpleAlert } from '@/composables/modals';
+import { usePackHistory } from '@/composables/packs';
 
 type Grouping = 'group' | 'artist';
 
@@ -89,7 +107,8 @@ const search = ref('');
 const grouping = ref<Grouping>('group');
 
 const router = useSimpleRouter();
-const { cards, isLoading } = useKPopCards();
+const { cards, isLoading, deleteCards } = useKPopCards();
+const { deletePack } = usePackHistory();
 const { loading: initialLoading } = useInitialLoad(1000);
 
 const ownershipCount = (cards: KPopCard[], type: OwnershipType) => cards.filter(c => c.ownershipType === type).length;
@@ -104,9 +123,9 @@ const getCardSummary = (cards: KPopCard[]): CardSummary => {
 };
 
 const artistItems = computed<ItemGroup[]>(() => {
-  const groups = groupBy(cards.value, c => c.artist);
+  const artists = groupBy(cards.value, c => c.artist);
 
-  return Object.entries(groups).map(([artist, cards]) => {
+  return Object.entries(artists).map(([artist, cards]) => {
     return {
       title: artist,
       summary: getCardSummary(cards),
@@ -152,6 +171,74 @@ const onItemGroupSelect = (item: ItemGroup) => {
 
 const onSelectEverything = () => {
   router.push('/cards');
+};
+
+function onItemGroupLongSelectDelegate(index: number) {
+  return () => {
+    const item = items.value[index];
+    if (!item) {
+      return;
+    }
+    onItemGroupLongSelect(item);
+  };
+}
+
+const onItemGroupLongSelect = async (item: ItemGroup) => {
+  const actionSheet = await actionSheetController.create({
+    buttons: [
+      { text: 'View', data: 'view' },
+      { text: 'Delete', data: 'delete', role: 'destructive' },
+      { text: 'Cancel', role: 'cancel' }
+    ]
+  });
+
+  actionSheet.present();
+
+  const resp = await actionSheet.onWillDismiss();
+
+  if (!resp.data) {
+    return;
+  }
+
+  if (resp.data === 'view') {
+    onItemGroupSelect(item);
+    return;
+  }
+
+  const deleteResp = await showSimpleAlert({
+    header: `Delete ${item.value}?`,
+    message: `This will remove all your cards for this ${item.type === 'group' ? 'group' : 'artist'}`,
+    okName: 'delete',
+    okClass: 'danger'
+  });
+
+  if (deleteResp !== 'delete') {
+    return;
+  }
+
+  if (item.type === 'group') {
+    executeWithLoading(async () => {
+      const groupName = item.value.toUpperCase();
+      const cardsToDelete = cards.value.filter(c => c.groupName?.toUpperCase() === groupName);
+      const packs = [...new Set(cardsToDelete.map(c => c.packId))].filter(c => !!c) as string[];
+
+      await deleteCards(cardsToDelete.map(c => c.id));
+      for (const pack of packs) {
+        await deletePack(pack);
+      }
+    }, 'Deleting group');
+  } else {
+    executeWithLoading(async () => {
+      const artist = item.value.toUpperCase();
+      const cardsToDelete = cards.value.filter(c => c.artist?.toUpperCase() === artist);
+      const packs = [...new Set(cardsToDelete.map(c => c.packId))].filter(c => !!c) as string[];
+
+      await deleteCards(cardsToDelete.map(c => c.id));
+      for (const pack of packs) {
+        await deletePack(pack);
+      }
+    }, 'Deleting artist');
+  }
 };
 </script>
 

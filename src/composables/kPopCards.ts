@@ -82,7 +82,7 @@ export const useKPopCards = () => {
     cards.value = [...cards.value];
   };
 
-  const importBackup = async (backup: Backup) => {
+  const importBackup = async (backup: Backup, packId?: string) => {
     const items = backupToPackedCards(backup);
     const newCards: KPopCard[] = [];
 
@@ -106,10 +106,11 @@ export const useKPopCards = () => {
         throw 'unable to store file';
       }
 
-      // TODO: this will need to check to see if the file already exists
+      // TODO: this will need to check to see if the file already exists for ownership
 
       const card: KPopCard = {
         id: item.id || uuidv1(),
+        packId,
         imageFilePath: fileResult.path,
         artist: item.artist,
         artistType: item.artistType,

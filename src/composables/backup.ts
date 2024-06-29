@@ -31,6 +31,7 @@ const buildBackup = async (cards: KPopCard[]): Promise<BackupV1> => {
 
     packedCards.push({
       id: card.id,
+      packId: card.packId,
       imageSrc: loadResult.data || '',
       artist: card.artist,
       artistType: card.artistType,

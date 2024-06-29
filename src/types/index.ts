@@ -9,6 +9,7 @@ export type WhereFrom = 'album' | 'event';
 export type OwnershipType = 'have' | 'want' | 'in-transit' | 'none';
 
 export interface KPopData {
+  packId?: string;
   artist: string;
   artistType: ArtistType;
   groupName?: string;

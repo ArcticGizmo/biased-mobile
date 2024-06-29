@@ -1,5 +1,5 @@
 <template>
-  <BasePage :title="card?.artist" max-width="500px">
+  <BasePage :title="card?.artist" max-width="500px" default-back-href="/">
     <div v-if="card" class="card-view p-4">
       <IonIcon class="top-5 right-5 absolute" :icon="trash" size="large" color="danger" @click="onDelete()" />
       <KImg :src="FileStore.toHref(card.imageFilePath)" :aspect-ratio="0.7" style="margin: auto" max-width="350px" />
@@ -53,6 +53,19 @@
         inputmode="text"
         readonly
       />
+
+      <!-- Card pack (for debugging) -->
+      <IonInput
+        v-if="ENV.IS_DEV"
+        class="mt-4"
+        :model-value="card.packId"
+        mode="md"
+        label="Pack"
+        label-placement="stacked"
+        fill="outline"
+        inputmode="text"
+        readonly
+      />
     </div>
   </BasePage>
 </template>
@@ -70,6 +83,7 @@ import { trash } from '@/icons';
 import { showSimpleAlert } from '@/composables/modals';
 import { useToast } from '@/composables/toast';
 import { useSimpleRouter } from '@/composables/router';
+import { ENV } from '@/env';
 
 const props = defineProps<{
   id: string;

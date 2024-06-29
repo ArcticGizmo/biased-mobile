@@ -189,7 +189,7 @@ const onDownloadPack = async (pack: AvailablePack) => {
     return;
   }
 
-  const backupResp = await executeWithLoading(async () => await withDelay(importBackup(packResp.result), 2000), 'Importing');
+  const backupResp = await executeWithLoading(async () => await withDelay(importBackup(packResp.result, pack.packId), 2000), 'Importing');
 
   if (!backupResp.ok) {
     console.error(backupResp.error);

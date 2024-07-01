@@ -2,6 +2,7 @@ import { createRouter, createWebHistory } from '@ionic/vue-router';
 import { RouteRecordRaw } from 'vue-router';
 import HomePage from '@/views/HomePage.vue';
 import TabsPage from '@/views/TabsPage.vue';
+import { ENV } from '@/env';
 
 const routes: Array<RouteRecordRaw> = [
   {
@@ -45,6 +46,13 @@ const routes: Array<RouteRecordRaw> = [
     component: () => import('@/views/NotFoundPage.vue')
   }
 ];
+
+if (ENV.IS_DEV) {
+  routes.push({
+    path: '/extractor',
+    component: () => import('@/views/ExtractorPage.vue')
+  });
+}
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),

@@ -55,6 +55,7 @@ export class Extractor {
       .set('resizable')
       .set('multiple')
       .set('zoomable')
+      .set('keyboard')
       .set('width', opts?.width || 200)
       .set('height', opts?.height || 200)
       .set('x', opts?.x || 0)
@@ -83,10 +84,9 @@ export class Extractor {
 
   clearSelections() {
     this.getSelections().forEach(e => {
-      console.log(e);
       e.remove();
     });
-    // add one pack in so it doesnt break everything
+
     this.addSelection();
   }
 

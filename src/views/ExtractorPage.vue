@@ -15,7 +15,7 @@
           <cropper-handle action="select" plain />
           <!-- used to move the background image -->
           <!-- <cropper-handle action="move" plain /> -->
-          <cropper-selection initial-coverage="0.8" initial-aspect-ratio="0.7" outlined movable resizable multiple zoomable>
+          <cropper-selection initial-coverage="0.8" initial-aspect-ratio="0.7" outlined movable resizable multiple zoomable keyboard>
             <cropper-grid role="grid" covered />
             <cropper-crosshair centered />
             <cropper-handle action="move" theme-color="rgba(255, 255, 255, 0.35)" />
@@ -38,8 +38,15 @@
 import 'cropperjs';
 import { IonButton } from '@ionic/vue';
 import { CropperImage, CropperCanvas } from 'cropperjs';
-import { onMounted, ref } from 'vue';
+import { onMounted, onUnmounted, ref } from 'vue';
 import { Extractor } from '@/composables/extractor';
+
+interface CopiedSelection {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+}
 
 const src = ref('https://media.karousell.com/media/photos/products/2022/6/20/bts_jimin_pc_1655706038_59617c25_progressive.jpg');
 
@@ -47,6 +54,8 @@ const cropperCanvas = ref<CropperCanvas>();
 const cropperImage = ref<CropperImage>();
 
 const extractor = new Extractor();
+
+let copiedSelection: CopiedSelection | undefined;
 
 const reset = () => {
   setTimeout(() => {
@@ -59,8 +68,33 @@ const onRemoveAll = () => {
   extractor.clearSelections();
 };
 
+const onKeyDown = (event: KeyboardEvent) => {
+  if (event.ctrlKey && event.key === 'c') {
+    const selected = extractor.getActiveSelection();
+    if (selected) {
+      copiedSelection = {
+        x: selected.x,
+        y: selected.y,
+        width: selected.width,
+        height: selected.height
+      };
+    }
+  }
+
+  if (event.ctrlKey && event.key === 'v') {
+    if (copiedSelection) {
+      extractor.addSelection(copiedSelection);
+    }
+  }
+};
+
 onMounted(() => {
   reset();
+  window.addEventListener('keydown', onKeyDown);
+});
+
+onUnmounted(() => {
+  window.removeEventListener('keydown', onKeyDown);
 });
 
 const addSelection = () => extractor.addSelection();

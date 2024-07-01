@@ -2,6 +2,8 @@
   <div class="page" style="border: 1px solid orange">
     <div class="nav-bar">
       <IonButton @click="reset()">Reset</IonButton>
+      <IonButton @click="onRemoveAll()">Remove All</IonButton>
+      <IonButton @click="addSelection()">Add Selection</IonButton>
       <IonButton @click="onTest()">Test</IonButton>
     </div>
     <div class="image-region">
@@ -10,17 +12,9 @@
           <cropper-image ref="cropperImage" :src="src" alt="image to edit" crossOrigin="anonymous" />
           <cropper-shade hidden />
           <cropper-handle action="select" plain />
+          <!-- used to move the background image -->
           <!-- <cropper-handle action="move" plain /> -->
-          <cropper-selection
-            ref="cropperSelection"
-            initial-coverage="0.8"
-            initial-aspect-ratio="0.7"
-            outlined
-            movable
-            resizable
-            multiple
-            zoomable
-          >
+          <cropper-selection initial-coverage="0.8" initial-aspect-ratio="0.7" outlined movable resizable multiple zoomable>
             <cropper-grid role="grid" covered />
             <cropper-crosshair centered />
             <cropper-handle action="move" theme-color="rgba(255, 255, 255, 0.35)" />
@@ -42,47 +36,42 @@
 <script setup lang="ts">
 import 'cropperjs';
 import { IonButton } from '@ionic/vue';
-import { CropperSelection, CropperImage, CropperCanvas } from 'cropperjs';
+import { CropperImage, CropperCanvas } from 'cropperjs';
 import { onMounted, ref } from 'vue';
+import { Extractor } from '@/composables/extractor';
 
 const src = ref('https://media.karousell.com/media/photos/products/2022/6/20/bts_jimin_pc_1655706038_59617c25_progressive.jpg');
 
 const cropperCanvas = ref<CropperCanvas>();
 const cropperImage = ref<CropperImage>();
-const cropperSelection = ref<CropperSelection>();
+
+const extractor = new Extractor();
 
 const reset = () => {
   setTimeout(() => {
     cropperImage.value?.$resetTransform();
     cropperImage.value?.$center('contain');
-
-    cropperSelection.value?.$change(50, 50, 300, 300);
   }, 150);
 };
 
-onMounted(() => reset());
-
-const getSelections = () => {
-  const elements: CropperSelection[] = [];
-  const collection = document.getElementsByTagName('cropper-selection');
-  for (let i = 0; i < collection.length; i++) {
-    elements.push(collection.item(i) as CropperSelection);
-  }
-  return elements;
+const onRemoveAll = () => {
+  extractor.clearSelections();
 };
 
-const getActiveSelection = () => {
-  return getSelections().find(e => e.active);
-};
+onMounted(() => {
+  reset();
+});
+
+const addSelection = () => extractor.addSelection();
 
 const onTest = () => {
   // const c = cropperCanvas.value!;
   // c.$
   // c.$setAction('selection');
-  const selections = getSelections();
+  const selections = extractor.getSelections();
   console.dir(selections);
 
-  console.log(getActiveSelection());
+  console.log(extractor.getActiveSelection());
 };
 </script>
 

@@ -4,6 +4,7 @@
       <IonButton @click="reset()">Reset</IonButton>
       <IonButton @click="onRemoveAll()">Remove All</IonButton>
       <IonButton @click="addSelection()">Add Selection</IonButton>
+      <IonButton @click="onDuplicate()">Duplicate</IonButton>
       <IonButton @click="onTest()">Test</IonButton>
     </div>
     <div class="image-region">
@@ -63,6 +64,13 @@ onMounted(() => {
 });
 
 const addSelection = () => extractor.addSelection();
+
+const onDuplicate = () => {
+  const selected = extractor.getActiveSelection();
+  if (selected) {
+    extractor.duplicateSelection(selected);
+  }
+};
 
 const onTest = () => {
   // const c = cropperCanvas.value!;

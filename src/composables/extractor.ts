@@ -1,13 +1,20 @@
 import { CropperCanvas, CropperCrosshair, CropperGrid, CropperHandle, CropperSelection } from 'cropperjs';
 
+interface SelectionOptions {
+  x?: number;
+  y?: number;
+  width?: number;
+  height?: number;
+}
+
 class ElementBuilder<T extends HTMLElement> {
   el: T;
   constructor(element: T) {
     this.el = element;
   }
 
-  set(name: string, value?: string) {
-    this.el.setAttribute(name, value || '');
+  set(name: string, value?: string | number) {
+    this.el.setAttribute(name, `${value ?? ''}`);
     return this;
   }
 
@@ -39,7 +46,7 @@ export class Extractor {
     return this.getSelections().find(e => e.active);
   }
 
-  addSelection() {
+  addSelection(opts?: SelectionOptions) {
     const c = this.getCanvas();
 
     const selection = new ElementBuilder(new CropperSelection())
@@ -48,8 +55,10 @@ export class Extractor {
       .set('resizable')
       .set('multiple')
       .set('zoomable')
-      .set('width', '400')
-      .set('height', '400');
+      .set('width', opts?.width || 200)
+      .set('height', opts?.height || 200)
+      .set('x', opts?.x || 0)
+      .set('y', opts?.y || 0);
 
     const grid = new ElementBuilder(new CropperGrid()).set('role', 'grid').set('covered');
     selection.add(grid.el);
@@ -79,5 +88,14 @@ export class Extractor {
     });
     // add one pack in so it doesnt break everything
     this.addSelection();
+  }
+
+  duplicateSelection(selection: CropperSelection) {
+    this.addSelection({
+      x: selection.x,
+      y: selection.y,
+      width: selection.width,
+      height: selection.height
+    });
   }
 }

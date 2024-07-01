@@ -56,7 +56,7 @@ onMounted(() => {
     show.value = true;
     setTimeout(() => {
       cropperImage.value?.$center('contain');
-      cropperSelection?.value?.$reset();
+      cropperSelection.value?.$reset();
     }, 10);
   }, 500);
 });
@@ -72,7 +72,7 @@ const onReset = () => {
 };
 
 const onAccept = async () => {
-  const canvas = await cropperSelection.value!.$toCanvas();
+  const canvas = await cropperSelection.value!.$toCanvas({ width: 1024, height: 1024 });
   modalController.dismiss(canvas.toDataURL(), 'accept');
 };
 </script>

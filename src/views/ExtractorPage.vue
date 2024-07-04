@@ -1,30 +1,89 @@
 <template>
-  <div class="page" style="border: 1px solid orange">
-    <div class="nav-bar">
-      <IonButton @click="reset()">Reset</IonButton>
-      <IonInput v-model="selectionData.x" label="x" fill="outline" mode="md" type="number" @ion-change="setDimension($event, 'x')" />
-      <IonInput v-model="selectionData.y" label="y" fill="outline" mode="md" type="number" @ion-change="setDimension($event, 'y')" />
-      <IonInput
-        v-model="selectionData.width"
-        label="w"
-        fill="outline"
-        mode="md"
-        type="number"
-        @ion-change="setDimension($event, 'width')"
-      />
-      <IonInput
-        v-model="selectionData.height"
-        label="h"
-        fill="outline"
-        mode="md"
-        type="number"
-        @ion-change="setDimension($event, 'height')"
-      />
+  <div class="page">
+    <div class="nav-bar mt-6">
+      <div class="grid grid-cols-2">
+        <IonInput v-model="selectionData.x" label="x" fill="outline" mode="md" type="number" @ion-change="setDimension($event, 'x')" />
+        <IonInput v-model="selectionData.y" label="y" fill="outline" mode="md" type="number" @ion-change="setDimension($event, 'y')" />
+        <IonInput
+          v-model="selectionData.width"
+          label="w"
+          fill="outline"
+          mode="md"
+          type="number"
+          @ion-change="setDimension($event, 'width')"
+        />
+        <IonInput
+          v-model="selectionData.height"
+          label="h"
+          fill="outline"
+          mode="md"
+          type="number"
+          @ion-change="setDimension($event, 'height')"
+        />
+      </div>
+      <div class="info">
+        <h4>Info</h4>
+        <IonButton fill="outline" @click="onGetFromGallery()"> Get Image </IonButton>
+        <!-- ======= who ======== -->
+        <!-- artist -->
+        <IonInput class="mt-4" v-model="artist" mode="md" label="Artist*" label-placement="stacked" fill="outline" inputmode="text" />
+
+        <!-- is soloist selection -->
+        <ArtistTypeInput class="mt-4" v-model="artistType" />
+
+        <VTransition :show="artistType === 'group'">
+          <IonInput
+            class="mt-4"
+            v-model="groupName"
+            mode="md"
+            label="Group Name*"
+            label-placement="stacked"
+            fill="outline"
+            inputmode="text"
+          />
+        </VTransition>
+
+        <!-- ======= where from ======== -->
+        <WhereFromInput class="mt-4" v-model="whereFrom" />
+
+        <!-- album -->
+        <IonInput
+          class="mt-4"
+          v-model="whereFromName"
+          mode="md"
+          :label="whereFromNameLabel"
+          label-placement="stacked"
+          fill="outline"
+          inputmode="text"
+        />
+
+        <!-- album version (optional) -->
+        <VTransition :show="whereFrom === 'album'">
+          <IonInput
+            class="mt-4"
+            v-model="albumVersion"
+            mode="md"
+            label="Album Version"
+            label-placement="stacked"
+            fill="outline"
+            inputmode="text"
+          />
+        </VTransition>
+
+        <!-- year -->
+        <PickerInput class="mt-4" v-model="year" :options="dateOptions" label="Released" label-placement="stacked" fill="outline" />
+
+        <!-- Ownership -->
+        <OwnershipInput class="mt-4" v-model="ownershipType" />
+
+        <IonButton class="mt-6 h-12" expand="block" type="submit" :disabled="!canSubmit" @click="onSubmit()">Add</IonButton>
+        <IonButton class="mt-6" expand="block" @click="reset()">Reset</IonButton>
+      </div>
     </div>
     <div class="image-region">
       <div class="editor">
         <cropper-canvas v-if="show" ref="cropperCanvas" background @actionstart="onActionStart" @actionend="onActionEnd">
-          <cropper-image ref="cropperImage" :src="src" alt="image to edit" crossOrigin="anonymous" translatable scalable />
+          <cropper-image ref="cropperImage" :src="imageSrc" alt="image to edit" crossOrigin="anonymous" translatable scalable />
           <cropper-shade />
           <cropper-handle id="image-handle" action="move" plain />
           <cropper-selection
@@ -61,7 +120,18 @@
 import 'cropperjs';
 import { IonButton, IonInput } from '@ionic/vue';
 import { CropperImage, CropperCanvas, CropperShade, CropperGrid, CropperCrosshair, CropperSelection, CropperHandle } from 'cropperjs';
-import { onMounted, onUnmounted, ref } from 'vue';
+import { computed, onMounted, onUnmounted, ref, watch } from 'vue';
+import { ArtistType, KPopCard, OwnershipType, WhereFrom } from '@/types';
+import VTransition from '@/components/VTransition.vue';
+import ArtistTypeInput from '@/components/ArtistTypeInput.vue';
+import PickerInput from '@/components/PickerInput.vue';
+import OwnershipInput from '@/components/OwnershipInput.vue';
+import WhereFromInput from '@/components/WhereFromInput.vue';
+import { Base64Uri } from '@/composables/base64';
+import { useImageImport } from '@/composables/imageImport';
+import { FileStore } from '@/composables/fileStore';
+import { useKPopCards } from '@/composables/kPopCards';
+import { useToast } from '@/composables/toast';
 
 interface SelectionData {
   x: number;
@@ -71,7 +141,6 @@ interface SelectionData {
 }
 
 const show = ref(false);
-const src = ref('https://media.karousell.com/media/photos/products/2022/6/20/bts_jimin_pc_1655706038_59617c25_progressive.jpg');
 
 const cropperCanvas = ref<CropperCanvas>();
 const cropperImage = ref<CropperImage>();
@@ -84,7 +153,43 @@ const selectionData = ref<SelectionData>({
   height: 0
 });
 
+const thisYear = new Date().getFullYear();
+
+const dateOptions = Array.from({ length: 50 }, (_, i) => {
+  const value = `${thisYear - i}`;
+  return { text: value, value };
+});
+
+const imageSrc = ref('');
+const artist = ref('');
+const artistType = ref<ArtistType>('group');
+const groupName = ref('');
+
+const whereFrom = ref<WhereFrom>('album');
+const whereFromName = ref('');
+const albumVersion = ref('');
+
+const year = ref(`${thisYear}`);
+const ownershipType = ref<OwnershipType>('none');
+
+const { photoFromGallery } = useImageImport();
+const { addCard, generateId } = useKPopCards();
+const { showToast } = useToast();
+
+const resetForm = () => {
+  imageSrc.value = '';
+  artist.value = '';
+  artistType.value = 'group';
+  groupName.value = '';
+  whereFrom.value = 'album';
+  whereFromName.value = '';
+  albumVersion.value = '';
+  year.value = `${thisYear}`;
+  ownershipType.value = 'none';
+};
+
 const reset = () => {
+  resetForm();
   setTimeout(() => {
     show.value = true;
     setTimeout(() => {
@@ -94,6 +199,23 @@ const reset = () => {
     }, 10);
   }, 500);
 };
+
+const whereFromNameLabel = computed(() => {
+  return whereFrom.value === 'album' ? 'Album*' : 'Event*';
+});
+
+const canSubmit = computed(() => {
+  if (artistType.value === 'group' && !groupName.value) {
+    return false;
+  }
+  return imageSrc.value && artist.value && whereFromName.value;
+});
+
+watch(artistType, type => {
+  if (type === 'solo') {
+    groupName.value = '';
+  }
+});
 
 let yLock: number | undefined;
 
@@ -160,18 +282,53 @@ const onSelectionChange = (event: any) => {
 const setDimension = (e: any, key: string) => {
   (cropperSelection.value as any)![key] = Number(e.detail.value);
 };
+
+const onGetFromGallery = async () => {
+  const resp = await photoFromGallery();
+  if (resp.ok) {
+    imageSrc.value = resp.base64Uri.toString();
+  }
+};
+
+const onSubmit = async () => {
+  const canvas = await cropperSelection.value!.$toCanvas({ width: 1024, height: 1024 });
+  const scaledImage = await Base64Uri.fromUri(canvas.toDataURL());
+
+  const fileResult = await FileStore.saveImage(`photo-cards/${generateId()}.${scaledImage.type()}`, scaledImage.toString());
+
+  if (!fileResult.ok) {
+    console.error('[create] could not save file to disk', fileResult.error);
+    return;
+  }
+
+  const data: KPopCard = {
+    id: generateId(),
+    imageFilePath: fileResult.path,
+    artist: artist.value,
+    artistType: artistType.value,
+    groupName: groupName.value,
+    whereFrom: whereFrom.value,
+    whereFromName: whereFromName.value,
+    albumVersion: albumVersion.value,
+    year: year.value,
+    ownershipType: ownershipType.value
+  };
+
+  addCard(data);
+  showToast({ message: 'Added!', color: 'success' });
+};
 </script>
 
 <style>
 .page {
   display: grid;
-  grid-template-columns: 20rem 1fr;
+  grid-template-columns: 25rem 1fr;
   height: 100%;
   width: 100%;
 }
 
 .nav-bar {
-  background-color: rgb(223, 223, 223);
+  overflow-y: scroll;
 }
 
 .editor {

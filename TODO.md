@@ -1,13 +1,11 @@
 # TODO
 
-## Extractor
-- add form fields
-- export to file (using atrist name)
-    - this should contact
-- add ability to lock x/y direction for selections (will make it easier)
-    - https://fengyuanchen.github.io/cropperjs/v2/api/cropper-selection.html#limit-boundaries
-- ability to select multiple
-- add ability to set x,y,width,height from form (for accuracy)
+## Image comparer
+- set up a server to send base64data and a list of the file locations to compare against
+    - use a server so that the model is fast to load
+    - should return the confidence back to the caller for each of the images
+- if >92 confidence match, display the matches and ask if there is a duplicate
+    - this is to help ensure that ids are preserved when updating stuff
 
 ## Other
 - ability to edit a card

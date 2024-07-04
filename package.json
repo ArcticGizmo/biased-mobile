@@ -11,6 +11,8 @@
         "build:android:release": "npm run build && cd android && gradlew assembleRelease && cd .. && shx cp ./android/app/build/outputs/apk/release/app-release-unsigned.apk ./apks/app-release.apk ",
         "preview": "vite preview",
         "serve:files": "http-server ./.vite-storage -a localhost -p 8200 -c-1.",
+        "serve:analysis": "flask --app ./imageAnalysis/images.py run --port 5005",
+        "analysis:build": "pip install -r ./imageAnalysis/requirements.txt",
         "test:e2e": "cypress run",
         "test:unit": "vitest",
         "lint": "eslint .",

@@ -2,7 +2,15 @@
   <div class="image-editor-modal">
     <div class="editor">
       <cropper-canvas v-if="show" class="rounded-md" background>
-        <cropper-image ref="cropperImage" :src="src" alt="image to edit" crossOrigin="anonymous" />
+        <cropper-image
+          ref="cropperImage"
+          :src="src"
+          alt="image to edit"
+          crossOrigin="anonymous"
+          initial-center-size="contain"
+          scalable
+          translatable
+        />
         <cropper-shade hidden />
         <cropper-handle action="select" plain />
         <cropper-handle action="move" plain />

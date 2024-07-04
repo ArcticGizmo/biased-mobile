@@ -2,6 +2,24 @@
   <div class="page" style="border: 1px solid orange">
     <div class="nav-bar">
       <IonButton @click="reset()">Reset</IonButton>
+      <IonInput v-model="selectionData.x" label="x" fill="outline" mode="md" type="number" @ion-change="setDimension($event, 'x')" />
+      <IonInput v-model="selectionData.y" label="y" fill="outline" mode="md" type="number" @ion-change="setDimension($event, 'y')" />
+      <IonInput
+        v-model="selectionData.width"
+        label="w"
+        fill="outline"
+        mode="md"
+        type="number"
+        @ion-change="setDimension($event, 'width')"
+      />
+      <IonInput
+        v-model="selectionData.height"
+        label="h"
+        fill="outline"
+        mode="md"
+        type="number"
+        @ion-change="setDimension($event, 'height')"
+      />
     </div>
     <div class="image-region">
       <div class="editor">
@@ -19,6 +37,7 @@
             linked
             keyboard
             zoomable
+            @change="onSelectionChange"
           >
             <cropper-grid role="grid" covered />
             <cropper-crosshair centered />
@@ -40,9 +59,16 @@
 
 <script setup lang="ts">
 import 'cropperjs';
-import { IonButton } from '@ionic/vue';
+import { IonButton, IonInput } from '@ionic/vue';
 import { CropperImage, CropperCanvas, CropperShade, CropperGrid, CropperCrosshair, CropperSelection, CropperHandle } from 'cropperjs';
 import { onMounted, onUnmounted, ref } from 'vue';
+
+interface SelectionData {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+}
 
 const show = ref(false);
 const src = ref('https://media.karousell.com/media/photos/products/2022/6/20/bts_jimin_pc_1655706038_59617c25_progressive.jpg');
@@ -50,6 +76,13 @@ const src = ref('https://media.karousell.com/media/photos/products/2022/6/20/bts
 const cropperCanvas = ref<CropperCanvas>();
 const cropperImage = ref<CropperImage>();
 const cropperSelection = ref<CropperSelection>();
+
+const selectionData = ref<SelectionData>({
+  x: 0,
+  y: 0,
+  width: 0,
+  height: 0
+});
 
 const reset = () => {
   setTimeout(() => {
@@ -118,6 +151,14 @@ const onActionEnd = (event: any) => {
   if (id === 'image-handle' || id === 'selection-handle') {
     selection.linked = true;
   }
+};
+
+const onSelectionChange = (event: any) => {
+  selectionData.value = event.detail as SelectionData;
+};
+
+const setDimension = (e: any, key: string) => {
+  (cropperSelection.value as any)![key] = Number(e.detail.value);
 };
 </script>
 

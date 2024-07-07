@@ -120,7 +120,7 @@ import BasePage from './BasePage.vue';
 import { IonButton, IonInput } from '@ionic/vue';
 import { CropperImage, CropperCanvas, CropperShade, CropperGrid, CropperCrosshair, CropperSelection, CropperHandle } from 'cropperjs';
 import { computed, onMounted, onUnmounted, ref, watch } from 'vue';
-import { ArtistType, KPopCard, OwnershipType, WhereFrom } from '@/types';
+import { ArtistType, KPopCard, WhereFrom } from '@/types';
 import VTransition from '@/components/VTransition.vue';
 import ArtistTypeInput from '@/components/ArtistTypeInput.vue';
 import PickerInput from '@/components/PickerInput.vue';
@@ -133,6 +133,7 @@ import { useToast } from '@/composables/toast';
 import { useImageCompare } from '@/composables/imageCompare';
 import { dialogController } from '@/composables/dialogController';
 import ImageCompareDialog from '@/components/ImageCompareDialog.vue';
+import { executeWithLoading } from '@/composables/modals';
 
 interface SelectionData {
   x: number;
@@ -302,7 +303,14 @@ const onSubmit = async () => {
     );
   });
 
-  const possibleMatches = await findPossibleMatches(scaledImage.toString(), filteredCards);
+  const matchesResp = await executeWithLoading(() => findPossibleMatches(scaledImage.toString(), filteredCards));
+
+  if (!matchesResp.ok) {
+    showToast({ message: 'Could not compare images', color: 'danger' });
+    return;
+  }
+
+  const possibleMatches = matchesResp.result;
 
   if (!possibleMatches.length) {
     await createNewCard(scaledImage);

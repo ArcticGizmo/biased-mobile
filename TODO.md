@@ -18,3 +18,5 @@
 - ability to share the collage to friends (if that is even possible)
     - https://ionicframework.com/docs/native/share
 - fix collage to split across pages even within the same group (happens for 17 all members for '17 is right here')
+
+## Cleanup

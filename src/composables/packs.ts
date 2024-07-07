@@ -2,7 +2,6 @@ import { ENV } from '@/env';
 import { useQuery } from '@tanstack/vue-query';
 import wretch from 'wretch';
 import QueryStringAddon from 'wretch/addons/queryString';
-import FormUrlAddon from 'wretch/addons/formUrl';
 import { Backup } from './backup';
 import { ComputedRef, readonly, ref } from 'vue';
 import { KvStore } from './kvStore';
@@ -22,7 +21,7 @@ const HISTORY_KEY = 'history';
 
 const makeWretch = (base: string) => {
   const url = ENV.isMobile ? base : '/proxy/' + base;
-  return wretch().addon(QueryStringAddon).addon(FormUrlAddon).url(url);
+  return wretch().addon(QueryStringAddon).url(url);
 };
 
 const w = makeWretch('https://drive.google.com');

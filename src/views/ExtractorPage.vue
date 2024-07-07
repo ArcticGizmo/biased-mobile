@@ -1,6 +1,7 @@
 <template>
   <div class="page">
     <div class="nav-bar mt-6">
+      <IonButton @click="onTest()">Test</IonButton>
       <div class="grid grid-cols-2">
         <IonInput v-model="selectionData.x" label="x" fill="outline" mode="md" type="number" @ion-change="setDimension($event, 'x')" />
         <IonInput v-model="selectionData.y" label="y" fill="outline" mode="md" type="number" @ion-change="setDimension($event, 'y')" />
@@ -132,6 +133,7 @@ import { useImageImport } from '@/composables/imageImport';
 import { FileStore } from '@/composables/fileStore';
 import { useKPopCards } from '@/composables/kPopCards';
 import { useToast } from '@/composables/toast';
+import { useImageCompare } from '@/composables/imageCompare';
 
 interface SelectionData {
   x: number;
@@ -173,7 +175,7 @@ const year = ref(`${thisYear}`);
 const ownershipType = ref<OwnershipType>('none');
 
 const { photoFromGallery } = useImageImport();
-const { addCard, generateId } = useKPopCards();
+const { cards, addCard, generateId } = useKPopCards();
 const { showToast } = useToast();
 
 const resetForm = () => {
@@ -294,7 +296,9 @@ const onSubmit = async () => {
   const canvas = await cropperSelection.value!.$toCanvas({ width: 1024, height: 1024 });
   const scaledImage = await Base64Uri.fromUri(canvas.toDataURL());
 
-  const fileResult = await FileStore.saveImage(`photo-cards/${generateId()}.${scaledImage.type()}`, scaledImage.toString());
+  const id = generateId();
+
+  const fileResult = await FileStore.saveImage(`photo-cards/${id}.${scaledImage.type()}`, scaledImage.toString());
 
   if (!fileResult.ok) {
     console.error('[create] could not save file to disk', fileResult.error);
@@ -302,7 +306,7 @@ const onSubmit = async () => {
   }
 
   const data: KPopCard = {
-    id: generateId(),
+    id,
     imageFilePath: fileResult.path,
     artist: artist.value,
     artistType: artistType.value,
@@ -316,6 +320,30 @@ const onSubmit = async () => {
 
   addCard(data);
   showToast({ message: 'Added!', color: 'success' });
+};
+
+const { compare } = useImageCompare();
+
+const onTest = async () => {
+  const a =
+    'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADcAAABICAIAAADdzfoFAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAIDSURBVGhD7ZchjgJBEEVHIpHIlUgkEolEIpFI5DgkEonkCEiOwBE4AkdAspWpn04FCOzO/5Ms2XpquqY7PLq7arqr2yeQljrSUkda6khLHWmp439bHo/HyWSy3+/R5ujKcjAYVFXV6/XQ5ujEcr1em6KDEIfeMirO53NEOcSWu90Ogg3X6xUvOMSWvh2d0WiEKI3YEoINh8MBURrK8rHcQFA6kQZleVduYt4IJ9KgLGHUlJu7vPEOKmSWMW9UBaigsYxrPZ1OVQWooLGMFEXLqq8G/muut/RXcXb5rzllaT8PkYDFo6Lj/VtDjd9sNi5h6eIPxqOigQFtYccXoPMMPuW7siyFybKHT3mZZdyjVowWi4U/13WNHgQyy7hHT6dTkbZn9CCQWRZsfe2o4Yrj8RhRDr2lLbEr2nSez2dEOcSWsQzZHkCURmm53W4h2CQQogpklpfLpWSM/MAhs5zNZq5oqfO3zkQFu1q4oiEpPXcILG3mhsOhK1oxR1SKwLKUnn6/b7sTUSmsZbzuWI4jqoayjHn9Av64TlmuViuIvMP+DMa0grKM98a3YEwrqMFluV+sqXcw0G6FYMWtnr8o465ooN0KavBPgGNaCoBjVTHFqHPLkmFMMercstyHlsslQr+nc0sJaakjLXWkpY601JGWOtJSR1rqSEsdaanjEyxvt2+w5lk6qw3k+AAAAABJRU5ErkJggg==';
+  // const canvas = await cropperSelection.value!.$toCanvas({ width: 1024, height: 1024 });
+  // const scaledImage = await Base64Uri.fromUri(canvas.toDataURL());
+  // console.log(scaledImage);
+  // console.log('---- a');
+  // console.dir(a);
+
+  const targets = cards.value.map(c => {
+    const parts = c.imageFilePath.split('.');
+    return {
+      id: c.id,
+      extension: parts[parts.length - 1]
+    };
+  });
+
+  console.dir(cards.value);
+
+  const resp = await compare(a, targets);
 };
 </script>
 

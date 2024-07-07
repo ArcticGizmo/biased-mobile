@@ -33,6 +33,8 @@ const backupToPackedCards = (backup: Backup) => {
   throw 'unknown backup version';
 };
 
+const generateId = () => uuidv1();
+
 loadSaved();
 
 export const useKPopCards = () => {
@@ -98,8 +100,11 @@ export const useKPopCards = () => {
         summary.skipped++;
         continue;
       }
+
+      const id = item.id || generateId();
+
       const extension = getExtensionFromBase64Uri(item.imageSrc, 'image/png');
-      const fileResult = await FileStore.saveImage(`photo-cards/${uuidv1()}.${extension}`, item.imageSrc);
+      const fileResult = await FileStore.saveImage(`photo-cards/${id}.${extension}`, item.imageSrc);
 
       if (!fileResult.ok) {
         console.error('[import backup] unable to store file', item);
@@ -109,7 +114,7 @@ export const useKPopCards = () => {
       // TODO: this will need to check to see if the file already exists for ownership
 
       const card: KPopCard = {
-        id: item.id || uuidv1(),
+        id,
         packId,
         imageFilePath: fileResult.path,
         artist: item.artist,
@@ -141,6 +146,6 @@ export const useKPopCards = () => {
     update,
     clearCards,
     importBackup,
-    generateId: () => uuidv1()
+    generateId
   };
 };

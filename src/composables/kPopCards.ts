@@ -75,7 +75,7 @@ export const useKPopCards = () => {
     cards.value = cards.value.filter(c => !ids.includes(c.id));
   };
 
-  const update = (id: string, changes: KPopCardUpdate) => {
+  const updateCard = (id: string, changes: KPopCardUpdate) => {
     const card = cards.value.find(c => c.id === id)!;
 
     const updatedCard = { ...card, ...changes, id };
@@ -143,7 +143,7 @@ export const useKPopCards = () => {
     addCard,
     deleteCard,
     deleteCards,
-    update,
+    updateCard,
     clearCards,
     importBackup,
     generateId

@@ -89,7 +89,7 @@ const props = defineProps<{
   id: string;
 }>();
 
-const { cards, update, deleteCard } = useKPopCards();
+const { cards, updateCard, deleteCard } = useKPopCards();
 const { showToast } = useToast();
 const router = useSimpleRouter();
 
@@ -100,7 +100,7 @@ const whereFromNameLabel = computed(() => {
 });
 
 const onOwnershipChange = (ownershipType: OwnershipType) => {
-  update(props.id, { ownershipType });
+  updateCard(props.id, { ownershipType });
 };
 
 const onDelete = async () => {

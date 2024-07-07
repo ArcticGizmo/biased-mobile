@@ -1,124 +1,122 @@
 <template>
-  <div class="page">
-    <div class="nav-bar mt-6">
-      <IonButton @click="onTest()">Test</IonButton>
-      <div class="grid grid-cols-2">
-        <IonInput v-model="selectionData.x" label="x" fill="outline" mode="md" type="number" @ion-change="setDimension($event, 'x')" />
-        <IonInput v-model="selectionData.y" label="y" fill="outline" mode="md" type="number" @ion-change="setDimension($event, 'y')" />
-        <IonInput
-          v-model="selectionData.width"
-          label="w"
-          fill="outline"
-          mode="md"
-          type="number"
-          @ion-change="setDimension($event, 'width')"
-        />
-        <IonInput
-          v-model="selectionData.height"
-          label="h"
-          fill="outline"
-          mode="md"
-          type="number"
-          @ion-change="setDimension($event, 'height')"
-        />
-      </div>
-      <div class="info">
-        <h4>Info</h4>
-        <IonButton fill="outline" @click="onGetFromGallery()"> Get Image </IonButton>
-        <!-- ======= who ======== -->
-        <!-- artist -->
-        <IonInput class="mt-4" v-model="artist" mode="md" label="Artist*" label-placement="stacked" fill="outline" inputmode="text" />
+  <BasePage title="Extractor" default-back-href="/settings">
+    <div class="page">
+      <div class="nav-bar mt-6">
+        <div class="grid grid-cols-2">
+          <IonInput v-model="selectionData.x" label="x" fill="outline" mode="md" type="number" @ion-change="setDimension($event, 'x')" />
+          <IonInput v-model="selectionData.y" label="y" fill="outline" mode="md" type="number" @ion-change="setDimension($event, 'y')" />
+          <IonInput
+            v-model="selectionData.width"
+            label="w"
+            fill="outline"
+            mode="md"
+            type="number"
+            @ion-change="setDimension($event, 'width')"
+          />
+          <IonInput
+            v-model="selectionData.height"
+            label="h"
+            fill="outline"
+            mode="md"
+            type="number"
+            @ion-change="setDimension($event, 'height')"
+          />
+        </div>
+        <div class="mt-4">
+          <IonButton expand="block" fill="outline" @click="onGetFromGallery()"> Get Image </IonButton>
+          <!-- ======= who ======== -->
+          <!-- artist -->
+          <IonInput class="mt-4" v-model="artist" mode="md" label="Artist*" label-placement="stacked" fill="outline" inputmode="text" />
 
-        <!-- is soloist selection -->
-        <ArtistTypeInput class="mt-4" v-model="artistType" />
+          <!-- is soloist selection -->
+          <ArtistTypeInput class="mt-4" v-model="artistType" />
 
-        <VTransition :show="artistType === 'group'">
+          <VTransition :show="artistType === 'group'">
+            <IonInput
+              class="mt-4"
+              v-model="groupName"
+              mode="md"
+              label="Group Name*"
+              label-placement="stacked"
+              fill="outline"
+              inputmode="text"
+            />
+          </VTransition>
+
+          <!-- ======= where from ======== -->
+          <WhereFromInput class="mt-4" v-model="whereFrom" />
+
+          <!-- album -->
           <IonInput
             class="mt-4"
-            v-model="groupName"
+            v-model="whereFromName"
             mode="md"
-            label="Group Name*"
+            :label="whereFromNameLabel"
             label-placement="stacked"
             fill="outline"
             inputmode="text"
           />
-        </VTransition>
 
-        <!-- ======= where from ======== -->
-        <WhereFromInput class="mt-4" v-model="whereFrom" />
+          <!-- album version (optional) -->
+          <VTransition :show="whereFrom === 'album'">
+            <IonInput
+              class="mt-4"
+              v-model="albumVersion"
+              mode="md"
+              label="Album Version"
+              label-placement="stacked"
+              fill="outline"
+              inputmode="text"
+            />
+          </VTransition>
 
-        <!-- album -->
-        <IonInput
-          class="mt-4"
-          v-model="whereFromName"
-          mode="md"
-          :label="whereFromNameLabel"
-          label-placement="stacked"
-          fill="outline"
-          inputmode="text"
-        />
+          <!-- year -->
+          <PickerInput class="mt-4" v-model="year" :options="dateOptions" label="Released" label-placement="stacked" fill="outline" />
 
-        <!-- album version (optional) -->
-        <VTransition :show="whereFrom === 'album'">
-          <IonInput
-            class="mt-4"
-            v-model="albumVersion"
-            mode="md"
-            label="Album Version"
-            label-placement="stacked"
-            fill="outline"
-            inputmode="text"
-          />
-        </VTransition>
-
-        <!-- year -->
-        <PickerInput class="mt-4" v-model="year" :options="dateOptions" label="Released" label-placement="stacked" fill="outline" />
-
-        <!-- Ownership -->
-        <OwnershipInput class="mt-4" v-model="ownershipType" />
-
-        <IonButton class="mt-6 h-12" expand="block" type="submit" :disabled="!canSubmit" @click="onSubmit()">Add</IonButton>
-        <IonButton class="mt-6" expand="block" @click="reset()">Reset</IonButton>
+          <IonButton class="mt-6 h-12" expand="block" type="submit" :disabled="!canSubmit" @click="onSubmit()">Add</IonButton>
+          <IonButton class="mt-6" expand="block" @click="reset()">Reset</IonButton>
+        </div>
+      </div>
+      <div class="image-region">
+        <div class="editor">
+          <cropper-canvas v-if="show" ref="cropperCanvas" background @actionstart="onActionStart" @actionend="onActionEnd">
+            <cropper-image ref="cropperImage" :src="imageSrc" alt="image to edit" crossOrigin="anonymous" translatable scalable />
+            <cropper-shade />
+            <cropper-handle id="image-handle" action="move" plain />
+            <cropper-selection
+              ref="cropperSelection"
+              initial-coverage="0.5"
+              initial-aspect-ratio="0.7"
+              outlined
+              movable
+              resizable
+              linked
+              keyboard
+              zoomable
+              @change="onSelectionChange"
+            >
+              <cropper-grid role="grid" covered />
+              <cropper-crosshair centered />
+              <cropper-handle id="selection-handle" action="move" theme-color="rgba(255, 255, 255, 0.35)" />
+              <cropper-handle action="n-resize" />
+              <cropper-handle action="e-resize" />
+              <cropper-handle action="s-resize" />
+              <cropper-handle action="w-resize" />
+              <cropper-handle action="ne-resize" />
+              <cropper-handle action="nw-resize" />
+              <cropper-handle action="se-resize" />
+              <cropper-handle action="sw-resize" />
+            </cropper-selection>
+          </cropper-canvas>
+        </div>
       </div>
     </div>
-    <div class="image-region">
-      <div class="editor">
-        <cropper-canvas v-if="show" ref="cropperCanvas" background @actionstart="onActionStart" @actionend="onActionEnd">
-          <cropper-image ref="cropperImage" :src="imageSrc" alt="image to edit" crossOrigin="anonymous" translatable scalable />
-          <cropper-shade />
-          <cropper-handle id="image-handle" action="move" plain />
-          <cropper-selection
-            ref="cropperSelection"
-            initial-coverage="0.5"
-            initial-aspect-ratio="0.7"
-            outlined
-            movable
-            resizable
-            linked
-            keyboard
-            zoomable
-            @change="onSelectionChange"
-          >
-            <cropper-grid role="grid" covered />
-            <cropper-crosshair centered />
-            <cropper-handle id="selection-handle" action="move" theme-color="rgba(255, 255, 255, 0.35)" />
-            <cropper-handle action="n-resize" />
-            <cropper-handle action="e-resize" />
-            <cropper-handle action="s-resize" />
-            <cropper-handle action="w-resize" />
-            <cropper-handle action="ne-resize" />
-            <cropper-handle action="nw-resize" />
-            <cropper-handle action="se-resize" />
-            <cropper-handle action="sw-resize" />
-          </cropper-selection>
-        </cropper-canvas>
-      </div>
-    </div>
-  </div>
+  </BasePage>
 </template>
 
 <script setup lang="ts">
 import 'cropperjs';
+import BasePage from './BasePage.vue';
 import { IonButton, IonInput } from '@ionic/vue';
 import { CropperImage, CropperCanvas, CropperShade, CropperGrid, CropperCrosshair, CropperSelection, CropperHandle } from 'cropperjs';
 import { computed, onMounted, onUnmounted, ref, watch } from 'vue';
@@ -126,7 +124,6 @@ import { ArtistType, KPopCard, OwnershipType, WhereFrom } from '@/types';
 import VTransition from '@/components/VTransition.vue';
 import ArtistTypeInput from '@/components/ArtistTypeInput.vue';
 import PickerInput from '@/components/PickerInput.vue';
-import OwnershipInput from '@/components/OwnershipInput.vue';
 import WhereFromInput from '@/components/WhereFromInput.vue';
 import { Base64Uri } from '@/composables/base64';
 import { useImageImport } from '@/composables/imageImport';
@@ -134,6 +131,8 @@ import { FileStore } from '@/composables/fileStore';
 import { useKPopCards } from '@/composables/kPopCards';
 import { useToast } from '@/composables/toast';
 import { useImageCompare } from '@/composables/imageCompare';
+import { dialogController } from '@/composables/dialogController';
+import ImageCompareDialog from '@/components/ImageCompareDialog.vue';
 
 interface SelectionData {
   x: number;
@@ -147,6 +146,7 @@ const show = ref(false);
 const cropperCanvas = ref<CropperCanvas>();
 const cropperImage = ref<CropperImage>();
 const cropperSelection = ref<CropperSelection>();
+const { findPossibleMatches } = useImageCompare();
 
 const selectionData = ref<SelectionData>({
   x: 0,
@@ -172,10 +172,9 @@ const whereFromName = ref('');
 const albumVersion = ref('');
 
 const year = ref(`${thisYear}`);
-const ownershipType = ref<OwnershipType>('none');
 
 const { photoFromGallery } = useImageImport();
-const { cards, addCard, generateId } = useKPopCards();
+const { cards, addCard, updateCard, generateId } = useKPopCards();
 const { showToast } = useToast();
 
 const resetForm = () => {
@@ -187,7 +186,6 @@ const resetForm = () => {
   whereFromName.value = '';
   albumVersion.value = '';
   year.value = `${thisYear}`;
-  ownershipType.value = 'none';
 };
 
 const reset = () => {
@@ -294,8 +292,52 @@ const onGetFromGallery = async () => {
 
 const onSubmit = async () => {
   const canvas = await cropperSelection.value!.$toCanvas({ width: 1024, height: 1024 });
-  const scaledImage = await Base64Uri.fromUri(canvas.toDataURL());
+  const scaledImage = Base64Uri.fromUri(canvas.toDataURL());
 
+  const filteredCards = cards.value.filter(c => {
+    return (
+      insensitiveCompare(c.artist, artist.value) &&
+      insensitiveCompare(c.groupName, groupName.value) &&
+      insensitiveCompare(c.whereFromName, whereFromName.value)
+    );
+  });
+
+  const possibleMatches = await findPossibleMatches(scaledImage.toString(), filteredCards);
+
+  if (!possibleMatches.length) {
+    await createNewCard(scaledImage);
+    return;
+  }
+
+  const duplicateAction = await dialogController.create({
+    component: ImageCompareDialog,
+    componentProps: {
+      src: scaledImage,
+      cards: possibleMatches
+    }
+  });
+
+  if (duplicateAction.role === 'add') {
+    await createNewCard(scaledImage);
+    return;
+  }
+
+  if (duplicateAction.role === 'replace') {
+    const replaceId = duplicateAction.data as string;
+    const fileResult = await FileStore.saveImage(`photo-cards/${replaceId}.${scaledImage.type()}`, scaledImage.toString());
+
+    if (fileResult.ok) {
+      updateCard(replaceId, { imageFilePath: fileResult.path });
+      showToast({ message: 'Image replaced', color: 'success' });
+    } else {
+      showToast({ message: 'Could not replace file', color: 'danger' });
+    }
+
+    return;
+  }
+};
+
+const createNewCard = async (scaledImage: Base64Uri) => {
   const id = generateId();
 
   const fileResult = await FileStore.saveImage(`photo-cards/${id}.${scaledImage.type()}`, scaledImage.toString());
@@ -315,35 +357,15 @@ const onSubmit = async () => {
     whereFromName: whereFromName.value,
     albumVersion: albumVersion.value,
     year: year.value,
-    ownershipType: ownershipType.value
+    ownershipType: 'none'
   };
 
   addCard(data);
   showToast({ message: 'Added!', color: 'success' });
 };
 
-const { compare } = useImageCompare();
-
-const onTest = async () => {
-  const a =
-    'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADcAAABICAIAAADdzfoFAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAIDSURBVGhD7ZchjgJBEEVHIpHIlUgkEolEIpFI5DgkEonkCEiOwBE4AkdAspWpn04FCOzO/5Ms2XpquqY7PLq7arqr2yeQljrSUkda6khLHWmp439bHo/HyWSy3+/R5ujKcjAYVFXV6/XQ5ujEcr1em6KDEIfeMirO53NEOcSWu90Ogg3X6xUvOMSWvh2d0WiEKI3YEoINh8MBURrK8rHcQFA6kQZleVduYt4IJ9KgLGHUlJu7vPEOKmSWMW9UBaigsYxrPZ1OVQWooLGMFEXLqq8G/muut/RXcXb5rzllaT8PkYDFo6Lj/VtDjd9sNi5h6eIPxqOigQFtYccXoPMMPuW7siyFybKHT3mZZdyjVowWi4U/13WNHgQyy7hHT6dTkbZn9CCQWRZsfe2o4Yrj8RhRDr2lLbEr2nSez2dEOcSWsQzZHkCURmm53W4h2CQQogpklpfLpWSM/MAhs5zNZq5oqfO3zkQFu1q4oiEpPXcILG3mhsOhK1oxR1SKwLKUnn6/b7sTUSmsZbzuWI4jqoayjHn9Av64TlmuViuIvMP+DMa0grKM98a3YEwrqMFluV+sqXcw0G6FYMWtnr8o465ooN0KavBPgGNaCoBjVTHFqHPLkmFMMercstyHlsslQr+nc0sJaakjLXWkpY601JGWOtJSR1rqSEsdaanjEyxvt2+w5lk6qw3k+AAAAABJRU5ErkJggg==';
-  // const canvas = await cropperSelection.value!.$toCanvas({ width: 1024, height: 1024 });
-  // const scaledImage = await Base64Uri.fromUri(canvas.toDataURL());
-  // console.log(scaledImage);
-  // console.log('---- a');
-  // console.dir(a);
-
-  const targets = cards.value.map(c => {
-    const parts = c.imageFilePath.split('.');
-    return {
-      id: c.id,
-      extension: parts[parts.length - 1]
-    };
-  });
-
-  console.dir(cards.value);
-
-  const resp = await compare(a, targets);
+const insensitiveCompare = (a: string | undefined, b: string | undefined) => {
+  return (a || '').toUpperCase() === (b || '').toUpperCase();
 };
 </script>
 
@@ -351,7 +373,7 @@ const onTest = async () => {
 .page {
   display: grid;
   grid-template-columns: 25rem 1fr;
-  height: 100%;
+  height: calc(100vh - 3rem);
   width: 100%;
 }
 
@@ -360,7 +382,6 @@ const onTest = async () => {
 }
 
 .editor {
-  border: 1px solid blue;
   width: 100%;
   height: 100%;
   padding: 1.5rem;

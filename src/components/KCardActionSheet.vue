@@ -33,7 +33,7 @@ export interface ActionSheetButton {
 
 const props = defineProps<{ ids: string[]; buttons: ActionSheetButton[] }>();
 
-const { cards, update } = useKPopCards();
+const { cards, updateCard } = useKPopCards();
 
 const matchedCards = computed(() => cards.value.filter(c => props.ids.includes(c.id)));
 
@@ -43,12 +43,12 @@ const onButtonSelect = (button: ActionSheetButton) => {
 
 const onOwnershipChange = (ownershipType: OwnershipType) => {
   for (const card of matchedCards.value) {
-    update(card.id, { ownershipType });
+    updateCard(card.id, { ownershipType });
   }
   dialogController.dismiss({ role: 'cancel' });
 };
 
 const onClose = () => {
-  dialogController.dismiss({ role: 'backdrop' });
+  dialogController.backdropDismiss();
 };
 </script>

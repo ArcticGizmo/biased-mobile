@@ -4,6 +4,7 @@
       <IonButton expand="block" fill="outline" @click="onCreateBackup()">Create Backup</IonButton>
       <IonButton expand="block" fill="outline" @click="onLoadBackup()">Import Backup</IonButton>
       <IonButton expand="block" fill="outline" @click="onClearAllCards()">Clear All Cards</IonButton>
+      <IonButton v-if="ENV.IS_DEV" class="mt-10" expand="block" fill="outline" router-link="/extractor">Open Extractor</IonButton>
     </div>
   </BasePage>
 </template>
@@ -18,6 +19,7 @@ import { useToast } from '@/composables/toast';
 import { alertOutline, happyOutline, sadOutline } from 'ionicons/icons';
 import { withDelay } from '@/util/delay';
 import { usePackHistory } from '@/composables/packs';
+import { ENV } from '@/env';
 
 const { cards, importBackup, clearCards } = useKPopCards();
 const { deleteAllPacks } = usePackHistory();

@@ -16,7 +16,7 @@ export interface AvailablePack {
 
 export type PackHistory = Record<string, number>;
 
-const LOOKUP_ID = '1Sq4GZwhedzhtJRcv-UCsV2l2-XJTlXYY';
+const LOOKUP_ID = ENV.driveId;
 const HISTORY_KEY = 'history';
 
 const makeWretch = (base: string) => {

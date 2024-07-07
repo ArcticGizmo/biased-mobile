@@ -8,5 +8,6 @@ export const ENV = {
   IS_DEV: env.DEV,
   IS_PROD: env.PROD,
   isWeb: !IS_MOBILE,
-  isMobile: IS_MOBILE
+  isMobile: IS_MOBILE,
+  driveId: env.VITE_GDRIVE_ID
 };

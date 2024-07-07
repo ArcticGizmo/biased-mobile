@@ -13,9 +13,9 @@ export type Backup = BackupV1;
 
 export type LoadBackupResponse = { ok: true; backup: Backup } | { ok: false; error: any };
 
-export const createBackup = async (cards: KPopCard[]) => {
+export const createBackup = async (cards: KPopCard[], filename?: string) => {
   const backup = await buildBackup(cards);
-  const filename = `kpop-cards-backup-${getDateTimeFileName(new Date())}.txt`;
+  filename ??= `kpop-cards-backup-${getDateTimeFileName(new Date())}.txt`;
   return await FileStore.save(filename, JSON.stringify(backup), { directory: Directory.Documents });
 };
 

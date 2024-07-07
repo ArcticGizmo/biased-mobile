@@ -20,3 +20,11 @@
 - fix collage to split across pages even within the same group (happens for 17 all members for '17 is right here')
 
 ## Cleanup
+
+
+## Files
+- boynextdoor - https://drive.google.com/drive/u/0/folders/19l0I1nQ4IIVPCVxZ5fIlaz8SRRLZYt_1?sort=13&direction=a
+- seventeen - https://drive.google.com/drive/u/0/folders/1QAmnuk3KyftYgQ6xxfDQ-cQJGuJ2RXPC?fbclid=PAZXh0bgNhZW0CMTEAAab8Uv_C8mcGGJko20tWIo90CoYalDZOOT6vEFbyOo5bwcjLAVf4jNkxajE_aem_B705re1Dz2gur8lNIHZVAw&sort=13&direction=a
+- bts - https://drive.google.com/drive/folders/1xoUF7x2EN_2h_zlXveLOcIQrgqQ0LHR_
+- enhypen - https://drive.google.com/drive/folders/1uh7DxQimFjIOvyK2fG3d7tO5p99OZcQI
+- astro - https://drive.google.com/drive/folders/11a06Vv_AtSqDxX0QDyP8Wz6STXqzYqOq

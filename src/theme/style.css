@@ -24,3 +24,8 @@ ion-searchbar {
 ion-searchbar {
   height: 100%;
 }
+
+ion-alert.fullscreen-alert .alert-wrapper {
+  width: 90vw;
+  max-width: 500px;
+}

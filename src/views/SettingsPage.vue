@@ -1,16 +1,16 @@
 <template>
   <BasePage title="Settings" max-width="500px">
     <div class="content m-4">
-      <IonButton expand="block" fill="outline" @click="onCreateBackup()">Create Backup</IonButton>
+      <IonButton expand="block" fill="outline" :disabled="!cards.length" @click="onCreateBackup()">Create Backup</IonButton>
       <IonButton expand="block" fill="outline" @click="onLoadBackup()">Import Backup</IonButton>
-      <IonButton expand="block" fill="outline" @click="onClearAllCards()">Clear All Cards</IonButton>
+      <IonButton expand="block" fill="outline" :disabled="!cards.length" @click="onClearAllCards()">Clear All Cards</IonButton>
       <IonButton v-if="ENV.IS_DEV" class="mt-10" expand="block" fill="outline" router-link="/extractor">Open Extractor</IonButton>
     </div>
   </BasePage>
 </template>
 
 <script setup lang="ts">
-import { IonButton } from '@ionic/vue';
+import { IonButton, alertController } from '@ionic/vue';
 import BasePage from './BasePage.vue';
 import { useKPopCards } from '@/composables/kPopCards';
 import { showLoading, showSimpleAlert } from '@/composables/modals';
@@ -20,16 +20,37 @@ import { alertOutline, happyOutline, sadOutline } from 'ionicons/icons';
 import { withDelay } from '@/util/delay';
 import { usePackHistory } from '@/composables/packs';
 import { ENV } from '@/env';
+import { getDateTimeFileName } from '@/util/datetime';
 
 const { cards, importBackup, clearCards } = useKPopCards();
 const { deleteAllPacks } = usePackHistory();
 const { showToast } = useToast();
 
 const onCreateBackup = async () => {
+  const defaultFileName = ENV.IS_DEV ? `kpop-cards-backup-${getDateTimeFileName(new Date())}.txt` : '';
+  const nameAlert = await alertController.create({
+    subHeader: 'Backup Name',
+    buttons: [
+      { text: 'Ok', role: 'ok' },
+      { text: 'cancel', role: 'cancel' }
+    ],
+    inputs: [{ name: 'name', label: 'Name', type: 'text', value: defaultFileName }],
+    cssClass: 'fullscreen-alert'
+  });
+
+  nameAlert.present();
+
+  const nameResp = await nameAlert.onDidDismiss<{ values: { name: string } }>();
+
+  if (nameResp.role !== 'ok') {
+    return;
+  }
+  const backupName = nameResp.data!.values.name;
+
   const loading = await showLoading('Creating Backup');
 
   try {
-    const resp = await withDelay(createBackup([...cards.value]), 2_000);
+    const resp = await withDelay(createBackup([...cards.value], backupName), 2_000);
     if (resp.ok) {
       await showToast({ message: 'Backup created!', color: 'success' });
     }

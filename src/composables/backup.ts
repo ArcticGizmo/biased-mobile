@@ -40,7 +40,8 @@ const buildBackup = async (cards: KPopCard[]): Promise<BackupV1> => {
       whereFromName: card.whereFromName,
       albumVersion: card.albumVersion,
       year: card.year,
-      ownershipType: card.ownershipType
+      ownershipType: card.ownershipType,
+      tags: card.tags
     });
   }
 

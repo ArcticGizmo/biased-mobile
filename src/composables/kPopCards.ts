@@ -124,7 +124,8 @@ export const useKPopCards = () => {
         whereFromName: item.whereFromName,
         albumVersion: item.albumVersion,
         year: item.year,
-        ownershipType: item.ownershipType
+        ownershipType: item.ownershipType,
+        tags: item.tags || []
       };
 
       newCards.push(card);

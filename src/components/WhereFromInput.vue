@@ -18,8 +18,8 @@ const OPTIONS = [
     icon: musicBox
   },
   {
-    value: 'event',
-    text: 'Event',
+    value: 'non-album',
+    text: 'Non-Album',
     icon: calendar
   }
 ];

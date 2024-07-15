@@ -5,8 +5,19 @@ export type OptionalFields<T> = {
 };
 
 export type ArtistType = 'group' | 'solo';
-export type WhereFrom = 'album' | 'event';
+export type WhereFrom = 'album' | 'non-album';
 export type OwnershipType = 'have' | 'want' | 'in-transit' | 'none';
+export type Tag =
+  | 'pre-order-benefit'
+  | 'weverse'
+  | 'broadcast'
+  | 'event'
+  | 'seasons-greetings'
+  | 'membership'
+  | 'other'
+  | 'pop-up'
+  | 'luckydraw'
+  | 'lightstick';
 
 export interface KPopData {
   packId?: string;
@@ -20,6 +31,8 @@ export interface KPopData {
   year?: string;
   //
   ownershipType: OwnershipType;
+  //
+  tags: Tag[];
 }
 
 export interface KPopCard extends KPopData {

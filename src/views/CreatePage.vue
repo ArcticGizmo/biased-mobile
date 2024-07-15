@@ -77,6 +77,9 @@
       <!-- year -->
       <PickerInput class="mt-4" v-model="year" :options="dateOptions" label="Released" label-placement="stacked" fill="outline" />
 
+      <!-- tags -->
+      <TagInput v-model="tags" />
+
       <!-- Ownership -->
       <OwnershipInput class="mt-4" v-model="ownershipType" />
 
@@ -91,6 +94,7 @@ import { useSimpleRouter } from '@/composables/router';
 import BasePage from './BasePage.vue';
 import KImg from '@/components/KImg.vue';
 import OwnershipInput from '@/components/OwnershipInput.vue';
+import TagInput from '@/components/TagInput.vue';
 import ArtistTypeInput from '@/components/ArtistTypeInput.vue';
 import WhereFromInput from '@/components/WhereFromInput.vue';
 import { KPhotoResponse, useImageImport } from '@/composables/imageImport';
@@ -99,7 +103,7 @@ import { cameraOutline, imagesOutline } from 'ionicons/icons';
 import VTransition from '@/components/VTransition.vue';
 import PickerInput from '@/components/PickerInput.vue';
 import ImageEditorModal from '@/components/ImageEditorModal.vue';
-import type { ArtistType, WhereFrom, OwnershipType, KPopCard } from '@/types';
+import type { ArtistType, WhereFrom, OwnershipType, KPopCard, Tag } from '@/types';
 import { useKPopCards } from '@/composables/kPopCards';
 import { FileStore } from '@/composables/fileStore';
 import { Base64Uri } from '@/composables/base64';
@@ -128,6 +132,7 @@ const albumVersion = ref('');
 
 const year = ref(`${thisYear}`);
 const ownershipType = ref<OwnershipType>('none');
+const tags = ref<Tag[]>(['pre-order-benefit']);
 
 const resetForm = () => {
   imageSrc.value = '';
@@ -151,7 +156,7 @@ onMounted(() => {
 });
 
 const whereFromNameLabel = computed(() => {
-  return whereFrom.value === 'album' ? 'Album*' : 'Event*';
+  return whereFrom.value === 'album' ? 'Album*' : 'Where From*';
 });
 
 const canSubmit = computed(() => {
@@ -224,7 +229,8 @@ const onSubmit = async () => {
     whereFromName: whereFromName.value,
     albumVersion: albumVersion.value,
     year: year.value,
-    ownershipType: ownershipType.value
+    ownershipType: ownershipType.value,
+    tags: tags.value
   };
 
   addCard(data);

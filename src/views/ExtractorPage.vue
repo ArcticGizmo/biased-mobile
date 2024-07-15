@@ -202,7 +202,7 @@ const reset = () => {
 };
 
 const whereFromNameLabel = computed(() => {
-  return whereFrom.value === 'album' ? 'Album*' : 'Event*';
+  return whereFrom.value === 'album' ? 'Album*' : 'Where From*';
 });
 
 const canSubmit = computed(() => {
@@ -365,7 +365,8 @@ const createNewCard = async (scaledImage: Base64Uri) => {
     whereFromName: whereFromName.value,
     albumVersion: albumVersion.value,
     year: year.value,
-    ownershipType: 'none'
+    ownershipType: 'none',
+    tags: []
   };
 
   addCard(data);

@@ -484,7 +484,6 @@ const onOpenFilter = async () => {
 
   const resp = await modal.onWillDismiss<{ filters: Filter[]; sorter: Sorter }>();
 
-  console.log(resp);
   if (resp.role !== 'accept') {
     return;
   }

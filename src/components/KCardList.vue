@@ -85,18 +85,15 @@ const cardSubtitle = (card: KPopCard) => {
 </script>
 
 <style scoped>
-:deep(.cols-4 .icon-want),
-:deep(.cols-4 .icon-have) {
+:deep(.cols-4 .ownership-icon) {
   font-size: 2rem;
 }
 
-:deep(.cols-5 .icon-want),
-:deep(.cols-5 .icon-have) {
+:deep(.cols-5 .ownership-icon) {
   font-size: 2rem;
 }
 
-:deep(.cols-6 .icon-want),
-:deep(.cols-6 .icon-have) {
+:deep(.cols-6 .ownership-icon) {
   font-size: 3rem;
 }
 

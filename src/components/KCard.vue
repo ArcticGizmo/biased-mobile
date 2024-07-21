@@ -8,14 +8,17 @@
       </IonCardContent>
     </template>
     <template v-else>
-      <KImg :aspect-ratio="ASPECT_RATIO" :src="src" />
+      <KImg style="position: relative" :aspect-ratio="ASPECT_RATIO" :src="src" />
+      <div class="absolute top-0 w-full flex items-end flex-row-reverse pr-2 pb-1" :style="{ aspectRatio: ASPECT_RATIO }">
+        <IonIcon class="text-xl" color="owned" :icon="checkmarkCircle" />
+      </div>
       <IonCardContent class="flex flex-col justify-center p-1 h-14">
         <IonCardTitle class="text-sm text-ellipsis overflow-hidden whitespace-nowrap">{{ title }}</IonCardTitle>
         <IonCardSubtitle v-if="subtitle" class="text-xs text-ellipsis overflow-hidden whitespace-nowrap">{{ subtitle }}</IonCardSubtitle>
       </IonCardContent>
-      <IonIcon v-if="status === 'want'" class="icon-want text-xl absolute top-2 right-2" color="love" :icon="heartCircle" />
-      <IonIcon v-if="status === 'in-transit'" class="icon-have text-xl absolute top-2 right-2" color="pending" :icon="paperPlane" />
-      <IonIcon v-if="status === 'have'" class="icon-have text-xl absolute top-2 right-2" color="owned" :icon="checkmarkCircle" />
+      <IonIcon v-if="status === 'want'" class="ownership-icon text-xl absolute top-2 right-2" color="love" :icon="heartCircle" />
+      <IonIcon v-if="status === 'in-transit'" class="ownership-icon text-xl absolute top-2 right-2" color="pending" :icon="paperPlane" />
+      <IonIcon v-if="status === 'have'" class="ownership-icon text-xl absolute top-2 right-2" color="owned" :icon="checkmarkCircle" />
     </template>
   </IonCard>
 </template>

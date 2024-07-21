@@ -1,49 +1,31 @@
 <template>
   <div class="tag-input">
     <div
-      v-for="(option, index) of OPTIONS"
+      v-for="(tag, index) of TAGS"
       :key="index"
       class="item"
-      :class="{ selected: modelValue.includes(option.value) }"
-      @click="onToggle(option.value)"
+      :class="{ selected: modelValue.includes(tag.id) }"
+      @click="onToggle(tag.id)"
     >
-      <IonIcon v-if="option.icon" :icon="option.icon" :color="modelValue.includes(option.value) ? 'primary' : 'medium'" />
-      <IonLabel>{{ option.text }}</IonLabel>
+      <IonIcon v-if="tag.icon" :icon="tag.icon" :color="modelValue.includes(tag.id) ? 'primary' : 'medium'" />
+      <IonLabel>{{ tag.text }}</IonLabel>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { Tag } from '@/types';
 import { IonLabel, IonIcon } from '@ionic/vue';
-import {
-  membership,
-  broadcast,
-  calendar,
-  calendarStar,
-  storefront,
-  emailHeartOpen,
-  clover,
-  torch,
-  mapMarkerQuestion,
-  starBox
-} from '@/icons';
+import { TAGS, type TagId } from '@/types/tags';
 
-interface Option {
-  value: Tag;
-  text: string;
-  icon: string;
-}
-
-const props = defineProps<{ modelValue: Tag[] }>();
+const props = defineProps<{ modelValue: TagId[] }>();
 
 const emits = defineEmits<{
-  (e: 'update:model-value', value: Tag[]): void;
-  (e: 'select', value: Tag): void;
-  (e: 'deselect', value: Tag): void;
+  (e: 'update:model-value', value: TagId[]): void;
+  (e: 'select', value: TagId): void;
+  (e: 'deselect', value: TagId): void;
 }>();
 
-const onToggle = (value: Tag) => {
+const onToggle = (value: TagId) => {
   if (props.modelValue.includes(value)) {
     emits('deselect', value);
     emits(
@@ -55,59 +37,6 @@ const onToggle = (value: Tag) => {
     emits('update:model-value', [...props.modelValue, value]);
   }
 };
-
-const OPTIONS: Option[] = [
-  {
-    value: 'pre-order-benefit',
-    text: 'POB',
-    icon: calendarStar
-  },
-  {
-    value: 'weverse',
-    text: 'Weverse',
-    icon: starBox
-  },
-  {
-    value: 'broadcast',
-    text: 'Broadcast',
-    icon: broadcast
-  },
-  {
-    value: 'event',
-    text: 'Event',
-    icon: calendar
-  },
-  {
-    value: 'seasons-greetings',
-    text: 'Seasons Greetings',
-    icon: emailHeartOpen
-  },
-  {
-    value: 'membership',
-    text: 'Membership',
-    icon: membership
-  },
-  {
-    value: 'pop-up',
-    text: 'Popup',
-    icon: storefront
-  },
-  {
-    value: 'luckydraw',
-    text: 'Luckydraw',
-    icon: clover
-  },
-  {
-    value: 'lightstick',
-    text: 'Lightstick',
-    icon: torch
-  },
-  {
-    value: 'other',
-    text: 'Other',
-    icon: mapMarkerQuestion
-  }
-];
 </script>
 
 <style scoped>

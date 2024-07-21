@@ -105,7 +105,8 @@ import { cameraOutline, imagesOutline } from 'ionicons/icons';
 import VTransition from '@/components/VTransition.vue';
 import PickerInput from '@/components/PickerInput.vue';
 import ImageEditorModal from '@/components/ImageEditorModal.vue';
-import type { ArtistType, WhereFrom, OwnershipType, KPopCard, Tag } from '@/types';
+import type { ArtistType, WhereFrom, OwnershipType, KPopCard } from '@/types';
+import type { TagId } from '@/types/tags';
 import { useKPopCards } from '@/composables/kPopCards';
 import { FileStore } from '@/composables/fileStore';
 import { Base64Uri } from '@/composables/base64';
@@ -134,7 +135,7 @@ const albumVersion = ref('');
 
 const year = ref(`${thisYear}`);
 const ownershipType = ref<OwnershipType>('none');
-const tags = ref<Tag[]>(['pre-order-benefit']);
+const tags = ref<TagId[]>([]);
 
 const resetForm = () => {
   imageSrc.value = '';

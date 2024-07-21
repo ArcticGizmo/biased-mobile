@@ -28,3 +28,16 @@
 - bts - https://drive.google.com/drive/folders/1xoUF7x2EN_2h_zlXveLOcIQrgqQ0LHR_
 - enhypen - https://drive.google.com/drive/folders/1uh7DxQimFjIOvyK2fG3d7tO5p99OZcQI
 - astro - https://drive.google.com/drive/folders/11a06Vv_AtSqDxX0QDyP8Wz6STXqzYqOq
+
+
+## tags
+- pre-order benefit
+- weverse
+- broadcast
+- event
+- seasons greetings
+- membership
+- other
+- popup
+- LD - lucky draw
+- LS - lightstick

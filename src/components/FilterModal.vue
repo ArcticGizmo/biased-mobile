@@ -50,7 +50,8 @@
 </template>
 
 <script setup lang="ts">
-import { KPopCard, Tag } from '@/types';
+import { KPopCard } from '@/types';
+import { TAGS } from '@/types/tags';
 import BaseModal from '@/views/BaseModal.vue';
 import { IonTitle, IonButtons, IonButton, IonIcon, modalController, onIonViewWillEnter } from '@ionic/vue';
 import { arrowBack } from 'ionicons/icons';
@@ -124,20 +125,14 @@ const createTagFilterSection = (): FilterSection => {
   const existingTags = props.cards.map(c => c.tags).flat();
   const uniqueTags = [...new Set(existingTags)];
 
-  const options: { id: Tag; text: string; disabled?: boolean }[] = [
-    { id: 'pre-order-benefit', text: 'POB' },
-    { id: 'weverse', text: 'Weverse' },
-    { id: 'broadcast', text: 'Broadcast' },
-    { id: 'event', text: 'Event' },
-    { id: 'seasons-greetings', text: 'Seasons Greetings' },
-    { id: 'membership', text: 'Membership' },
-    { id: 'pop-up', text: 'Pop-Up' },
-    { id: 'luckydraw', text: 'Luckydraw' },
-    { id: 'lightstick', text: 'Lightstick' },
-    { id: 'other', text: 'Other' }
-  ];
-
-  options.forEach(o => (o.disabled = !uniqueTags.includes(o.id)));
+  const options = TAGS.map(t => {
+    return {
+      id: t.id,
+      text: t.text,
+      icon: t.icon,
+      disabled: !uniqueTags.includes(t.id)
+    };
+  });
 
   return reactive({
     name: 'Tag',

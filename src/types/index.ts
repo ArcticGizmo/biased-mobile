@@ -1,3 +1,5 @@
+import { TagId } from './tags';
+
 export type IonicMode = 'md' | 'ios';
 
 export type OptionalFields<T> = {
@@ -7,17 +9,6 @@ export type OptionalFields<T> = {
 export type ArtistType = 'group' | 'solo';
 export type WhereFrom = 'album' | 'non-album';
 export type OwnershipType = 'have' | 'want' | 'in-transit' | 'none';
-export type Tag =
-  | 'pre-order-benefit'
-  | 'weverse'
-  | 'broadcast'
-  | 'event'
-  | 'seasons-greetings'
-  | 'membership'
-  | 'other'
-  | 'pop-up'
-  | 'luckydraw'
-  | 'lightstick';
 
 export interface KPopData {
   packId?: string;
@@ -32,7 +23,7 @@ export interface KPopData {
   //
   ownershipType: OwnershipType;
   //
-  tags: Tag[];
+  tags: TagId[];
 }
 
 export interface KPopCard extends KPopData {

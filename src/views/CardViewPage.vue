@@ -57,7 +57,7 @@
       <!-- tags -->
       <div class="mt-4">Tags</div>
       <div class="tags">
-        <ion-chip v-for="(tag, index) in selectedTags" :key="index" readonly>
+        <ion-chip v-for="(tag, index) in selectedTags" :key="index">
           <IonIcon :icon="tag.icon" />
           <span>{{ tag.text }}</span>
         </ion-chip>

@@ -7,6 +7,12 @@
         @change="onOwnershipChange"
       />
     </div>
+    <div v-if="selectedTags.length" class="tags">
+      <ion-chip v-for="(tag, index) in selectedTags" :key="index">
+        <IonIcon :icon="tag.icon" />
+        <span>{{ tag.text }}</span>
+      </ion-chip>
+    </div>
     <ion-list>
       <ion-item v-for="(button, index) of buttons" :key="index">
         <ion-label :color="button.color" @click="onButtonSelect(button)">{{ button.text }}</ion-label>
@@ -18,11 +24,12 @@
 <script setup lang="ts">
 import BaseActionDialog from '@/views/BaseActionDialog.vue';
 import { dialogController } from '@/composables/dialogController';
-import { IonList, IonItem, IonLabel } from '@ionic/vue';
+import { IonList, IonItem, IonLabel, IonChip, IonIcon } from '@ionic/vue';
 import OwnershipInput from './OwnershipInput.vue';
 import { useKPopCards } from '@/composables/kPopCards';
 import { computed } from 'vue';
 import { OwnershipType } from '@/types';
+import { getFilteredTags } from '@/types/tags';
 
 export interface ActionSheetButton {
   text: string;
@@ -51,4 +58,11 @@ const onOwnershipChange = (ownershipType: OwnershipType) => {
 const onClose = () => {
   dialogController.backdropDismiss();
 };
+
+const selectedTags = computed(() => {
+  if (matchedCards.value.length === 1) {
+    return getFilteredTags(matchedCards.value[0].tags || []);
+  }
+  return [];
+});
 </script>

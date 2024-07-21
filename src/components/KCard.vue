@@ -9,8 +9,8 @@
     </template>
     <template v-else>
       <KImg style="position: relative" :aspect-ratio="ASPECT_RATIO" :src="src" />
-      <div class="absolute top-0 w-full flex items-end flex-row-reverse pr-2 pb-1" :style="{ aspectRatio: ASPECT_RATIO }">
-        <IonIcon class="text-xl" color="owned" :icon="checkmarkCircle" />
+      <div class="absolute top-0 w-full flex flex-col-reverse items-end content-end pr-2 pb-1" :style="{ aspectRatio: ASPECT_RATIO }">
+        <IonIcon v-for="(icon, index) in tagIcons" :key="index" class="text-xl" color="primary" :icon="icon" />
       </div>
       <IonCardContent class="flex flex-col justify-center p-1 h-14">
         <IonCardTitle class="text-sm text-ellipsis overflow-hidden whitespace-nowrap">{{ title }}</IonCardTitle>
@@ -28,6 +28,8 @@ import { IonCard, IonIcon, IonCardContent, IonCardTitle, IonCardSubtitle, IonSke
 import { checkmarkCircle, heartCircle, paperPlane } from 'ionicons/icons';
 import KImg from './KImg.vue';
 import { OwnershipType } from '@/types';
+import { computed } from 'vue';
+import { TAGS, type TagId } from '@/types/tags';
 
 const ASPECT_RATIO = 0.7;
 
@@ -37,9 +39,12 @@ interface KCardProps {
   subtitle?: string;
   status?: OwnershipType;
   skeleton?: boolean;
+  tags?: TagId[];
 }
 
-withDefaults(defineProps<KCardProps>(), { status: 'none' });
+const props = withDefaults(defineProps<KCardProps>(), { status: 'none', tags: () => [] });
+
+const tagIcons = computed(() => TAGS.filter(t => props.tags.includes(t.id)).map(t => t.icon));
 </script>
 
 <style scoped>

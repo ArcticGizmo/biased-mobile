@@ -31,6 +31,7 @@
           :subtitle="cardSubtitle(card)"
           :src="FileStore.toHref(card.imageFilePath)"
           :status="card.ownershipType"
+          :tags="card.tags"
           @click="emits('select', card)"
           v-touch:hold="() => emits('long-hold', card)"
         />

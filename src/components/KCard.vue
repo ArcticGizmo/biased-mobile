@@ -29,7 +29,7 @@ import { checkmarkCircle, heartCircle, paperPlane } from 'ionicons/icons';
 import KImg from './KImg.vue';
 import { OwnershipType } from '@/types';
 import { computed } from 'vue';
-import { TAGS, type TagId } from '@/types/tags';
+import { getFilteredTags, type TagId } from '@/types/tags';
 
 const ASPECT_RATIO = 0.7;
 
@@ -44,7 +44,7 @@ interface KCardProps {
 
 const props = withDefaults(defineProps<KCardProps>(), { status: 'none', tags: () => [] });
 
-const tagIcons = computed(() => TAGS.filter(t => props.tags.includes(t.id)).map(t => t.icon));
+const tagIcons = computed(() => getFilteredTags(props.tags).map(t => t.icon));
 </script>
 
 <style scoped>

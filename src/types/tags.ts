@@ -65,3 +65,5 @@ export const TAGS = [
 ] as const;
 
 export type TagId = (typeof TAGS)[number]['id'];
+
+export const getFilteredTags = (tagIds: TagId[]) => TAGS.filter(t => tagIds.includes(t.id));

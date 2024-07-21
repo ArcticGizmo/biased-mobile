@@ -54,6 +54,15 @@
         readonly
       />
 
+      <!-- tags -->
+      <div class="mt-4">Tags</div>
+      <div class="tags">
+        <ion-chip v-for="(tag, index) in selectedTags" :key="index" readonly>
+          <IonIcon :icon="tag.icon" />
+          <span>{{ tag.text }}</span>
+        </ion-chip>
+      </div>
+
       <!-- Card pack (for debugging) -->
       <IonInput
         v-if="ENV.IS_DEV"
@@ -71,7 +80,7 @@
 </template>
 
 <script setup lang="ts">
-import { IonIcon, IonInput } from '@ionic/vue';
+import { IonIcon, IonInput, IonChip } from '@ionic/vue';
 import KImg from '@/components/KImg.vue';
 import BasePage from './BasePage.vue';
 import OwnershipInput from '@/components/OwnershipInput.vue';
@@ -84,6 +93,7 @@ import { showSimpleAlert } from '@/composables/modals';
 import { useToast } from '@/composables/toast';
 import { useSimpleRouter } from '@/composables/router';
 import { ENV } from '@/env';
+import { getFilteredTags } from '@/types/tags';
 
 const props = defineProps<{
   id: string;
@@ -123,6 +133,8 @@ const onDelete = async () => {
     console.error('unable to remove card', error);
   }
 };
+
+const selectedTags = computed(() => getFilteredTags(card.value?.tags || []));
 </script>
 
 <style scoped></style>

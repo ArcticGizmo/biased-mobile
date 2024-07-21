@@ -410,7 +410,11 @@ const applyAdvancedFilter = (cards: KPopCard[], filters: Filter[]) => {
   return cards.filter(c => {
     return filters.some(f => {
       const value = (c as any)[f.key];
-      return f.values.includes(value);
+      if (Array.isArray(value)) {
+        return f.values.some(v => value.includes(v));
+      } else {
+        return f.values.includes(value);
+      }
     });
   });
 };

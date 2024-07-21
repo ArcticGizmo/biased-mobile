@@ -16,6 +16,7 @@
         <span class="p-0 pl-1 mb-1 text-xl">Sort</span>
         <div class="options">
           <FilterItem
+            class="h-8"
             v-for="(option, index) of SORT_OPTIONS"
             :key="index"
             :model-value="option.value === sorter"
@@ -26,15 +27,17 @@
         </div>
       </div>
       <template v-for="section of filterSections" :key="section.name">
-        <div v-if="section.options.length > 1" class="mb-5">
+        <div v-if="section.options.length" class="mb-5">
           <span class="p-0 pl-1 mb-1 text-xl">{{ section.name }}</span>
           <div class="options">
             <FilterItem
+              class="h-8"
               v-for="(option, index) of section.options"
               :key="index"
-              :model-value="section.values.includes(option)"
-              :text="option"
-              @changed="toggleValue(section, option, $event)"
+              :model-value="section.values.includes(option.id)"
+              :text="option.text"
+              :disabled="option.disabled"
+              @changed="toggleValue(section, option.id, $event)"
             />
           </div>
         </div>
@@ -47,22 +50,25 @@
 </template>
 
 <script setup lang="ts">
-import { KPopCard } from '@/types';
+import { KPopCard, Tag } from '@/types';
 import BaseModal from '@/views/BaseModal.vue';
 import { IonTitle, IonButtons, IonButton, IonIcon, modalController, onIonViewWillEnter } from '@ionic/vue';
 import { arrowBack } from 'ionicons/icons';
 import FilterItem from './FilterItem.vue';
 import { onMounted, reactive, ref } from 'vue';
-import { newToOld } from '@/icons';
-import { oldToNew } from '@/icons';
-import { aToZ } from '@/icons';
-import { zToA } from '@/icons';
+import { newToOld, oldToNew, aToZ, zToA } from '@/icons';
+
+interface FilterOption {
+  id: string;
+  text: string;
+  disabled?: boolean;
+}
 
 interface FilterSection {
   name: string;
   key: string;
   values: string[];
-  options: string[];
+  options: FilterOption[];
 }
 
 export interface Filter {
@@ -106,12 +112,39 @@ const props = defineProps<{ cards: KPopCard[]; activeFilters?: Filter[]; activeS
 const sorter = ref<Sorter>('new-to-old');
 const filterSections = ref<FilterSection[]>([]);
 
-const createFilterSection = (name: string, key: string) => {
+const createFilterSection = (name: string, key: string): FilterSection => {
   const rawOptions = props.cards.map(c => (c as any)[key]).filter(c => c != null);
   const options = [...new Set(rawOptions)];
   options.sort((a, b) => a.localeCompare(b));
 
-  return reactive({ name, key, values: [], options });
+  return reactive({ name, key, values: [], options: options.map(o => ({ id: o, text: o })) });
+};
+
+const createTagFilterSection = (): FilterSection => {
+  const existingTags = props.cards.map(c => c.tags).flat();
+  const uniqueTags = [...new Set(existingTags)];
+
+  const options: { id: Tag; text: string; disabled?: boolean }[] = [
+    { id: 'pre-order-benefit', text: 'POB' },
+    { id: 'weverse', text: 'Weverse' },
+    { id: 'broadcast', text: 'Broadcast' },
+    { id: 'event', text: 'Event' },
+    { id: 'seasons-greetings', text: 'Seasons Greetings' },
+    { id: 'membership', text: 'Membership' },
+    { id: 'pop-up', text: 'Pop-Up' },
+    { id: 'luckydraw', text: 'Luckydraw' },
+    { id: 'lightstick', text: 'Lightstick' },
+    { id: 'other', text: 'Other' }
+  ];
+
+  options.forEach(o => (o.disabled = !uniqueTags.includes(o.id)));
+
+  return reactive({
+    name: 'Tag',
+    key: 'tags',
+    values: [],
+    options
+  });
 };
 
 const onReset = (useInitial = false) => {
@@ -123,7 +156,8 @@ const onReset = (useInitial = false) => {
     createFilterSection('Artist', 'artist'),
     createFilterSection('Group', 'groupName'),
     createFilterSection('Album', 'whereFromName'),
-    createFilterSection('Year', 'year')
+    createFilterSection('Year', 'year'),
+    createTagFilterSection()
   ];
 
   if (useInitial) {

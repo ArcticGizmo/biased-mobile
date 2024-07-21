@@ -16,6 +16,14 @@ import zToA from '@mdi/svg/svg/sort-alphabetical-descending.svg';
 import newToOld from '@mdi/svg/svg/sort-reverse-variant.svg';
 import oldToNew from '@mdi/svg/svg/sort-variant.svg';
 import progressTag from '@mdi/svg/svg/progress-tag.svg';
+import membership from '@mdi/svg/svg/wallet-membership.svg';
+import broadcast from '@mdi/svg/svg/broadcast.svg';
+import calendarStar from '@mdi/svg/svg/calendar-star.svg';
+import storefront from '@mdi/svg/svg/storefront.svg';
+import emailHeartOpen from '@mdi/svg/svg/email-open-heart-outline.svg';
+import clover from '@mdi/svg/svg/clover.svg';
+import torch from '@mdi/svg/svg/torch.svg';
+import mapMarkerQuestion from '@mdi/svg/svg/map-marker-question.svg';
 
 export {
   imageAlbum,
@@ -35,5 +43,13 @@ export {
   zToA,
   newToOld,
   oldToNew,
-  progressTag
+  progressTag,
+  membership,
+  broadcast,
+  calendarStar,
+  storefront,
+  emailHeartOpen,
+  clover,
+  torch,
+  mapMarkerQuestion
 };

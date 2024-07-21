@@ -7,7 +7,7 @@
       :class="{ selected: modelValue.includes(option.value) }"
       @click="onToggle(option.value)"
     >
-      <IonIcon v-if="option.icon" :icon="option.icon" :color="option.iconColor" />
+      <IonIcon v-if="option.icon" :icon="option.icon" :color="modelValue.includes(option.value) ? 'primary' : 'medium'" />
       <IonLabel>{{ option.text }}</IonLabel>
     </div>
   </div>
@@ -16,14 +16,23 @@
 <script setup lang="ts">
 import { Tag } from '@/types';
 import { IonLabel, IonIcon } from '@ionic/vue';
-import { checkmarkCircle, heart, paperPlane } from 'ionicons/icons';
-import { noCard } from '@/icons';
+import {
+  membership,
+  broadcast,
+  calendar,
+  calendarStar,
+  storefront,
+  emailHeartOpen,
+  clover,
+  torch,
+  mapMarkerQuestion,
+  starBox
+} from '@/icons';
 
 interface Option {
   value: Tag;
   text: string;
   icon: string;
-  iconColor?: string;
 }
 
 const props = defineProps<{ modelValue: Tag[] }>();
@@ -35,7 +44,6 @@ const emits = defineEmits<{
 }>();
 
 const onToggle = (value: Tag) => {
-  console.log('---- eggg');
   if (props.modelValue.includes(value)) {
     emits('deselect', value);
     emits(
@@ -51,51 +59,53 @@ const onToggle = (value: Tag) => {
 const OPTIONS: Option[] = [
   {
     value: 'pre-order-benefit',
-    text: 'Missing',
-    icon: noCard,
-    iconColor: 'medium'
+    text: 'POB',
+    icon: calendarStar
   },
   {
     value: 'weverse',
-    text: 'Want',
-    icon: heart,
-    iconColor: 'love'
+    text: 'Weverse',
+    icon: starBox
   },
   {
     value: 'broadcast',
-    text: 'Coming',
-    icon: paperPlane,
-    iconColor: 'pending'
+    text: 'Broadcast',
+    icon: broadcast
   },
   {
     value: 'event',
-    text: 'Have',
-    icon: checkmarkCircle,
-    iconColor: 'owned'
+    text: 'Event',
+    icon: calendar
   },
   {
     value: 'seasons-greetings',
-    text: 'Missing',
-    icon: noCard,
-    iconColor: 'medium'
+    text: 'Seasons Greetings',
+    icon: emailHeartOpen
   },
   {
     value: 'membership',
-    text: 'Want',
-    icon: heart,
-    iconColor: 'love'
-  },
-  {
-    value: 'other',
-    text: 'Coming',
-    icon: paperPlane,
-    iconColor: 'pending'
+    text: 'Membership',
+    icon: membership
   },
   {
     value: 'pop-up',
-    text: 'Have',
-    icon: checkmarkCircle,
-    iconColor: 'owned'
+    text: 'Popup',
+    icon: storefront
+  },
+  {
+    value: 'luckydraw',
+    text: 'Luckydraw',
+    icon: clover
+  },
+  {
+    value: 'lightstick',
+    text: 'Lightstick',
+    icon: torch
+  },
+  {
+    value: 'other',
+    text: 'Other',
+    icon: mapMarkerQuestion
   }
 ];
 </script>
@@ -110,7 +120,7 @@ const OPTIONS: Option[] = [
 }
 
 .item {
-  height: 4rem;
+  height: 4.5rem;
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -130,6 +140,6 @@ const OPTIONS: Option[] = [
 }
 
 ion-icon {
-  font-size: 1.5rem;
+  font-size: 1.75rem;
 }
 </style>

@@ -77,11 +77,13 @@
       <!-- year -->
       <PickerInput class="mt-4" v-model="year" :options="dateOptions" label="Released" label-placement="stacked" fill="outline" />
 
-      <!-- tags -->
-      <TagInput v-model="tags" />
-
       <!-- Ownership -->
-      <OwnershipInput class="mt-4" v-model="ownershipType" />
+      <div class="mt-4">Ownership</div>
+      <OwnershipInput v-model="ownershipType" />
+
+      <!-- tags -->
+      <div class="mt-4">Tags</div>
+      <TagInput v-model="tags" />
 
       <IonButton class="mt-6 h-12" expand="block" type="submit" :disabled="!canSubmit" @click="onSubmit()">Add</IonButton>
     </div>

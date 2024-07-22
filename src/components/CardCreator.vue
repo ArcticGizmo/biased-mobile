@@ -1,6 +1,6 @@
 <template>
-  <!-- <div class="upload-pic">
-    <KImg :src="imageSrc" background height="50vh">
+  <div class="upload-pic" :class="{ 'image-error': imageSrcField.errorMessage.value }">
+    <KImg :src="imageSrcField.value.value" background height="50vh">
       <template #fallback>
         <p>Upload your PC!</p>
       </template>
@@ -20,79 +20,52 @@
       <IonButton fill="outline" @click="onGetFromUrl()">
         <IonIcon slot="icon-only" :icon="web" />
       </IonButton>
-      <IonButton fill="outline" :disabled="!imageSrc" @click="onEditImage()">
+      <IonButton fill="outline" :disabled="!imageSrcField.value.value" @click="onEditImage()">
         <IonIcon slot="icon-only" :icon="pencil" />
       </IonButton>
     </div>
-  </div> -->
+
+    <div v-if="imageSrcField.errorMessage.value" class="error-text pb-2">{{ imageSrcField.errorMessage.value }}</div>
+  </div>
 
   <!-- ======= who ======== -->
   <!-- artist -->
-  <IonFormInput name="artist" label="Artist" />
-  <!-- <IonInput
-    name="artist"
-    :value="artistField.value.value"
-    class="mt-4 ion-touched ion-invalid"
-    mode="md"
-    label="Artist*"
-    label-placement="stacked"
-    fill="outline"
-    inputmode="text"
-    :error-text="artistField.errorMessage.value"
-    @ion-change="artistField.handleChange"
-  /> -->
+  <IonFormInput class="mt-4" name="artist" label="Artist*" />
 
   <!-- is soloist selection -->
-  <!-- <ArtistTypeInput class="mt-4" v-model="artistType" /> -->
+  <ArtistTypeInput class="mt-4" v-model="artistTypeField.value.value" />
 
-  <VTransition :show="artistType === 'group'">
-    <!-- <IonInput class="mt-4" v-model="groupName" mode="md" label="Group Name*" label-placement="stacked" fill="outline" inputmode="text" /> -->
+  <VTransition :show="values.artistType === 'group'">
+    <IonFormInput class="mt-4" name="groupName" label="Group Name*" />
   </VTransition>
 
   <!-- ======= where from ======== -->
-  <!-- <WhereFromInput class="mt-4" v-model="whereFrom" /> -->
+  <WhereFromInput class="mt-4" v-model="whereFromField.value.value" />
 
-  <!-- album -->
-  <!-- <IonInput
-    class="mt-4"
-    v-model="whereFromName"
-    mode="md"
-    :label="whereFromNameLabel"
-    label-placement="stacked"
-    fill="outline"
-    inputmode="text"
-  /> -->
+  <!-- album/name -->
+  <IonFormInput class="mt-4" name="whereFromName" :label="whereFromNameLabel" />
 
   <!-- album version (optional) -->
-  <VTransition :show="whereFrom === 'album'">
-    <!-- <IonInput
-      class="mt-4"
-      v-model="albumVersion"
-      mode="md"
-      label="Album Version"
-      label-placement="stacked"
-      fill="outline"
-      inputmode="text"
-    /> -->
+  <VTransition :show="values.whereFrom === 'album'">
+    <IonFormInput class="mt-4" name="albumVersion" label="Album Version" />
   </VTransition>
 
   <!-- year -->
-  <!-- <PickerInput class="mt-4" v-model="year" :options="dateOptions" label="Released" label-placement="stacked" fill="outline" /> -->
+  <PickerFormInput class="mt-4" name="year" :options="dateOptions" label="Released" />
 
   <!-- Ownership -->
   <div class="mt-4">Ownership</div>
-  <!-- <OwnershipInput v-model="ownershipType" /> -->
+  <OwnershipInput v-model="ownershipTypeField.value.value" />
 
   <!-- tags -->
   <div class="mt-4">Tags</div>
-  <!-- <TagInput v-model="tags" /> -->
+  <TagInput v-model="tagsField.value.value" />
 
-  <IonButton class="mt-6 h-12" expand="block" type="submit" :disabled="!meta.valid" @click="onSubmit()">Add</IonButton>
+  <IonButton class="mt-6 h-12" expand="block" type="submit" @click="onSubmit()">Add</IonButton>
 </template>
 
 <script setup lang="ts">
-import { IonButton, IonIcon, IonInput, alertController, modalController, onIonViewDidEnter } from '@ionic/vue';
-import { useSimpleRouter } from '@/composables/router';
+import { IonButton, IonIcon, modalController, onIonViewDidEnter } from '@ionic/vue';
 import KImg from '@/components/KImg.vue';
 import OwnershipInput from '@/components/OwnershipInput.vue';
 import TagInput from '@/components/TagInput.vue';
@@ -102,21 +75,17 @@ import { KPhotoResponse, useImageImport } from '@/composables/imageImport';
 import { ref, watch, computed, onMounted } from 'vue';
 import { cameraOutline, imagesOutline } from 'ionicons/icons';
 import VTransition from '@/components/VTransition.vue';
-import PickerInput from '@/components/PickerInput.vue';
 import ImageEditorModal from '@/components/ImageEditorModal.vue';
-import type { ArtistType, WhereFrom, OwnershipType, KPopCard } from '@/types';
+import type { ArtistType, WhereFrom, OwnershipType } from '@/types';
 import type { TagId } from '@/types/tags';
-import { useKPopCards } from '@/composables/kPopCards';
-import { FileStore } from '@/composables/fileStore';
-import { Base64Uri } from '@/composables/base64';
+
 import { imageBroken, pencil, web } from '@/icons';
 import * as yup from 'yup';
 import { useForm, useField } from 'vee-validate';
 import IonFormInput from './form/IonFormInput.vue';
+import PickerFormInput from './form/PickerFormInput.vue';
 
 const { takePhoto, photoFromGallery, photoFromUrl } = useImageImport();
-const { addCard, generateId } = useKPopCards();
-const router = useSimpleRouter();
 
 const thisYear = new Date().getFullYear();
 
@@ -125,54 +94,58 @@ const dateOptions = Array.from({ length: 50 }, (_, i) => {
   return { text: value, value };
 });
 
+const originalImgSrc = ref('');
+
 const schema = yup.object({
-  // imageSrc: yup.string().required(),
-  artist: yup.string().required().min(4).max(10).label('Artist')
-  // artistType: yup.string<ArtistType>().required(),
+  imageSrc: yup.string().required('Image is required').label('Image'),
+  artist: yup.string().required().label('Artist'),
+  artistType: yup.string<ArtistType>().required().label('Artist Type'),
   // // do conditional typing here
-  // groupName: yup.string(),
-  // whereFrom: yup.string<WhereFrom>().required(),
-  // whereFromName: yup.string().required(),
-  // albumVersion: yup.string(),
-  // year: yup.string(),
-  // ownershipType: yup.string<OwnershipType>().required(),
-  // tags: yup.array<TagId[]>().required()
+  groupName: yup
+    .string()
+    .when('artistType', { is: 'group', then: s => s.required() })
+    .label('Group Name'),
+  whereFrom: yup.string<WhereFrom>().required().label('Where From'),
+  whereFromName: yup.string().required().label('Where From Name'),
+  albumVersion: yup.string().label('Album Version'),
+  year: yup.string().label('Released'),
+  ownershipType: yup.string<OwnershipType>().required().label('Ownership'),
+  tags: yup.array<TagId[]>().required().label('Tags')
 });
 
-type CreatorForm = yup.InferType<typeof schema>;
+export type CreatorForm = yup.InferType<typeof schema>;
+
+const props = defineProps<{ initial?: Partial<CreatorForm> }>();
+
+const emits = defineEmits<{
+  (e: 'submit', form: CreatorForm): void;
+}>();
 
 const defaultForm = (): Partial<CreatorForm> => {
-  // TODO: allow defaults from props
+  // take in initials and remove all undefineds
+  const initial: any = { ...(props.initial || {}) };
+  Object.keys(initial).forEach(key => initial[key] === undefined && delete initial[key]);
+
   return {
-    artist: 'egg'
-    // artistType: 'group',
-    // whereFrom: 'album',
-    // ownershipType: 'none',
-    // tags: []
+    artistType: 'group',
+    whereFrom: 'album',
+    year: dateOptions[0].value,
+    ownershipType: 'none',
+    tags: [],
+    ...initial
   };
 };
 
-const { values, handleSubmit, meta, resetForm } = useForm<CreatorForm>({
+const { values, handleSubmit, resetForm, setFieldValue } = useForm<CreatorForm>({
   validationSchema: schema,
-  // use field initial values might make this redundant
   initialValues: defaultForm()
 });
 
-const artistField = useField<string>('artist', undefined, { validateOnValueUpdate: true });
-
-const imageSrc = ref('');
-const originalImgSrc = ref('');
-const artist = ref('');
-const artistType = ref<ArtistType>('group');
-const groupName = ref('');
-
-const whereFrom = ref<WhereFrom>('album');
-const whereFromName = ref('');
-const albumVersion = ref('');
-
-const year = ref(`${thisYear}`);
-const ownershipType = ref<OwnershipType>('none');
-const tags = ref<TagId[]>([]);
+const imageSrcField = useField<string>('imageSrc');
+const artistTypeField = useField<ArtistType>('artistType');
+const whereFromField = useField<WhereFrom>('whereFrom');
+const ownershipTypeField = useField<OwnershipType>('ownershipType');
+const tagsField = useField<TagId[]>('tags');
 
 onIonViewDidEnter(() => {
   resetForm();
@@ -183,26 +156,22 @@ onMounted(() => {
 });
 
 const whereFromNameLabel = computed(() => {
-  return whereFrom.value === 'album' ? 'Album*' : 'Where From*';
+  return values.whereFrom === 'album' ? 'Album*' : 'Where From*';
 });
 
-const canSubmit = computed(() => {
-  if (artistType.value === 'group' && !groupName.value) {
-    return false;
+watch(
+  () => values.artistType,
+  type => {
+    if (type === 'solo') {
+      setFieldValue('groupName', '');
+    }
   }
-  return imageSrc.value && artist.value && whereFromName.value;
-});
-
-watch(artistType, type => {
-  if (type === 'solo') {
-    groupName.value = '';
-  }
-});
+);
 
 const setImage = async (resp: KPhotoResponse) => {
   if (resp.ok) {
-    imageSrc.value = resp.base64Uri.toString();
     originalImgSrc.value = resp.base64Uri.toString();
+    imageSrcField.setValue(originalImgSrc.value);
   }
 };
 
@@ -232,45 +201,13 @@ const onEditImage = async () => {
 
   const resp = await modal.onWillDismiss<string>();
   if (resp.role === 'accept') {
-    imageSrc.value = resp.data!;
+    imageSrcField.setValue(resp.data!);
   }
 };
 
-const onSubmit = handleSubmit(async () => {
-  // const scaledImage = await Base64Uri.fromUri(imageSrc.value).compress({ quality: 0.75, maxHeight: 1024, maxWidth: 1024 });
-  // const fileResult = await FileStore.saveImage(`photo-cards/${generateId()}.${scaledImage.type()}`, scaledImage.toString());
-  // if (!fileResult.ok) {
-  //   console.error('[create] could not save file to disk', fileResult.error);
-  //   return;
-  // }
-  // const data: KPopCard = {
-  //   id: generateId(),
-  //   imageFilePath: fileResult.path,
-  //   artist: artist.value,
-  //   artistType: artistType.value,
-  //   groupName: groupName.value,
-  //   whereFrom: whereFrom.value,
-  //   whereFromName: whereFromName.value,
-  //   albumVersion: albumVersion.value,
-  //   year: year.value,
-  //   ownershipType: ownershipType.value,
-  //   tags: tags.value
-  // };
-  // addCard(data);
-  // resetForm();
-  // const alert = await alertController.create({
-  //   header: 'Added!',
-  //   message: 'Do you still have more to add?',
-  //   buttons: [
-  //     { role: 'more', text: 'Add more' },
-  //     { role: 'done', text: 'Done' }
-  //   ]
-  // });
-  // alert.present();
-  // const resp = await alert.onWillDismiss<void>();
-  // if (resp.role === 'done') {
-  //   router.back({ fallback: '/home' });
-  // }
+const onSubmit = handleSubmit(formValues => {
+  emits('submit', formValues);
+  resetForm();
 });
 </script>
 
@@ -289,5 +226,19 @@ const onSubmit = handleSubmit(async () => {
 
 .pic-actions > * {
   width: 100%;
+}
+
+.error-text {
+  color: var(--ion-color-danger);
+  font-size: 0.75rem;
+  padding-left: 1rem;
+}
+
+.image-error {
+  border: 1px solid var(--ion-color-danger);
+}
+
+.image-error .k-img {
+  background-color: rgba(var(--ion-color-danger-rgb), 0.1);
 }
 </style>

@@ -3,6 +3,7 @@
     v-bind="attrs"
     :model-value="model"
     :label="label"
+    :name="name"
     :mode="fill ? 'md' : undefined"
     :fill="fill"
     :label-placement="labelPlacement"
@@ -18,6 +19,7 @@ import { useAttrs, ref } from 'vue';
 const model = defineModel<string | number>({ required: true });
 
 const props = defineProps<{
+  name?: string;
   options: PickerColumnOption[];
   label?: string;
   fill?: 'outline' | 'solid';

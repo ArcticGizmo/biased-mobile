@@ -1,7 +1,11 @@
 <template>
   <BasePage :title="card?.artist" max-width="500px" default-back-href="/">
     <div v-if="card" class="card-view p-4">
-      <IonIcon class="top-5 right-5 absolute" :icon="trash" size="large" color="danger" @click="onDelete()" />
+      <div class="absolute top-5 right-5 flex flex-col">
+        <IonIcon :icon="trash" size="large" color="danger" @click="onDelete()" />
+        <IonIcon class="mt-3" :icon="pencil" size="large" color="primary" @click="onEdit()" />
+      </div>
+
       <KImg :src="FileStore.toHref(card.imageFilePath)" :aspect-ratio="0.7" style="margin: auto" max-width="350px" />
       <OwnershipInput :model-value="card.ownershipType" @change="onOwnershipChange" />
       <!-- ======= who ======== -->
@@ -88,7 +92,7 @@ import { useKPopCards } from '@/composables/kPopCards';
 import { computed } from 'vue';
 import { OwnershipType } from '@/types';
 import { FileStore } from '@/composables/fileStore';
-import { trash } from '@/icons';
+import { trash, pencil } from '@/icons';
 import { showSimpleAlert } from '@/composables/modals';
 import { useToast } from '@/composables/toast';
 import { useSimpleRouter } from '@/composables/router';
@@ -108,6 +112,9 @@ const card = computed(() => cards.value.find(c => c.id === props.id));
 const whereFromNameLabel = computed(() => {
   return card.value?.whereFrom === 'album' ? 'Album' : 'Event';
 });
+
+const selectedTags = computed(() => getFilteredTags(card.value?.tags || []));
+
 
 const onOwnershipChange = (ownershipType: OwnershipType) => {
   updateCard(props.id, { ownershipType });
@@ -134,7 +141,11 @@ const onDelete = async () => {
   }
 };
 
-const selectedTags = computed(() => getFilteredTags(card.value?.tags || []));
+const onEdit = async () => {
+  
+}
+
+
 </script>
 
 <style scoped></style>

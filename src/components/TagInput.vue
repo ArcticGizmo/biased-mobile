@@ -8,7 +8,7 @@
       @click="onToggle(tag.id)"
     >
       <IonIcon v-if="tag.icon" :icon="tag.icon" :color="modelValue.includes(tag.id) ? 'primary' : 'medium'" />
-      <IonLabel>{{ tag.text }}</IonLabel>
+      <IonLabel class="text-center">{{ tag.text }}</IonLabel>
     </div>
   </div>
 </template>

@@ -61,7 +61,7 @@
   <div class="mt-4">Tags</div>
   <TagInput v-model="tagsField.value.value" />
 
-  <IonButton class="mt-6 h-12" expand="block" type="submit" @click="onSubmit()">Add</IonButton>
+  <IonButton class="mt-6 h-12" expand="block" type="submit" @click="onSubmit()">{{ submitText || 'Add' }}</IonButton>
 </template>
 
 <script setup lang="ts">
@@ -115,7 +115,7 @@ const schema = yup.object({
 
 export type CreatorForm = yup.InferType<typeof schema>;
 
-const props = defineProps<{ initial?: Partial<CreatorForm> }>();
+const props = defineProps<{ initial?: Partial<CreatorForm>; submitText?: string }>();
 
 const emits = defineEmits<{
   (e: 'submit', form: CreatorForm): void;

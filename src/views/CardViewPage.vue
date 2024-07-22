@@ -84,7 +84,7 @@
 </template>
 
 <script setup lang="ts">
-import { IonIcon, IonInput, IonChip } from '@ionic/vue';
+import { IonIcon, IonInput, IonChip, modalController } from '@ionic/vue';
 import KImg from '@/components/KImg.vue';
 import BasePage from './BasePage.vue';
 import OwnershipInput from '@/components/OwnershipInput.vue';
@@ -98,6 +98,7 @@ import { useToast } from '@/composables/toast';
 import { useSimpleRouter } from '@/composables/router';
 import { ENV } from '@/env';
 import { getFilteredTags } from '@/types/tags';
+import EditCardModal from '@/components/EditCardModal.vue';
 
 const props = defineProps<{
   id: string;
@@ -114,7 +115,6 @@ const whereFromNameLabel = computed(() => {
 });
 
 const selectedTags = computed(() => getFilteredTags(card.value?.tags || []));
-
 
 const onOwnershipChange = (ownershipType: OwnershipType) => {
   updateCard(props.id, { ownershipType });
@@ -142,10 +142,16 @@ const onDelete = async () => {
 };
 
 const onEdit = async () => {
-  
-}
+  const modal = await modalController.create({
+    component: EditCardModal,
+    componentProps: { card: card.value },
+    cssClass: 'modal-fullscreen'
+  });
 
+  modal.present();
 
+  await modal.onWillDismiss();
+};
 </script>
 
 <style scoped></style>

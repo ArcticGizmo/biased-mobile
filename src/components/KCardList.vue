@@ -86,18 +86,6 @@ const cardSubtitle = (card: KPopCard) => {
 </script>
 
 <style scoped>
-:deep(.cols-4 .ownership-icon) {
-  font-size: 2rem;
-}
-
-:deep(.cols-5 .ownership-icon) {
-  font-size: 2rem;
-}
-
-:deep(.cols-6 .ownership-icon) {
-  font-size: 3rem;
-}
-
 .k-card {
   transition: padding 0.1s ease-out;
 }

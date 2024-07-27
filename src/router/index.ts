@@ -3,8 +3,9 @@ import { RouteRecordRaw } from 'vue-router';
 import HomePage from '@/views/HomePage.vue';
 import TabsPage from '@/views/TabsPage.vue';
 import { ENV } from '@/env';
+import { wireUpRouteLifecycles } from '@/composables/lifecycle';
 
-const routes: Array<RouteRecordRaw> = [
+const routes: RouteRecordRaw[] = [
   {
     path: '/',
     component: TabsPage,
@@ -53,6 +54,8 @@ if (ENV.IS_DEV) {
     component: () => import('@/views/ExtractorPage.vue')
   });
 }
+
+wireUpRouteLifecycles(routes);
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),

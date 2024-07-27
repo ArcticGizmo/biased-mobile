@@ -65,19 +65,20 @@
 </template>
 
 <script setup lang="ts">
-import { IonButton, IonIcon, modalController, onIonViewDidEnter } from '@ionic/vue';
+import { IonButton, IonIcon, modalController } from '@ionic/vue';
 import KImg from '@/components/KImg.vue';
 import OwnershipInput from '@/components/OwnershipInput.vue';
 import TagInput from '@/components/TagInput.vue';
 import ArtistTypeInput from '@/components/ArtistTypeInput.vue';
 import WhereFromInput from '@/components/WhereFromInput.vue';
 import { KPhotoResponse, useImageImport } from '@/composables/imageImport';
-import { ref, watch, computed, onMounted } from 'vue';
+import { ref, watch, computed } from 'vue';
 import { cameraOutline, imagesOutline } from 'ionicons/icons';
 import VTransition from '@/components/VTransition.vue';
 import ImageEditorModal from '@/components/ImageEditorModal.vue';
 import type { ArtistType, WhereFrom, OwnershipType } from '@/types';
 import type { TagId } from '@/types/tags';
+import { onPageWillEnter } from '@/composables/lifecycle';
 
 import { imageBroken, pencil, web } from '@/icons';
 import * as yup from 'yup';
@@ -147,11 +148,7 @@ const whereFromField = useField<WhereFrom>('whereFrom');
 const ownershipTypeField = useField<OwnershipType>('ownershipType');
 const tagsField = useField<TagId[]>('tags');
 
-onIonViewDidEnter(() => {
-  resetForm();
-});
-
-onMounted(() => {
+onPageWillEnter(() => {
   resetForm();
 });
 

@@ -35,8 +35,6 @@ export const useImageCompare = () => {
 
     const resp = await compare(dataUrl, targets);
 
-    console.log('ranking', resp);
-
     return resp.filter(r => r.score > THRESHOLD).map(r => cards.find(c => c.id === r.id)!);
   };
 

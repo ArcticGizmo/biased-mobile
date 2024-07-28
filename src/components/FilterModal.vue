@@ -27,7 +27,7 @@
         </div>
       </div>
       <template v-for="section of filterSections" :key="section.name">
-        <div v-if="section.options.length" class="mb-5">
+        <div v-if="section.options.filter(x => !x.disabled).length" class="mb-5">
           <span class="p-0 pl-1 mb-1 text-xl">{{ section.name }}</span>
           <div class="options">
             <FilterItem
@@ -114,7 +114,10 @@ const sorter = ref<Sorter>('new-to-old');
 const filterSections = ref<FilterSection[]>([]);
 
 const createFilterSection = (name: string, key: string): FilterSection => {
-  const rawOptions = props.cards.map(c => (c as any)[key]).filter(c => c != null);
+  const rawOptions = props.cards
+    .map(c => (c as any)[key])
+    .flat()
+    .filter(c => c != null);
   const options = [...new Set(rawOptions)];
   options.sort((a, b) => a.localeCompare(b));
 
@@ -148,7 +151,7 @@ const onReset = (useInitial = false) => {
   const oldFilters = props.activeFilters || [];
 
   const sections: FilterSection[] = [
-    createFilterSection('Artist', 'artist'),
+    createFilterSection('Artist', 'artists'),
     createFilterSection('Group', 'groupName'),
     createFilterSection('Album', 'whereFromName'),
     createFilterSection('Year', 'year'),

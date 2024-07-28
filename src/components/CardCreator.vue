@@ -212,7 +212,7 @@ const onEditImage = async () => {
 };
 
 const onSubmit = handleSubmit(formValues => {
-  emits('submit', formValues);
+  emits('submit', { ...formValues, artists: formValues.artists.filter(a => a) });
   resetForm();
 });
 </script>

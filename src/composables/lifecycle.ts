@@ -31,7 +31,7 @@ This means that all lifecycle events for **everything** within a page can be tri
 hook and actually be intuitive
 */
 const useLifecycle = () => {
-  const page = inject<Ref<Page>>('page')!;
+  const page = inject<Ref<Page>>('page', () => ref(createPage('__modal')), true);
 
   const hooks: HookMap = {
     willEnter: [],

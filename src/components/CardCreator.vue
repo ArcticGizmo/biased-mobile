@@ -29,8 +29,8 @@
   </div>
 
   <!-- ======= who ======== -->
-  <!-- artist -->
-  <IonFormInput class="mt-4" name="artist" label="Artist*" />
+  <!-- artists -->
+  <IonArrayFormInput class="mt-4" name="artists" :label="values.artists.length === 1 ? 'Artist*' : 'Artists*'" />
 
   <!-- is soloist selection -->
   <ArtistTypeInput class="mt-4" v-model="artistTypeField.value.value" />
@@ -85,6 +85,7 @@ import * as yup from 'yup';
 import { useForm, useField } from 'vee-validate';
 import IonFormInput from './form/IonFormInput.vue';
 import PickerFormInput from './form/PickerFormInput.vue';
+import IonArrayFormInput from '@/components/form/IonArrayFormInput.vue';
 
 const { takePhoto, photoFromGallery, photoFromUrl } = useImageImport();
 
@@ -99,7 +100,15 @@ const originalImgSrc = ref('');
 
 const schema = yup.object({
   imageSrc: yup.string().required('Image is required').label('Image'),
-  artists: yup.array().of(yup.string().required()).label('Artists').required().min(1),
+  artists: yup
+    .array<string[]>()
+    .compact(v => !v || !v.trim())
+    .required()
+    .min(1, v => {
+      if (v.originalValue.length === 1) return 'Artist is required';
+      return 'At least 1 entry must be filled';
+    })
+    .label('Artists'),
   artistType: yup.string<ArtistType>().required().label('Artist Type'),
   groupName: yup
     .string()
@@ -127,6 +136,7 @@ const defaultForm = (): Partial<CreatorForm> => {
   Object.keys(initial).forEach(key => initial[key] === undefined && delete initial[key]);
 
   return {
+    artists: [],
     artistType: 'group',
     whereFrom: 'album',
     year: dateOptions[0].value,
@@ -148,7 +158,7 @@ const ownershipTypeField = useField<OwnershipType>('ownershipType');
 const tagsField = useField<TagId[]>('tags');
 
 onPageWillEnter(() => {
-  resetForm();
+  resetForm({ values: defaultForm() });
 });
 
 const whereFromNameLabel = computed(() => {

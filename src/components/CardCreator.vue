@@ -99,9 +99,8 @@ const originalImgSrc = ref('');
 
 const schema = yup.object({
   imageSrc: yup.string().required('Image is required').label('Image'),
-  artist: yup.string().required().label('Artist'),
+  artists: yup.array().of(yup.string().required()).label('Artists').required().min(1),
   artistType: yup.string<ArtistType>().required().label('Artist Type'),
-  // // do conditional typing here
   groupName: yup
     .string()
     .when('artistType', { is: 'group', then: s => s.required() })

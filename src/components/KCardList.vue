@@ -27,7 +27,7 @@
         <KCard
           :class="{ selected: selected?.includes(card.id) }"
           :key="index"
-          :title="card.artist"
+          :title="card.artists.join(', ')"
           :subtitle="cardSubtitle(card)"
           :src="FileStore.toHref(card.imageFilePath)"
           :status="card.ownershipType"

@@ -1,5 +1,5 @@
 <template>
-  <BasePage :title="card?.artist" max-width="500px" default-back-href="/">
+  <BasePage :title="card?.artists[0]" max-width="500px" default-back-href="/">
     <div v-if="card" class="card-view p-4">
       <div class="absolute top-5 right-5 flex flex-col">
         <IonIcon :icon="trash" size="large" color="danger" @click="onDelete()" />

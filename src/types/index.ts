@@ -12,7 +12,7 @@ export type OwnershipType = 'have' | 'want' | 'in-transit' | 'none';
 
 export interface KPopData {
   packId?: string;
-  artist: string;
+  artists: string[];
   artistType: ArtistType;
   groupName?: string;
   //

@@ -33,7 +33,7 @@ const buildBackup = async (cards: KPopCard[]): Promise<BackupV1> => {
       id: card.id,
       packId: card.packId,
       imageSrc: loadResult.data || '',
-      artist: card.artist,
+      artists: card.artists,
       artistType: card.artistType,
       groupName: card.groupName,
       whereFrom: card.whereFrom,

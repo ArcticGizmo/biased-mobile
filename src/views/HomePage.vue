@@ -123,7 +123,8 @@ const getCardSummary = (cards: KPopCard[]): CardSummary => {
 };
 
 const artistItems = computed<ItemGroup[]>(() => {
-  const artists = groupBy(cards.value, c => c.artist);
+  // TODO: I don't think this will work
+  const artists = groupBy(cards.value, c => c.artists);
 
   return Object.entries(artists).map(([artist, cards]) => {
     return {
@@ -227,10 +228,10 @@ const onItemGroupLongSelect = async (item: ItemGroup) => {
         await deletePack(pack);
       }
     }, 'Deleting group');
-  } else {
+  } else if (item.type === 'artist') {
     executeWithLoading(async () => {
-      const artist = item.value.toUpperCase();
-      const cardsToDelete = cards.value.filter(c => c.artist?.toUpperCase() === artist);
+      const artistUp = item.value.toUpperCase();
+      const cardsToDelete = cards.value.filter(c => c.artists.some(a => a.toUpperCase() === artistUp));
       const packs = [...new Set(cardsToDelete.map(c => c.packId))].filter(c => !!c) as string[];
 
       await deleteCards(cardsToDelete.map(c => c.id));

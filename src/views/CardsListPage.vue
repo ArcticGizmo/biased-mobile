@@ -245,7 +245,7 @@ const onMultiSelectAction = async () => {
 const getBestCollageName = (ids: string[]) => {
   const matchingCards = cards.value.filter(c => ids.includes(c.id));
 
-  const artistNames = [...new Set(matchingCards.map(c => c.artist))];
+  const artistNames = [...new Set(matchingCards.map(c => c.artists).flat())];
   if (artistNames.length === 1) {
     return artistNames[0];
   }
@@ -382,10 +382,14 @@ const deleteSelectedCards = async (ids: string[]) => {
 
 const initialCardFilter = computed(() => {
   let filteredCards = [...cards.value];
-  if (group.value) filteredCards = filteredCards.filter(c => (c.groupName || '').toUpperCase() === group.value!.toUpperCase());
-  if (artist.value) filteredCards = filteredCards.filter(c => c.artist.toUpperCase() === artist.value!.toUpperCase());
 
-  return sortBy(filteredCards, [{ key: 'year', desc: true }, { key: 'whereFromName' }, { key: 'artist' }]);
+  const groupUp = group.value?.toUpperCase();
+  if (groupUp) filteredCards = filteredCards.filter(c => (c.groupName || '').toUpperCase() === groupUp);
+
+  const artistUp = artist.value?.toUpperCase();
+  if (artistUp) filteredCards = filteredCards.filter(c => c.artists.some(a => a.toUpperCase() === artistUp));
+
+  return sortBy(filteredCards, [{ key: 'year', desc: true }, { key: 'whereFromName' }, { key: 'artists' }]);
 });
 
 const applyBasicFilter = (cards: KPopCard[]) => {
@@ -422,11 +426,11 @@ const applyAdvancedFilter = (cards: KPopCard[], filters: Filter[]) => {
 const applyBasicSort = (cards: KPopCard[], sorter: Sorter) => {
   switch (sorter) {
     case 'a-to-z':
-      cards.sort((a, b) => a.artist.localeCompare(b.artist));
+      cards.sort((a, b) => a.artists[0].localeCompare(b.artists[0]));
       break;
 
     case 'z-to-a':
-      cards.sort((a, b) => b.artist.localeCompare(a.artist));
+      cards.sort((a, b) => b.artists[0].localeCompare(a.artists[0]));
       break;
 
     case 'old-to-new':
@@ -443,7 +447,7 @@ const filteredCards = computed(() => {
   let cards = applyBasicFilter(initialCardFilter.value);
   cards = applyAdvancedFilter(cards, activeFilters.value);
   applyBasicSort(cards, activeSorter.value);
-  return multiSort(cards, ['artist', 'whereFromName', 'albumVersion', 'year'], search.value);
+  return multiSort(cards, ['artists', 'whereFromName', 'albumVersion', 'year'], search.value);
 });
 
 const enterAnimation = (baseEl: HTMLElement) => {

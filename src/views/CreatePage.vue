@@ -29,7 +29,7 @@ const onSubmit = async (formValues: CreatorForm) => {
   const data: KPopCard = {
     id: generateId(),
     imageFilePath: fileResult.path,
-    artist: formValues.artist,
+    artists: formValues.artists,
     artistType: formValues.artistType,
     groupName: formValues.groupName,
     whereFrom: formValues.whereFrom,

@@ -26,7 +26,7 @@
           <IonButton expand="block" fill="outline" @click="onGetFromGallery()"> Get Image </IonButton>
           <!-- ======= who ======== -->
           <!-- artist -->
-          <IonInput class="mt-4" v-model="artist" mode="md" label="Artist*" label-placement="stacked" fill="outline" inputmode="text" />
+          <!-- <IonInput class="mt-4" v-model="artist" mode="md" label="Artist*" label-placement="stacked" fill="outline" inputmode="text" /> -->
 
           <!-- is soloist selection -->
           <ArtistTypeInput class="mt-4" v-model="artistType" />
@@ -164,7 +164,7 @@ const dateOptions = Array.from({ length: 50 }, (_, i) => {
 });
 
 const imageSrc = ref('');
-const artist = ref('');
+const artists = ref<string[]>([]);
 const artistType = ref<ArtistType>('group');
 const groupName = ref('');
 
@@ -180,7 +180,7 @@ const { showToast } = useToast();
 
 const resetForm = () => {
   imageSrc.value = '';
-  artist.value = '';
+  artists.value = [];
   artistType.value = 'group';
   groupName.value = '';
   whereFrom.value = 'album';
@@ -209,7 +209,7 @@ const canSubmit = computed(() => {
   if (artistType.value === 'group' && !groupName.value) {
     return false;
   }
-  return imageSrc.value && artist.value && whereFromName.value;
+  return imageSrc.value && artists.value.length && whereFromName.value;
 });
 
 watch(artistType, type => {
@@ -297,7 +297,7 @@ const onSubmit = async () => {
 
   const filteredCards = cards.value.filter(c => {
     return (
-      insensitiveCompare(c.artist, artist.value) &&
+      c.artists.some(a => artists.value.some(b => insensitiveCompare(a, b))) &&
       insensitiveCompare(c.groupName, groupName.value) &&
       insensitiveCompare(c.whereFromName, whereFromName.value)
     );
@@ -358,7 +358,7 @@ const createNewCard = async (scaledImage: Base64Uri) => {
   const data: KPopCard = {
     id,
     imageFilePath: fileResult.path,
-    artist: artist.value,
+    artists: artists.value,
     artistType: artistType.value,
     groupName: groupName.value,
     whereFrom: whereFrom.value,

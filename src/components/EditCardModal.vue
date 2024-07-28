@@ -29,7 +29,7 @@ const inital = computed<CreatorForm>(() => {
   const c = props.card;
   return {
     imageSrc: FileStore.toHref(c.imageFilePath),
-    artist: c.artist,
+    artists: c.artists,
     artistType: c.artistType,
     groupName: c.groupName,
     whereFrom: c.whereFrom,
@@ -64,7 +64,7 @@ const onSubmit = async (values: CreatorForm) => {
   updateCard(props.card.id, {
     packId: undefined,
     imageFilePath,
-    artist: values.artist,
+    artists: values.artists,
     artistType: values.artistType,
     groupName: values.groupName,
     whereFrom: values.whereFrom,

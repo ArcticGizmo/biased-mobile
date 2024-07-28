@@ -69,7 +69,12 @@ export const createImages = async (cards: KPopCard[], opts?: CreateImageOptions)
 const createCardGroups = (cards: KPopCard[]): CardGroup[] => {
   // sort by year
   const sortedCards = [...cards];
-  sortedCards.sort(firstBy('year').thenBy('whereFromName').thenBy('albumVersion').thenBy('artist'));
+  sortedCards.sort(
+    firstBy('year')
+      .thenBy('whereFromName')
+      .thenBy('albumVersion')
+      .thenBy(x => x.artists[0])
+  );
 
   // get albums
   const albums = [...new Set(sortedCards.map(c => c.whereFromName))];

@@ -117,7 +117,7 @@ export const useKPopCards = () => {
         id,
         packId,
         imageFilePath: fileResult.path,
-        artist: item.artist,
+        artists: item.artists,
         artistType: item.artistType,
         groupName: item.groupName,
         whereFrom: item.whereFrom,

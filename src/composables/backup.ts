@@ -31,9 +31,8 @@ const buildBackup = async (cards: KPopCard[]): Promise<BackupV1> => {
 
     packedCards.push({
       id: card.id,
-      packId: card.packId,
       imageSrc: loadResult.data || '',
-      artists: card.artists,
+      artists: card.artists || [],
       artistType: card.artistType,
       groupName: card.groupName,
       whereFrom: card.whereFrom,
@@ -41,7 +40,7 @@ const buildBackup = async (cards: KPopCard[]): Promise<BackupV1> => {
       albumVersion: card.albumVersion,
       year: card.year,
       ownershipType: card.ownershipType,
-      tags: card.tags
+      tags: card.tags || []
     });
   }
 

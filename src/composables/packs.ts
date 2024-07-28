@@ -14,10 +14,14 @@ export interface AvailablePack {
   url: string;
 }
 
-export type PackHistory = Record<string, number>;
+export interface PackHistory {
+  id: string;
+  timestamp: number;
+  cardIds: string[];
+}
 
 const LOOKUP_ID = ENV.driveId;
-const HISTORY_KEY = 'history';
+const HISTORY_KEY = 'pack-histories';
 
 const makeWretch = (base: string) => {
   const url = ENV.isMobile ? base : '/proxy/' + base;
@@ -56,33 +60,34 @@ export const usePacksQuery = () => {
   });
 };
 
-const packHistory = ref<PackHistory>({});
+const packHistories = ref<PackHistory[]>([]);
 
 const cacheHistory = async () => {
-  KvStore.saveJson(HISTORY_KEY, packHistory.value);
+  KvStore.saveJson(HISTORY_KEY, packHistories.value);
 };
 
 const loadSaved = async () => {
-  packHistory.value = (await KvStore.loadJson<PackHistory>(HISTORY_KEY)) || {};
+  packHistories.value = (await KvStore.loadJson<PackHistory[]>(HISTORY_KEY)) || [];
 };
 
 loadSaved();
 
 export const usePackHistory = () => {
-  const addPack = async (packId: string, timestamp: number) => {
-    packHistory.value[packId] = timestamp;
+  const addPack = async (packId: string, timestamp: number, cardIds: string[]) => {
+    deletePack(packId);
+    packHistories.value.push({ id: packId, timestamp, cardIds });
     await cacheHistory();
   };
 
   const deletePack = async (packId: string) => {
-    delete packHistory.value[packId];
+    packHistories.value = packHistories.value.filter(p => p.id !== packId);
     await cacheHistory();
   };
 
   const deleteAllPacks = async () => {
-    packHistory.value = {};
+    packHistories.value = [];
     await cacheHistory();
   };
 
-  return { packHistory: readonly(packHistory) as ComputedRef<PackHistory>, addPack, deletePack, deleteAllPacks };
+  return { packHistories: readonly(packHistories) as ComputedRef<PackHistory[]>, addPack, deletePack, deleteAllPacks };
 };

@@ -84,7 +84,7 @@ export const useKPopCards = () => {
     cards.value = [...cards.value];
   };
 
-  const importBackup = async (backup: Backup, packId?: string) => {
+  const importBackup = async (backup: Backup) => {
     const items = backupToPackedCards(backup);
     const newCards: KPopCard[] = [];
 
@@ -115,9 +115,8 @@ export const useKPopCards = () => {
 
       const card: KPopCard = {
         id,
-        packId,
         imageFilePath: fileResult.path,
-        artists: item.artists,
+        artists: item.artists || [(item as any).artist].filter(c => c),
         artistType: item.artistType,
         groupName: item.groupName,
         whereFrom: item.whereFrom,

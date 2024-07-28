@@ -11,7 +11,6 @@ export type WhereFrom = 'album' | 'non-album';
 export type OwnershipType = 'have' | 'want' | 'in-transit' | 'none';
 
 export interface KPopData {
-  packId?: string;
   artists: string[];
   artistType: ArtistType;
   groupName?: string;
@@ -32,6 +31,6 @@ export interface KPopCard extends KPopData {
 }
 
 export interface KPopCardPackable extends KPopData {
-  id?: string;
+  id: string;
   imageSrc: string;
 }

@@ -80,8 +80,8 @@ const PACK_SORT_ORDER: Record<PackStatus, number> = {
 const { showToast } = useToast();
 
 const packsQuery = usePacksQuery();
-const { packHistory, addPack, deletePack } = usePackHistory();
-const { cards, deleteCards, importBackup } = useKPopCards();
+const { packHistories, addPack, deletePack } = usePackHistory();
+const { deleteCards, importBackup } = useKPopCards();
 
 const packs = computed(() => packsQuery.data.value || []);
 
@@ -115,7 +115,7 @@ const search = ref('');
 const sorter = ref<PackSorter>('status');
 
 const getPackStatus = (pack: AvailablePack): PackStatus => {
-  const timeOnDisk = packHistory.value[pack.packId];
+  const timeOnDisk = packHistories.value.find(p => p.id === pack.packId)?.timestamp;
 
   if (!timeOnDisk) {
     return 'not-downloaded';
@@ -189,7 +189,7 @@ const onDownloadPack = async (pack: AvailablePack) => {
     return;
   }
 
-  const backupResp = await executeWithLoading(async () => await withDelay(importBackup(packResp.result, pack.packId), 2000), 'Importing');
+  const backupResp = await executeWithLoading(async () => await withDelay(importBackup(packResp.result), 2000), 'Importing');
 
   if (!backupResp.ok) {
     console.error(backupResp.error);
@@ -197,7 +197,11 @@ const onDownloadPack = async (pack: AvailablePack) => {
     return;
   }
 
-  addPack(pack.packId, pack.updatedAt);
+  addPack(
+    pack.packId,
+    pack.updatedAt,
+    packResp.result.cards.map(c => c.id)
+  );
 
   const { imported, skipped } = backupResp.result;
 
@@ -231,10 +235,17 @@ const onDeletePack = async (pack: AvailablePack) => {
     return;
   }
 
-  const cardIdsToDelete = cards.value.filter(c => c.packId === pack.packId).map(c => c.id);
+  const otherHistories = packHistories.value.filter(p => p.id !== pack.packId);
+  const existingHistory = packHistories.value.find(p => p.id === pack.packId);
+  const existingCardIds = existingHistory?.cardIds || [];
+
+  // check all card ids not already present in a different pack
+  const cardIdsNotInOtherPacks = existingCardIds.filter(id => {
+    return !otherHistories.some(h => h.cardIds.includes(id));
+  });
 
   const deleteResp = await executeWithLoading(async () => {
-    await deleteCards(cardIdsToDelete);
+    await deleteCards(cardIdsNotInOtherPacks);
     await deletePack(pack.packId);
   }, 'Deleting');
 

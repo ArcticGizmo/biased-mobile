@@ -62,7 +62,6 @@ const onSubmit = async (values: CreatorForm) => {
   }
 
   updateCard(props.card.id, {
-    packId: undefined,
     imageFilePath,
     artists: values.artists,
     artistType: values.artistType,
